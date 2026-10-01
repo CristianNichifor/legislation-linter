@@ -311,7 +311,7 @@ def test_http_route_stores_workflow_only_for_local_origin(dossier_db):
     code, data = http_request(state, "POST", "/api/dosare/ai-workflow", execute_request())
     assert code == 200
     assert data["contract"] == "ai-draft-storage-audit-v1"
-    assert data["audit_json" if False else "server_calls_model"] is False
+    assert data["server_calls_model"] is False
 
 
 def test_http_byok_routes_are_local_only_and_secret_free(dossier_db):

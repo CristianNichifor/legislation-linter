@@ -1128,20 +1128,20 @@ def _matrix_workspace_summary(
         },
     ]
     status = "work_ready" if ready_rows or private.get("notes_total") else "needs_sources"
-    private_path = None
-    tracker_path = None
     try:
         from scripts import dosare
 
         private_path = dosare.cale(stare)
     except ValueError:
-        pass
+        # Public mode has no private dossier store; do not invent a local path.
+        private_path = None
     try:
         from scripts import tracker_events
 
         tracker_path = tracker_events.cale(stare)
     except ValueError:
-        pass
+        # Public mode has no private tracker store.
+        tracker_path = None
     payload = matrice.build_workspace(
         rows=rows,
         summary=rezumat,
@@ -2685,20 +2685,20 @@ def _drilldown_dosar_matrice(stare: Stare, dosar: dict, proiecte: dict) -> dict:
         and (ready_checks["exact_provisions"] or ready_checks["source_snapshots"])
         else "needs_evidence"
     )
-    private_path = None
-    tracker_path = None
     try:
         from scripts import dosare
 
         private_path = dosare.cale(stare)
     except ValueError:
-        pass
+        # Public mode has no private dossier store; do not invent a local path.
+        private_path = None
     try:
         from scripts import tracker_events
 
         tracker_path = tracker_events.cale(stare)
     except ValueError:
-        pass
+        # Public mode has no private tracker store.
+        tracker_path = None
     workspace_payload = matrice.build_workspace(
         rows=[rand] if rand else [],
         summary={},
@@ -3330,7 +3330,6 @@ def construieste_vid(corpus_db: str, graf_db: str, limita: int | None = None) ->
     vouch that any instrument type was gathered exhaustively, so every finding is `blocking` and
     says on its face it cannot tell a legislative gap from a gap in the collection. That is the
     honest default until a finished collection earns a stronger claim (see `vid_corpus.py`)."""
-    import re
 
     from scripts.vid_corpus import raport_vid
 
@@ -3545,7 +3544,6 @@ def construieste_considerente(corpus_db: str, *, fereastra: int = 2400) -> dict[
     first N characters of a decision are reliably the least useful N characters in it. The window
     is cut around the Court's own statement of violation, which `temeiuri.py` already located.
     """
-    import sqlite3
 
     from scripts.temeiuri import considerente as taie_considerente
     from scripts.temeiuri import temeiuri as citeste_temeiuri
@@ -3602,7 +3600,6 @@ def construieste_norme_lovite(corpus_db: str) -> list[dict]:
     rather than four — otherwise a draft matching it reports four identical findings, and the norm
     becomes its own nearest neighbour in any calibration run over this set.
     """
-    import sqlite3
 
     from scripts.lovituri import extrage
     from scripts.prevedere import Prevedere, textul, versiuni
@@ -3777,7 +3774,6 @@ def construieste_neconstitutional(
     a dial an operator turns by declaring what they actually finished collecting, not a default
     that flatters the data.
     """
-    import sqlite3
 
     from scripts.neconstitutional import din_baze, registru
     from scripts.prevedere import Prevedere, textul, versiuni
@@ -4247,7 +4243,6 @@ def _prevedere(qs: dict, stare: Stare) -> dict:
             from scripts import provision_identity
 
             identity = provision_identity.resolve(con, act_id, locator).to_dict()
-            locator = identity["locator"]
         except ValueError as exc:
             return {
                 "gasit": False,

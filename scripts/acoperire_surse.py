@@ -30,10 +30,14 @@ OPTIONAL_CONTROL_FAMILIES = (
     "monitorul_oficial_other_parts",
 )
 CAPABILITY_LIMITATIONS = [
-    "O ancoră oficială verificată dovedește că entrypointul răspunde, nu că există documente "
-    "ingerate local.",
-    "Familiile cu metadate manuale sunt acoperite doar cât a introdus un operator; nu au "
-    "prospețime automată.",
+    (
+        "O ancoră oficială verificată dovedește că entrypointul răspunde, nu că există documente "
+        + "ingerate local."
+    ),
+    (
+        "Familiile cu metadate manuale sunt acoperite doar cât a introdus un operator; nu au "
+        + "prospețime automată."
+    ),
 ]
 ANCHOR_ONLY_PIPELINES = {
     "legislatie_ro": "scripts.colector (API SOAP legislatie.just.ro)",

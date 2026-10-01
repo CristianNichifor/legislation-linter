@@ -1269,7 +1269,8 @@ def serveste(
         from scripts.local_runtime import DEFAULT_CHANNEL, open_runtime
 
         with open_runtime(data_home, data_channel or DEFAULT_CHANNEL) as runtime:
-            return _serveste_local(port, runtime, deschide_browser)
+            _serveste_local(port, runtime, deschide_browser)
+            return
     stare = Stare(corpus, initiative, graf, eu)
     server = ThreadingHTTPServer(("127.0.0.1", port), face_handler(stare))
     grafic = "cu graf" if stare.are_graf() else "fără graf"

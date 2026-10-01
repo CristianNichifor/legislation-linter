@@ -48,6 +48,20 @@ from scripts.lovituri import ZILE_SUSPENDARE as ZILE_SUSPENDARE
 from scripts.lovituri import Lovitura as Lovitura
 from scripts.rang_normativ import poate_modifica
 
+# Keep the public API explicit when implementations live in lower-level modules.
+__all__ = [
+    "ZILE_SUSPENDARE",
+    "FELURI_REPARATOARE",
+    "Lovitura",
+    "Muchie",
+    "Nereparat",
+    "registru",
+    "sumar",
+    "raport",
+    "din_baze",
+    "main",
+]
+
 # Edges that can put a struck text right. A `refera` cannot: pointing at a provision is not
 # changing it, and 12 310 of the 14 345 edges in this graph are references.
 FELURI_REPARATOARE: Final[frozenset[str]] = frozenset(

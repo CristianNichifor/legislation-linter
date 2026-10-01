@@ -38,6 +38,9 @@ from scripts.parsare_publicare import FEREASTRA as FEREASTRA
 from scripts.parsare_publicare import Publicare as Publicare
 from scripts.parsare_publicare import publicare as publicare
 
+# Keep the public API explicit when implementations live in lower-level modules.
+__all__ = ["FEREASTRA", "Publicare", "publicare", "reciteste"]
+
 
 def reciteste(cale_db: str = "corpus.db", *, lot: int = 5000, log=print) -> dict[str, int]:
     """Fill `publicat` / `monitor` for a corpus collected before this module existed.

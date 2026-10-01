@@ -39,6 +39,9 @@ from scripts.identitate_act import candidati as candidati
 from scripts.identitate_act import id_unic as id_unic
 from scripts.identitate_act import rezolva as rezolva
 
+# Keep the public API explicit when implementations live in lower-level modules.
+__all__ = ["EMITENT_CANONIC", "candidati", "id_unic", "rezolva", "recupereaza", "main"]
+
 
 def recupereaza(cale_db, *, limita: int | None = None, log=print) -> dict:
     """Give an act row back to every document that lost one to a namesake.

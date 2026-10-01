@@ -39,10 +39,10 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from pathlib import Path
 
-from scripts import omonime
 from scripts.api import Inregistrare
+from scripts.identitate_act import id_unic
 from scripts.parsare import ActParsat
-from scripts.publicare import publicare
+from scripts.parsare_publicare import publicare
 from scripts.referinte import Act
 from scripts.text import fara_separatoare
 
@@ -706,7 +706,7 @@ def scrie_act(con: sqlite3.Connection, parsat: ActParsat) -> Randament:
     # Not `act.id`: that is the *citation* key and several acts can answer to it. Eighteen
     # different acts are `Hotărâre nr. 1 din 2016`, and deleting by the citation before inserting
     # is what removed seventeen of them, their provisions with them.
-    act_id = omonime.id_unic(
+    act_id = id_unic(
         con,
         cheie_citare=act.id,
         tip=act.tip,
@@ -1127,7 +1127,7 @@ def scrie_inregistrare(con: sqlite3.Connection, rec: Inregistrare, act: Act) -> 
         ),
     )
     # Not `act.id` — see `scrie_act`. The citation key is shared; the act row is not.
-    act_id = omonime.id_unic(
+    act_id = id_unic(
         con,
         cheie_citare=act.id,
         tip=act.tip,

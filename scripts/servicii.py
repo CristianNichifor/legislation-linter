@@ -1128,20 +1128,20 @@ def _matrix_workspace_summary(
         },
     ]
     status = "work_ready" if ready_rows or private.get("notes_total") else "needs_sources"
-    private_path = None
-    tracker_path = None
     try:
         from scripts import dosare
 
         private_path = dosare.cale(stare)
     except ValueError:
-        pass
+        # Public mode has no private dossier store; do not invent a local path.
+        private_path = None
     try:
         from scripts import tracker_events
 
         tracker_path = tracker_events.cale(stare)
     except ValueError:
-        pass
+        # Public mode has no private tracker store.
+        tracker_path = None
     payload = matrice.build_workspace(
         rows=rows,
         summary=rezumat,
@@ -2685,20 +2685,20 @@ def _drilldown_dosar_matrice(stare: Stare, dosar: dict, proiecte: dict) -> dict:
         and (ready_checks["exact_provisions"] or ready_checks["source_snapshots"])
         else "needs_evidence"
     )
-    private_path = None
-    tracker_path = None
     try:
         from scripts import dosare
 
         private_path = dosare.cale(stare)
     except ValueError:
-        pass
+        # Public mode has no private dossier store; do not invent a local path.
+        private_path = None
     try:
         from scripts import tracker_events
 
         tracker_path = tracker_events.cale(stare)
     except ValueError:
-        pass
+        # Public mode has no private tracker store.
+        tracker_path = None
     workspace_payload = matrice.build_workspace(
         rows=[rand] if rand else [],
         summary={},

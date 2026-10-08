@@ -33,7 +33,7 @@ from scripts.text import cheie, normalizeaza
 SPARQL_ENDPOINT = "https://publications.europa.eu/webapi/rdf/sparql"
 CELEX_URI = "http://publications.europa.eu/resource/celex/{celex}"
 USER_AGENT = (
-    "legislativ-linter/0.1 (+https://github.com/CristianNichifor/legislativ; "
+    "legislativ-linter/0.1 (+https://github.com/CristianNichifor/legislation-linter; "
     "contact: cristian@cnwebify.com)"
 )
 

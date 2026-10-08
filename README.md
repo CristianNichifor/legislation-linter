@@ -1,4 +1,4 @@
-# legislativ
+# legislation-linter
 
 A linter for Romanian legislation. Paste a draft act and it reports **what it touches**, **what
 deadlines it creates**, **what terminology it drifts from**, and **which bills already in Parliament
@@ -42,7 +42,7 @@ uv sync --all-groups
 You need the corpus once. Download it, if a release exists:
 
 ```bash
-scripts/ia_corpus.sh https://github.com/CristianNichifor/legislativ/releases/download/<versiune>
+scripts/ia_corpus.sh https://github.com/CristianNichifor/legislation-linter/releases/download/<versiune>
 ```
 
 …or build it locally (a few hours, once, resumable):

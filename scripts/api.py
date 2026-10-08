@@ -54,7 +54,7 @@ ENDPOINT = "https://legislatie.just.ro/apiws/FreeWebService.svc/SOAP"
 NS_TEMPURI = "http://tempuri.org/"
 NS_DATA = "http://schemas.datacontract.org/2004/07/FreeWebService"
 USER_AGENT = (
-    "legislativ-linter/0.1 (+https://github.com/CristianNichifor/legislativ; "
+    "legislativ-linter/0.1 (+https://github.com/CristianNichifor/legislation-linter; "
     "contact: cristian@cnwebify.com)"
 )
 

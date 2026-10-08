@@ -1,4 +1,4 @@
-// legislativ-rescrieri — the plain-language rewrite service, hardened against abuse.
+// legislation-linter-rewrite — the plain-language rewrite service, hardened against abuse.
 //
 // It restates one provision of PUBLIC law in plain language (Danish style, docs/STIL_DANEZ.md) and
 // caches the result so each provision is rewritten once, ever. The app's own draft never touches
@@ -17,8 +17,10 @@
 //     Gateway (env.AIG_ID), which adds free caching + analytics; if the gateway does not exist yet
 //     the call falls back to Workers AI directly, so it works before the gateway is created.
 //
-// GET  /rescrie?act=<id>&loc=<locator>       → cached rewrite, or 404 if not generated yet
-// POST /rescrie {act, loc, text}             → cached rewrite, or generate + cache
+// GET  /legislation-linter/api/rewrite?act=<id>&loc=<locator> → cached rewrite, or 404 if not generated
+// POST /legislation-linter/api/rewrite {act, loc, text}       → cached rewrite, or generate + cache
+// The route is same-origin with the app on projects.cristian-nichifor.com; any path ending in
+// /api/rewrite is served, so a self-hosted copy works on its own host too.
 
 const MAX_CHARS = 4000; // a single provision; longer inputs are abuse, not law
 // client may pick the drafting norm; each maps to a system prompt and a cache-key namespace
@@ -121,7 +123,7 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { headers: cors });
 
     const url = new URL(request.url);
-    if (!url.pathname.endsWith("/rescrie")) return json({ error: "not found" }, cors, 404);
+    if (!url.pathname.endsWith("/api/rewrite")) return json({ error: "not found" }, cors, 404);
     if (!originPermis(request, env)) return json({ error: "origine nepermisă" }, cors, 403);
 
     if (env.RL) {

@@ -17,7 +17,7 @@ from pathlib import Path
 from scripts import dataset_release, release_smoke
 
 CONTRACT = "public-local-acceptance-v1"
-TRUSTED_ORIGIN = "https://date.cristian-nichifor.com"
+TRUSTED_ORIGIN = "https://data.cristian-nichifor.com"
 
 
 @dataclass(frozen=True)

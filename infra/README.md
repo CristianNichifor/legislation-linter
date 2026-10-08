@@ -18,14 +18,15 @@ allocation, so light use can cost **nothing**.
 |---|---|---|---|
 | **Workers** | 100k req/day free | the rewrite service (`worker/src/index.js`) | **deployed** |
 | **Workers AI** (`env.AI`) | free daily Neuron allocation | runs the rewrite (Llama 3.3 70B) | live |
-| **Workers KV** `legislativ-rescrieri` | 100k reads / 1k writes / 1 GB free | the rewrite cache | live (`8a788c53…`) |
+| **Workers KV** `legislation-linter-rewrite` | 100k reads / 1k writes / 1 GB free | the rewrite cache | created by Terraform; id goes in `worker/wrangler.toml` |
 | **Rate-limiting binding** (`RL`) | free | per-IP limit, no KV cost | live |
 | **AI Gateway** `law-legislation-project-gateway` | free | caching + analytics in front of Workers AI | live |
-| **R2** `legislativ` | 10 GB / 1M class A ops per month free | the corpus and the search index, read by the browser over Range | **live** on `date.cristian-nichifor.com` — see the cost model below |
+| **R2** `legislation-linter` | 10 GB / 1M class A ops per month free | the corpus and the search index, read by the browser over Range | copied object for object from Core `legislativ`; served on `data.cristian-nichifor.com` — see the cost model below |
 
-Account: **CN Webify** `432316a05c0d6000c6e196fe32e47dd7`. Existing maintainer endpoint:
-`https://legislativ-rescrieri.cn-webify.workers.dev/rescrie`. It is not used as the public app
-default.
+Account: **CN Webify Customers** `5d5a0c8a05e5d8292065cd0c0cf60291`. Worker `legislation-linter-rewrite`, served only on the
+route `https://projects.cristian-nichifor.com/legislation-linter/api/*` (Terraform owns the route;
+`workers_dev = false`). Endpoint: `https://projects.cristian-nichifor.com/legislation-linter/api/rewrite`.
+It is not used as the public app default.
 
 ## R2 — what a republish actually costs
 
@@ -103,11 +104,11 @@ change and not currently worth it — the corpus is republished rarely.
 Already deployed and working. To redeploy after a change:
 
 ```sh
-cd infra/worker && npx wrangler deploy      # needs `npx wrangler login` once
+./infra/deploy.sh      # pins the Customers account; needs `npx wrangler login` once
 ```
 
 No secret to set — Workers AI needs no key. In the app, pick "online (BYOK)" → "Worker propriu" and
-paste your own `/rescrie` endpoint.
+paste the endpoint above, or your own Worker's `/api/rewrite`.
 
 ### AI Gateway (optional, free — for caching + analytics)
 
@@ -127,9 +128,9 @@ which is why this one step is a dashboard/API-token action.
 
 ## Contract
 
-- `POST /rescrie {act, loc, text, stil?, model?}` → `{rescriere, cached, model, stil}`; generates on
+- `POST /legislation-linter/api/rewrite {act, loc, text, stil?, model?}` → `{rescriere, cached, model, stil}`; generates on
   a cache miss, stores it, returns it.
-- `GET /rescrie?act=&loc=&stil=` → cached rewrite or `404 negenerat`.
+- `GET /legislation-linter/api/rewrite?act=&loc=&stil=` → cached rewrite or `404 negenerat`.
 - `stil`: `nou` (plain-language / Danish, default) or `actual` (current legal register, Legea
   24/2000). It namespaces the cache so the two norms never collide.
 - `model` is honored only from an allowlist (`@cf/meta/llama-3.3-70b-instruct-fp8-fast`,

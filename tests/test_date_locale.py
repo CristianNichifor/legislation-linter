@@ -48,7 +48,7 @@ class Transport:
         self.raw = json.dumps(self.manifest).encode()
         self.channel = {
             "schema_version": 1,
-            "manifest": f"https://date.cristian-nichifor.com/{version}/dataset-release.json",
+            "manifest": f"https://data.cristian-nichifor.com/{version}/dataset-release.json",
             "sha256": hashlib.sha256(self.raw).hexdigest(),
         }
 

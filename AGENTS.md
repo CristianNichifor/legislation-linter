@@ -1,4 +1,4 @@
-# legislativ
+# legislation-linter
 
 Linter for draft Romanian legislation: unfulfilled statutory deadlines, terminology drift, and candidate contradictions — every finding carrying the article it came from.
 

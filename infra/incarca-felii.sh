@@ -15,12 +15,12 @@
 #   CF_ACCOUNT      Cloudflare account id                      (required)
 #   CF_R2_TOKEN     the API token value                        (or CF_R2_TOKEN_OP)
 #   CF_R2_TOKEN_OP  an op:// reference, read at run time
-#   BUCKET          bucket name                                (default: legislativ)
+#   BUCKET          bucket name                                (default: legislation-linter)
 #   PREFIX          the dated prefix to publish under          (default: today)
 
 set -euo pipefail
 
-BUCKET=${BUCKET:-legislativ}
+BUCKET=${BUCKET:-legislation-linter}
 PREFIX=${PREFIX:-$(date +%F)}
 
 cd "$(dirname "$0")/.."

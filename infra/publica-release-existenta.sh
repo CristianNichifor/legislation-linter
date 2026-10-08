@@ -14,8 +14,8 @@ esac
 
 RELEASE_DIR=${RELEASE_DIR:?$USAGE}
 PREFIX=${PREFIX:?$USAGE}
-BUCKET=${BUCKET:-legislativ}
-ORIGIN=${ORIGIN:-https://date.cristian-nichifor.com}
+BUCKET=${BUCKET:-legislation-linter}
+ORIGIN=${ORIGIN:-https://data.cristian-nichifor.com}
 
 echo "verifying local release: $RELEASE_DIR"
 uv run python -m scripts.dataset_release verify "$RELEASE_DIR"

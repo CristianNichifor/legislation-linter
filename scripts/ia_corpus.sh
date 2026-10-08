@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Descarcă corpusul publicat (release) și îl dezarhivează lângă cod.
 # Folosire: scripts/ia_corpus.sh <url-release-base>
-#   ex: scripts/ia_corpus.sh https://github.com/CristianNichifor/legislativ/releases/download/corpus-2026-09
+#   ex: scripts/ia_corpus.sh https://github.com/CristianNichifor/legislation-linter/releases/download/corpus-2026-09
 set -euo pipefail
 cd "$(dirname "$0")/.."
 BAZA="${1:?dă adresa de bază a release-ului}"

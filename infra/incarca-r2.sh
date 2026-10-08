@@ -17,14 +17,14 @@
 #   CF_ACCOUNT      Cloudflare account id                      (required)
 #   CF_R2_TOKEN     the API token value                        (or CF_R2_TOKEN_OP)
 #   CF_R2_TOKEN_OP  an op:// reference to read it from         (needs the 1Password CLI)
-#   BUCKET          bucket name                                (default: legislativ)
+#   BUCKET          bucket name                                (default: legislation-linter)
 #   FISIER          the file or directory to upload            (default: publicat.db)
 #   PREFIX          dated prefix for the object                (default: today)
 #   CHEIE           key under the bucket                       (default: $PREFIX/corpus.db)
 
 set -euo pipefail
 
-BUCKET=${BUCKET:-legislativ}
+BUCKET=${BUCKET:-legislation-linter}
 FISIER=${FISIER:-publicat.db}
 PREFIX=${PREFIX:-$(date +%F)}
 CHEIE=${CHEIE:-$PREFIX/corpus.db}

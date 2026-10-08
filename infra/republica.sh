@@ -18,7 +18,7 @@
 #   CF_R2_TOKEN_OP  op:// reference to read it at run time
 #   LUCRU           working directory for the built copies      (default: ~/.local/share/legislativ)
 #   CORPUS          the collected corpus                        (default: ./corpus.db)
-#   BUCKET          R2 bucket                                   (default: legislativ)
+#   BUCKET          R2 bucket                                   (default: legislation-linter)
 #   PREFIX          dated prefix                                (default: today)
 #   FELII           slices the search index is built in         (default: 8)
 #   EU_PUBLIC_DB    explicitly curated standalone public EU DB (optional, never auto-discovered)
@@ -36,7 +36,7 @@ esac
 
 LUCRU=${LUCRU:-$HOME/.local/share/legislativ}
 CORPUS=${CORPUS:-corpus.db}
-BUCKET=${BUCKET:-legislativ}
+BUCKET=${BUCKET:-legislation-linter}
 PREFIX=${PREFIX:-$(date +%F)}
 FELII=${FELII:-8}
 uv run python -c 'import sys; from scripts.dataset_release import validate_release_id; validate_release_id(sys.argv[1])' "$PREFIX"

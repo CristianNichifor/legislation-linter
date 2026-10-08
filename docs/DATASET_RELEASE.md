@@ -120,8 +120,8 @@ If the release folder is already built and verified, skip the rebuild:
 ```bash
 RELEASE_DIR=/home/cristianvn/.local/share/legislativ/release-payload-2026-09-10 \
 PREFIX=2026-09-10 \
-CF_ACCOUNT=432316a05c0d6000c6e196fe32e47dd7 \
-CF_R2_TOKEN_OP='op://vault/item/credential' \
+CF_ACCOUNT=5d5a0c8a05e5d8292065cd0c0cf60291 \
+CF_R2_TOKEN_OP='op://05 Automation/Cloudflare R2 legislation-linter (Customers)/credential' \
 infra/publica-release-existenta.sh --latest
 ```
 

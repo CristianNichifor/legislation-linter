@@ -14,7 +14,7 @@ esac
 
 RELEASE_DIR=${RELEASE_DIR:?$USAGE}
 PREFIX=${PREFIX:?$USAGE}
-BUCKET=${BUCKET:-legislativ}
+BUCKET=${BUCKET:-legislation-linter}
 ORIGIN=${ORIGIN:-https://data.cristian-nichifor.com}
 
 echo "verifying local release: $RELEASE_DIR"

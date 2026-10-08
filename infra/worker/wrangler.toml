@@ -1,11 +1,15 @@
-name = "legislativ-rescrieri"
+name = "legislation-linter-rewrite"
 main = "src/index.js"
 compatibility_date = "2025-01-01"
+# Served only on the route projects.cristian-nichifor.com/legislation-linter/api/*, which Terraform
+# binds in the CN Webify Customers account; no workers.dev endpoint in production.
+workers_dev = false
 
-# The plain-language rewrite cache. `legislativ-rescrieri`, created for this project.
+# The plain-language rewrite cache, `legislation-linter-rewrite`, created by Terraform in Customers.
+# TODO(before deploy): set to `tofu output kv_namespace_ids` → legislation-linter-rewrite.
 [[kv_namespaces]]
 binding = "RESCRIERI"
-id = "8a788c5315bf4c61a72c23d3ef5f46d9"
+id = "REPLACE_WITH_CUSTOMERS_KV_NAMESPACE_ID"
 
 # Workers AI — Cloudflare's own hosted models. Free within the daily Neuron allocation, no external
 # key. The Worker calls it through this binding.
@@ -32,11 +36,11 @@ simple = { limit = 20, period = 60 }
 # drive-by. Anything outside a browser could forge the header in one line of curl regardless, so
 # this list was never the control that matters. Those are the per-IP rate limit and CAP_ZILNIC
 # below, both unaffected, and the fact that only PUBLIC law text is ever sent here.
-ORIGINI = "https://cristiannichifor.github.io,http://localhost:8080,http://127.0.0.1:8080"
+ORIGINI = "https://projects.cristian-nichifor.com,https://cristiannichifor.github.io,http://localhost:8080,http://127.0.0.1:8080"
 # Hard ceiling on NEW rewrites per day (a spend cap, in KV). Leave unset to disable.
 CAP_ZILNIC = "1500"
 # The AI Gateway to route Workers AI calls through, for free caching + analytics (Account
-# 432316a05c0d6000c6e196fe32e47dd7 / CN Webify). If this gateway does not exist the Worker falls back
+# 5d5a0c8a05e5d8292065cd0c0cf60291 / CN Webify Customers). If this gateway does not exist the Worker falls back
 # to Workers AI directly, so it is safe to leave set. Unset to skip the gateway entirely.
 AIG_ID = "law-legislation-project-gateway"
 # Default Workers AI model; the client may request another from the allowlist in src/index.js.

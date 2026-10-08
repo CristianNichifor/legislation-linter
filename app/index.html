@@ -1457,7 +1457,7 @@
               title="Cheia rămâne în sesiunea browserului și este trimisă doar furnizorului ales."
               aria-label="Cheia API pentru furnizorul online" style="display:none">
             <input id="ai-endpoint" class="ai-endpoint" type="text" placeholder="endpoint furnizor"
-              title="Endpointul furnizorului tău. Pentru Worker propriu folosește /rescrie."
+              title="Endpointul furnizorului tău. Pentru Worker propriu folosește /api/rewrite."
               aria-label="Endpointul furnizorului online" style="display:none">
             <span class="hint" id="ai-sug" style="display:none"></span>
             <span class="hint" id="ai-nota"></span>
@@ -3906,7 +3906,7 @@ async function sugereazaModel(){
     const p=aiProvider(), cfg=aiProv(p);
     if(prov) prov.value=p;
     if(selO){ selO.value=aiModelOnline(p); selO.placeholder=cfg.modelHint||"model online"; }
-    if(ep){ ep.value=aiEndpoint(p); ep.placeholder=cfg.endpoint||"https://…/rescrie"; }
+    if(ep){ ep.value=aiEndpoint(p); ep.placeholder=cfg.endpoint||"https://…/api/rewrite"; }
     if(key){ key.value=aiKey(p); key.placeholder=cfg.cheie?"API key":"fără cheie"; }
   }
   const arata=()=>{ const m=mode.value;

@@ -21,7 +21,7 @@ allocation, so light use can cost **nothing**.
 | **Workers KV** `legislation-linter-rewrite` | 100k reads / 1k writes / 1 GB free | the rewrite cache | created by Terraform; id goes in `worker/wrangler.toml` |
 | **Rate-limiting binding** (`RL`) | free | per-IP limit, no KV cost | live |
 | **AI Gateway** `law-legislation-project-gateway` | free | caching + analytics in front of Workers AI | live |
-| **R2** `legislativ` | 10 GB / 1M class A ops per month free | the corpus and the search index, read by the browser over Range | **live** on `date.cristian-nichifor.com` — see the cost model below |
+| **R2** `legislativ` | 10 GB / 1M class A ops per month free | the corpus and the search index, read by the browser over Range | **live** on `data.cristian-nichifor.com` — see the cost model below |
 
 Account: **CN Webify Customers** `5d5a0c8a05e5d8292065cd0c0cf60291`. Worker `legislation-linter-rewrite`, served only on the
 route `https://projects.cristian-nichifor.com/legislation-linter/api/*` (Terraform owns the route;

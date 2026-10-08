@@ -23,14 +23,14 @@
 #   CF_R2_TOKEN     valoarea tokenului API                         (sau CF_R2_TOKEN_OP)
 #   CF_R2_TOKEN_OP  o referință op:// din care să fie citit
 #   BUCKET          numele bucketului                              (implicit: legislativ)
-#   DOMENIU         domeniul public al bucketului                  (implicit: date.cristian-nichifor.com)
+#   DOMENIU         domeniul public al bucketului                  (implicit: data.cristian-nichifor.com)
 #   PASTREAZA       câte prefixe recente se păstrează oricum       (implicit: 2)
 #   CONFIRMA        „da" ca să se șteargă cu adevărat              (implicit: nu)
 
 set -euo pipefail
 
 BUCKET=${BUCKET:-legislativ}
-DOMENIU=${DOMENIU:-date.cristian-nichifor.com}
+DOMENIU=${DOMENIU:-data.cristian-nichifor.com}
 PASTREAZA=${PASTREAZA:-2}
 CONFIRMA=${CONFIRMA:-nu}
 FLUX_PAGES=${FLUX_PAGES:-.github/workflows/pages.yml}

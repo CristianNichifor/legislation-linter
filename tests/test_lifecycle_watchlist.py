@@ -1,5 +1,6 @@
 import io
 import json
+from datetime import UTC, datetime
 from types import SimpleNamespace
 
 from scripts import depozit, lifecycle_watchlist, source_registry, tracker_events
@@ -14,9 +15,9 @@ def seed_project(stare):
     with depozit.deschide(stare.initiative) as con:
         con.execute(
             "INSERT INTO initiative(plx_id,cam,idp,titlu,stadiu,citit_la,data_inreg,sursa_url) "
-            "VALUES ('PL-x 10/2026',2,'10','Lege urmărită','Raport depus',"
-            "'2026-09-12T10:00:00+00:00','2026-09-01',"
-            "'https://www.cdep.ro/pls/proiecte/upl_pck.proiect?idp=10')"
+            "VALUES ('PL-x 10/2026',2,'10','Lege urmărită','Raport depus',?,'2026-09-01',"
+            "'https://www.cdep.ro/pls/proiecte/upl_pck.proiect?idp=10')",
+            (datetime.now(UTC).isoformat(),),
         )
         con.execute(
             "INSERT INTO initiativa_etapa(plx_id,ord,data,camera,actiune) "

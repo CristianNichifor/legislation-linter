@@ -1,15 +1,17 @@
 name = "legislation-linter-rewrite"
 main = "src/index.js"
 compatibility_date = "2025-01-01"
+# CN Webify Customers. Pinned so a login or token with access to several accounts cannot deploy
+# to the wrong one.
+account_id = "5d5a0c8a05e5d8292065cd0c0cf60291"
 # Served only on the route projects.cristian-nichifor.com/legislation-linter/api/*, which Terraform
 # binds in the CN Webify Customers account; no workers.dev endpoint in production.
 workers_dev = false
 
-# The plain-language rewrite cache, `legislation-linter-rewrite`, created by Terraform in Customers.
-# TODO(before deploy): set to `tofu output kv_namespace_ids` → legislation-linter-rewrite.
+# The plain-language rewrite cache, KV `legislation-linter-rewrite`, created by Terraform in Customers.
 [[kv_namespaces]]
 binding = "RESCRIERI"
-id = "REPLACE_WITH_CUSTOMERS_KV_NAMESPACE_ID"
+id = "a15a3a6704fa414696001b94b777f36b"
 
 # Workers AI — Cloudflare's own hosted models. Free within the daily Neuron allocation, no external
 # key. The Worker calls it through this binding.

@@ -3535,7 +3535,7 @@ const MODELE_ONLINE=[
    model:"gpt-5-mini", modelHint:"model OpenAI", cheie:true},
   {id:"anthropic", et:"Anthropic", endpoint:"https://api.anthropic.com/v1/messages",
    model:"claude-haiku-4-5-20251001", modelHint:"model Anthropic", cheie:true},
-  {id:"worker", et:"Worker propriu", endpoint:"",
+  {id:"worker", et:"Worker propriu", endpoint:"https://projects.cristian-nichifor.com/legislation-linter/api/rewrite",
    model:"", modelHint:"model opțional", cheie:false},
 ];
 function aiProvideri(){ return Object.fromEntries(MODELE_ONLINE.map(p=>[p.id,p])); }

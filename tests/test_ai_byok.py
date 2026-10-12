@@ -24,6 +24,7 @@ def test_online_rewrite_is_byok_not_project_default():
     assert "fără furnizor plătit al platformei" in html
     assert 'sessionStorage.setItem(aiStore("key")' in html
     assert "legislativ-rescrieri.cn-webify.workers.dev" not in html
+    assert "https://projects.cristian-nichifor.com/legislation-linter/api/rewrite" in html
 
 
 def test_static_csp_allows_only_named_byok_destinations():
@@ -37,6 +38,7 @@ def test_static_csp_allows_only_named_byok_destinations():
     assert ("https", "api.openai.com", "") in origini
     assert ("https", "api.anthropic.com", "") in origini
     assert ("https", "*.workers.dev", "") in origini
+    assert ("https", "projects.cristian-nichifor.com", "") in origini
     assert "'self'" in surse
 
 

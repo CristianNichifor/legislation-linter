@@ -1,4 +1,5 @@
 import io
+from datetime import UTC, datetime
 from types import SimpleNamespace
 
 import pytest
@@ -16,8 +17,10 @@ def add_project(stare):
     with depozit.deschide(stare.initiative) as con:
         con.execute(
             "INSERT INTO initiative(plx_id,cam,idp,titlu,stadiu,citit_la,data_inreg,sursa_url) "
-            "VALUES ('PL-x 10/2026',2,'10','Lege cockpit','Raport depus',"
-            "'2026-09-10T10:00:00+00:00','2026-09-01','https://www.cdep.ro/proiect10')"
+            "VALUES ('PL-x 10/2026',2,'10','Lege cockpit','Raport depus',?,"
+            "'2026-09-01','https://www.cdep.ro/proiect10')",
+            # Read "now": a fixed date ages past stale_days and flips next_actions.
+            (datetime.now(UTC).isoformat(timespec="seconds"),),
         )
         con.commit()
 

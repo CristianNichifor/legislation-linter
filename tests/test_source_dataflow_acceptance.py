@@ -48,7 +48,7 @@ class PublicDatasetFixture:
         self.manifest_raw = json.dumps(self.manifest).encode()
         self.channel = {
             "schema_version": 1,
-            "manifest": f"https://date.cristian-nichifor.com/{release_id}/dataset-release.json",
+            "manifest": f"https://data.cristian-nichifor.com/{release_id}/dataset-release.json",
             "sha256": hashlib.sha256(self.manifest_raw).hexdigest(),
         }
 
@@ -90,7 +90,7 @@ def test_public_local_source_dataflow_acceptance(tmp_path):
     assert "manifest_text" not in status["offer"]
     assert transport.requests[:2] == [
         (local.DEFAULT_CHANNEL, 0),
-        ("https://date.cristian-nichifor.com/2026-09-10/dataset-release.json", 0),
+        ("https://data.cristian-nichifor.com/2026-09-10/dataset-release.json", 0),
     ]
 
     manager.activate(first, lambda record: record)

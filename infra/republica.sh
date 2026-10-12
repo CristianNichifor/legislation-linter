@@ -18,7 +18,7 @@
 #   CF_R2_TOKEN_OP  op:// reference to read it at run time
 #   LUCRU           working directory for the built copies      (default: ~/.local/share/legislativ)
 #   CORPUS          the collected corpus                        (default: ./corpus.db)
-#   BUCKET          R2 bucket                                   (default: legislativ)
+#   BUCKET          R2 bucket                                   (default: legislation-linter)
 #   PREFIX          dated prefix                                (default: today)
 #   FELII           slices the search index is built in         (default: 8)
 #   EU_PUBLIC_DB    explicitly curated standalone public EU DB (optional, never auto-discovered)
@@ -36,7 +36,7 @@ esac
 
 LUCRU=${LUCRU:-$HOME/.local/share/legislativ}
 CORPUS=${CORPUS:-corpus.db}
-BUCKET=${BUCKET:-legislativ}
+BUCKET=${BUCKET:-legislation-linter}
 PREFIX=${PREFIX:-$(date +%F)}
 FELII=${FELII:-8}
 uv run python -c 'import sys; from scripts.dataset_release import validate_release_id; validate_release_id(sys.argv[1])' "$PREFIX"
@@ -132,7 +132,7 @@ uv run python -m scripts.dataset_release verify "$STAGE"
 r2 copyto "$STAGE/dataset-release.json" "r2:$BUCKET/$PREFIX/dataset-release.json" --immutable
 r2 check "$STAGE" "r2:$BUCKET/$PREFIX" --one-way --download --include dataset-release.json
 uv run python -m scripts.dataset_release channel "$STAGE" \
-  --manifest-url "https://date.cristian-nichifor.com/$PREFIX/dataset-release.json" \
+  --manifest-url "https://data.cristian-nichifor.com/$PREFIX/dataset-release.json" \
   --output "$LUCRU/channel.json"
 if [ "$LATEST" -eq 1 ]; then
   r2 copyto "$LUCRU/channel.json" "r2:$BUCKET/channel.json"
@@ -141,4 +141,4 @@ echo "channel proposal: $LUCRU/channel.json (publish only with explicit --latest
 
 echo
 echo "încărcat. Ultimul pas, un singur rând în .github/workflows/pages.yml:"
-echo "  --depozit https://date.cristian-nichifor.com/$PREFIX"
+echo "  --depozit https://data.cristian-nichifor.com/$PREFIX"

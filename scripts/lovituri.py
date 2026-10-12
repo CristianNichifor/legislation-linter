@@ -20,10 +20,32 @@ from __future__ import annotations
 
 import argparse
 import sqlite3
-from datetime import date
+from dataclasses import dataclass
+from datetime import date, timedelta
+from typing import Final
 
 from scripts import depozit
 from scripts.decizii import Proviziune, citeste
+
+# Article 147 (1) of the Constitution, and article 145 (1) before the 2003 revision.
+ZILE_SUSPENDARE: Final[int] = 45
+
+
+@dataclass(frozen=True)
+class Lovitura:
+    """One provision put out of force by one decision."""
+
+    decizie: str
+    publicat: date | None
+    proviziune: Proviziune
+    definitiva: bool | None
+
+    @property
+    def termen(self) -> date | None:
+        """When the suspension ran out. `None` where no suspension was ever running."""
+        if self.proviziune.fel != "neconstitutional" or self.publicat is None:
+            return None
+        return self.publicat + timedelta(days=ZILE_SUSPENDARE)
 
 
 def _data(brut: str | None) -> date | None:
@@ -86,8 +108,6 @@ def extrage(cale_db: str = "corpus.db", *, lot: int = 2000, log=print) -> dict[s
 
 def incarca(cale_db: str = "corpus.db") -> list:
     """Every recorded strike, as the register consumes them. Reads only; never parses."""
-    from scripts.neconstitutional import Lovitura
-
     cx = sqlite3.connect(f"file:{cale_db}?mode=ro", uri=True)
     try:
         return [

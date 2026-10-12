@@ -72,10 +72,12 @@ CSP = (
     # connect targets:
     #  · `api.openai.com` / `api.anthropic.com` — explicit BYOK rewrite providers;
     #  · `*.workers.dev` — a user-owned Worker rewrite endpoint;
+    #  · `projects.cristian-nichifor.com` — the project's own rewrite Worker, the "Worker propriu"
+    #    default; the app is also served from GitHub Pages, where it is not 'self';
     #  · huggingface.co / hf.co — WebLLM's on-device model weights, for the opt-in local AI. The
     #    provision text stays on the device; only the model is downloaded.
     "connect-src 'self' https://cdn.jsdelivr.net https://esm.run https://api.openai.com "
-    "https://api.anthropic.com https://*.workers.dev "
+    "https://api.anthropic.com https://*.workers.dev https://projects.cristian-nichifor.com "
     "https://huggingface.co https://*.huggingface.co https://hf.co https://*.hf.co "
     "https://raw.githubusercontent.com__DEPOZIT_CSP__; "
     "worker-src 'self' blob:; child-src 'self' blob:; "
@@ -104,7 +106,7 @@ def _csp(depozit: str = "") -> str:
 
 
 PYODIDE = "https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.js"
-PUBLIC_CHANNEL = "https://date.cristian-nichifor.com/channel.json"
+PUBLIC_CHANNEL = "https://data.cristian-nichifor.com/channel.json"
 
 
 def _public_config(channel=PUBLIC_CHANNEL, allow_loopback=False):

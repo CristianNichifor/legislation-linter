@@ -181,7 +181,7 @@ def test_build_copy_verify_and_channel(tmp_path):
             "channel",
             str(folder),
             "--manifest-url",
-            "https://date.cristian-nichifor.com/2026-09-10/dataset-release.json",
+            "https://data.cristian-nichifor.com/2026-09-10/dataset-release.json",
             "--output",
             str(output),
         ]
@@ -271,14 +271,14 @@ def test_reject_private_table_and_symlink(tmp_path):
 @pytest.mark.parametrize(
     "url",
     [
-        "http://date.cristian-nichifor.com/2026-09-10/dataset-release.json",
+        "http://data.cristian-nichifor.com/2026-09-10/dataset-release.json",
         "https://evil.test/2026-09-10/dataset-release.json",
-        "https://user@date.cristian-nichifor.com/2026-09-10/dataset-release.json",
-        "https://date.cristian-nichifor.com/latest/dataset-release.json",
-        "https://date.cristian-nichifor.com/../2026-09-10/dataset-release.json",
-        "https://date.cristian-nichifor.com/%2e%2e/dataset-release.json",
-        "https://date.cristian-nichifor.com/2026-09-10/dataset-release.json?x=1",
-        "https://date.cristian-nichifor.com/2026-09-10/dataset-release.json#x",
+        "https://user@data.cristian-nichifor.com/2026-09-10/dataset-release.json",
+        "https://data.cristian-nichifor.com/latest/dataset-release.json",
+        "https://data.cristian-nichifor.com/../2026-09-10/dataset-release.json",
+        "https://data.cristian-nichifor.com/%2e%2e/dataset-release.json",
+        "https://data.cristian-nichifor.com/2026-09-10/dataset-release.json?x=1",
+        "https://data.cristian-nichifor.com/2026-09-10/dataset-release.json#x",
     ],
 )
 def test_bad_channel(url):

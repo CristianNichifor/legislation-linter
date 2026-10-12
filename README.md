@@ -1,4 +1,4 @@
-# legislativ
+# legislation-linter
 
 A linter for Romanian legislation. Paste a draft act and it reports **what it touches**, **what
 deadlines it creates**, **what terminology it drifts from**, and **which bills already in Parliament
@@ -21,7 +21,7 @@ or hosted service is required.
 | Tests | 1 936 (`uv run pytest -q`) |
 | Product gate | **ready on verified local data** — `python -m scripts.app_completeness --data-home ~/.local/share/legislativ --sync-source-anchors --require-complete` passed with 9/9 required capabilities ready |
 | Corpus | walked once end to end: 25 156 pages → 205 321 documents; a packed release is ~742 MB |
-| Public deployment | not published. The `date.cnwebify.dev` channel returned 404 on 2026-09-10; the host has since moved to `date.cristian-nichifor.com` and must still be published and verified by a maintainer |
+| Public deployment | not published. The `date.cnwebify.dev` channel returned 404 on 2026-09-10; the host has since moved to `data.cristian-nichifor.com` and must still be published and verified by a maintainer |
 | Last merged | final source-anchor verification closure and acceptance evidence |
 | Next | full-product finish: matrix-first workspace polish, real MCP execution UX, law-as-code authoring/checking, source-specific adapters and release deployment verification |
 
@@ -42,7 +42,7 @@ uv sync --all-groups
 You need the corpus once. Download it, if a release exists:
 
 ```bash
-scripts/ia_corpus.sh https://github.com/CristianNichifor/legislativ/releases/download/<versiune>
+scripts/ia_corpus.sh https://github.com/CristianNichifor/legislation-linter/releases/download/<versiune>
 ```
 
 …or build it locally (a few hours, once, resumable):

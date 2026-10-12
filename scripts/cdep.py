@@ -42,7 +42,7 @@ from scripts.text import cheie, normalizeaza
 BASE = "https://www.cdep.ro/ords/pls/proiecte/upl_pck2015"
 CAM_DEPUTATI = 2
 USER_AGENT = (
-    "legislativ-linter/0.1 (+https://github.com/CristianNichifor/legislativ; "
+    "legislativ-linter/0.1 (+https://github.com/CristianNichifor/legislation-linter; "
     "contact: cristian@cnwebify.com)"
 )
 

@@ -40,14 +40,27 @@ from __future__ import annotations
 import argparse
 import sqlite3
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date
 from typing import Final
 
 from scripts.decizii import Proviziune
+from scripts.lovituri import ZILE_SUSPENDARE as ZILE_SUSPENDARE
+from scripts.lovituri import Lovitura as Lovitura
 from scripts.rang_normativ import poate_modifica
 
-# Article 147 (1) of the Constitution, and article 145 (1) before the 2003 revision.
-ZILE_SUSPENDARE: Final[int] = 45
+# Keep the public API explicit when implementations live in lower-level modules.
+__all__ = [
+    "ZILE_SUSPENDARE",
+    "FELURI_REPARATOARE",
+    "Lovitura",
+    "Muchie",
+    "Nereparat",
+    "registru",
+    "sumar",
+    "raport",
+    "din_baze",
+    "main",
+]
 
 # Edges that can put a struck text right. A `refera` cannot: pointing at a provision is not
 # changing it, and 12 310 of the 14 345 edges in this graph are references.
@@ -65,23 +78,6 @@ class Muchie:
     locator: str
     fel: str
     de_la: date | None
-
-
-@dataclass(frozen=True)
-class Lovitura:
-    """One provision put out of force by one decision."""
-
-    decizie: str
-    publicat: date | None
-    proviziune: Proviziune
-    definitiva: bool | None
-
-    @property
-    def termen(self) -> date | None:
-        """When the suspension ran out. `None` where no suspension was ever running."""
-        if self.proviziune.fel != "neconstitutional" or self.publicat is None:
-            return None
-        return self.publicat + timedelta(days=ZILE_SUSPENDARE)
 
 
 @dataclass(frozen=True)

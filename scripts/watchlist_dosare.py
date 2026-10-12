@@ -208,8 +208,10 @@ def manifest(stare, path, dossier_id: str, limit: int = 500) -> dict:
         "surse": items,
         "attention": sum(1 for item in items if item["needs_attention"]),
         "limitari": [
-            "Manifestul exportă starea locală cunoscută a surselor urmărite; nu sincronizează "
-            "sursele oficiale în momentul exportului.",
+            (
+                "Manifestul exportă starea locală cunoscută a surselor urmărite; nu sincronizează "
+                + "sursele oficiale în momentul exportului."
+            ),
             "Hash-urile sunt disponibile numai pentru sursele sincronizate local în registru.",
             "Domeniile și cuvintele cheie descriu intenția de urmărire, nu o sursă publică unică.",
             *(

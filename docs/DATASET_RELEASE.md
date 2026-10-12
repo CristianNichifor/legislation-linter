@@ -49,16 +49,16 @@ validated dictionary without type coercion. `load_manifest(raw_bytes_or_text)` a
 bounded JSON parsing and duplicate-key rejection. Errors are `ReleaseError`, a
 `ValueError` subclass. `validate_channel(channel, trusted_origin=...)` and
 `load_channel(raw, trusted_origin=...)` handle channel pointers; the default origin
-is `https://date.cristian-nichifor.com`. The schema is `schema/dataset_release.schema.json`,
+is `https://data.cristian-nichifor.com`. The schema is `schema/dataset_release.schema.json`,
 with channel shape in `$defs/channel`. Runtime validation additionally enforces real
 calendar dates, filename uniqueness, strict Python integer types and byte limits.
 
-The configured trusted channel URL is `https://date.cristian-nichifor.com/channel.json`:
+The configured trusted channel URL is `https://data.cristian-nichifor.com/channel.json`:
 
 ```json
 {
   "schema_version": 1,
-  "manifest": "https://date.cristian-nichifor.com/2026-09-10/dataset-release.json",
+  "manifest": "https://data.cristian-nichifor.com/2026-09-10/dataset-release.json",
   "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 }
 ```
@@ -92,7 +92,7 @@ uv run python -m scripts.dataset_release build /tmp/release-2026-09-10 \
   --release 2026-09-10 --published-corpus /path/to/publicat.db
 uv run python -m scripts.dataset_release verify /tmp/release-2026-09-10
 uv run python -m scripts.dataset_release channel /tmp/release-2026-09-10 \
-  --manifest-url https://date.cristian-nichifor.com/2026-09-10/dataset-release.json \
+  --manifest-url https://data.cristian-nichifor.com/2026-09-10/dataset-release.json \
   --output /tmp/channel-proposal.json
 ```
 
@@ -120,8 +120,8 @@ If the release folder is already built and verified, skip the rebuild:
 ```bash
 RELEASE_DIR=/home/cristianvn/.local/share/legislativ/release-payload-2026-09-10 \
 PREFIX=2026-09-10 \
-CF_ACCOUNT=432316a05c0d6000c6e196fe32e47dd7 \
-CF_R2_TOKEN_OP='op://vault/item/credential' \
+CF_ACCOUNT=5d5a0c8a05e5d8292065cd0c0cf60291 \
+CF_R2_TOKEN_OP='op://05 Automation/Cloudflare R2 legislation-linter (Customers)/credential' \
 infra/publica-release-existenta.sh --latest
 ```
 

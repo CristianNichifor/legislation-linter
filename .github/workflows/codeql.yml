@@ -5,9 +5,9 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
   schedule:
     # Weekly, so a new CodeQL rule catches something even when the code has not changed.
     - cron: "27 4 * * 1"

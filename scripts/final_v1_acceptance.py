@@ -259,7 +259,7 @@ def run(root: Path) -> dict:
         stare, {"source_limit": ["10"], "event_limit": ["10"]}
     )
     matrix = _matrice_dosar({"emitent": ["Parlamentul"], "problema": ["semnale"]}, stare)
-    evidence = project_evidence_pack.build(
+    project_evidence_pack.build(
         stare, {"project_id": [PROJECT_ID], "dossier_id": [DOSSIER_ID], "event_limit": ["10"]}
     )
     selected = {

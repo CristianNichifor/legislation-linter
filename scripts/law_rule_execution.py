@@ -459,8 +459,10 @@ def _row(draft: dict, checks: list[dict]) -> dict:
         "limitations": [
             "Execuție deterministă pe ciorne law-rule-draft-v1; nu este verdict juridic.",
             "Lipsa unui semnal local nu dovedește că norma de implementare există.",
-            "Semnalele depind de acoperirea corpusului și de raportul local "
-            "al obligațiilor neîndeplinite.",
+            (
+                "Semnalele depind de acoperirea corpusului și de raportul local "
+                + "al obligațiilor neîndeplinite."
+            ),
         ],
     }
 

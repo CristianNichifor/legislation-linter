@@ -285,7 +285,6 @@ def _open(path, *, write=False):
                         f"BEFORE {operation} ON {table} BEGIN "
                         f"SELECT RAISE(ABORT,'{message}'); END"
                     )
-            version = 14
         if write:
             con.execute(f"PRAGMA user_version={SCHEMA_VERSION}")
         yield con

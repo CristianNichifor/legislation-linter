@@ -1,12 +1,12 @@
-# One job. There is no pipeline stage to run: the collector that would reach the legislative
-# portal is a stub that raises, so what CI can check is the extractors and the number they are
-# allowed to claim — which is the part that matters anyway.
 name: CI
 
 on:
   push:
     branches: [main]
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   linter:
@@ -52,3 +52,29 @@ jobs:
       # test_etalon_precizie.py holds the plumbing honest in the meantime.
       - name: Etalon precizie
         run: uv run python -m scripts.etalon_precizie
+
+  browser:
+    uses: ./.github/workflows/browser.yml
+
+  runtime:
+    uses: ./.github/workflows/local-runtime.yml
+
+  verify:
+    name: verify
+    if: ${{ always() }}
+    needs: [linter, browser, runtime]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every correctness job to succeed
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PYTHON'
+          import json, os, sys
+          results = json.loads(os.environ["RESULTS"])
+          bad = {name: job["result"] for name, job in results.items()
+                 if job["result"] != "success"}
+          if bad:
+              sys.exit(f"Correctness jobs did not succeed: {bad}")
+          print("All correctness jobs succeeded")
+          PYTHON

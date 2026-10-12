@@ -23,7 +23,7 @@ să depui un duplicat.
 Ai nevoie o singură dată de corpus (baza de legislație). Fie îl descarci, dacă a fost publicat:
 
 ```bash
-scripts/ia_corpus.sh https://github.com/CristianNichifor/legislativ/releases/download/<versiune>
+scripts/ia_corpus.sh https://github.com/CristianNichifor/legislation-linter/releases/download/<versiune>
 ```
 
 fie îl construiești local (câteva ore, o singură dată, reia de unde a rămas dacă se oprește):

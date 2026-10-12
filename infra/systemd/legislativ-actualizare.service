@@ -1,6 +1,6 @@
 [Unit]
 Description=Legislativ — aduce corpusul la zi (colectare coadă, date, lovituri, muchii)
-Documentation=https://github.com/CristianNichifor/legislativ
+Documentation=https://github.com/CristianNichifor/legislation-linter
 # Enumerarea serviciului se face prin rețea; fără asta prima rulare după boot eșuează
 # într-un mod care arată ca o defecțiune a serviciului, nu ca lipsă de rețea.
 Wants=network-online.target

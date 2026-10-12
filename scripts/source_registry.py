@@ -1025,7 +1025,7 @@ def _fetch_official_anchor(url: str) -> dict:
     request = Request(
         url,
         headers={
-            "User-Agent": "legislativ-source-verifier/1.0 (+https://github.com/CristianNichifor/legislativ)",
+            "User-Agent": "legislativ-source-verifier/1.0 (+https://github.com/CristianNichifor/legislation-linter)",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         },
     )

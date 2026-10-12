@@ -8,7 +8,7 @@
 #   ./infra/deploy.sh                                                      # deploy only (wrangler login)
 set -euo pipefail
 
-ACCOUNT="432316a05c0d6000c6e196fe32e47dd7"   # CN Webify
+ACCOUNT="5d5a0c8a05e5d8292065cd0c0cf60291"   # CN Webify Customers
 GATEWAY="law-legislation-project-gateway"
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")/worker" && pwd)"
 cd "$here"
@@ -28,9 +28,10 @@ else
 fi
 
 echo "==> 2/2  wrangler deploy"
-npx wrangler deploy
+# Pinned so a login with access to several accounts cannot deploy to the wrong one.
+CLOUDFLARE_ACCOUNT_ID="$ACCOUNT" npx wrangler deploy
 
 echo
 echo "Done — runs on Workers AI, no key needed."
-echo "Endpoint: https://legislativ-rescrieri.cn-webify.workers.dev/rescrie"
-echo "The app already targets it — pick 'online (prin API)' in the AI settings."
+echo "Endpoint: https://projects.cristian-nichifor.com/legislation-linter/api/rewrite"
+echo "Paste it in the app under 'online (BYOK)' → 'Worker propriu'."

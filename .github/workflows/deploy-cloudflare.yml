@@ -2,12 +2,13 @@ name: deploy-cloudflare
 
 # Deploy the rewrite Worker (infra/worker) to CN Webify Customers. No secrets: a one-hour
 # Cloudflare token comes from the CN Webify token broker, which accepts this exact file, on
-# `main`, for push and workflow_dispatch. The route
-# projects.cristian-nichifor.com/legislation-linter/api/* is bound by CN Webify's Terraform.
+# `main` and `dev`, for push and workflow_dispatch. main serves
+# projects.cristian-nichifor.com/legislation-linter/api/*; dev is its protected preview
+# (`--env dev`) at projects-dev.cristian-nichifor.com, behind the CN Webify preview gate.
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
     paths:
       - "infra/worker/**"
       - ".github/workflows/deploy-cloudflare.yml"
@@ -18,7 +19,7 @@ permissions:
   id-token: write          # the broker reads this job's GitHub OIDC token
 
 concurrency:
-  group: deploy-cloudflare
+  group: deploy-cloudflare-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -37,10 +38,15 @@ jobs:
           echo "CLOUDFLARE_ACCOUNT_ID=5d5a0c8a05e5d8292065cd0c0cf60291" >> "$GITHUB_ENV"
       - name: Deploy legislation-linter-rewrite
         working-directory: infra/worker
-        run: npx --yes wrangler@4 deploy
+        run: npx --yes wrangler@4 deploy ${{ github.ref_name == 'dev' && '--env dev' || '' }}
       - name: Summary
         run: |
           {
-            echo "Deployed Worker \`legislation-linter-rewrite\` to CN Webify Customers."
-            echo "Endpoint (route bound by CN Webify): https://projects.cristian-nichifor.com/legislation-linter/api/rewrite"
+            if [ "$GITHUB_REF_NAME" = dev ]; then
+              echo "Deployed Worker \`legislation-linter-rewrite-dev\` to CN Webify Customers."
+              echo "Preview (sign-in required): https://projects-dev.cristian-nichifor.com/legislation-linter/api/rewrite"
+            else
+              echo "Deployed Worker \`legislation-linter-rewrite\` to CN Webify Customers."
+              echo "Endpoint (route bound by CN Webify): https://projects.cristian-nichifor.com/legislation-linter/api/rewrite"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"

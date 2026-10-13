@@ -49,6 +49,12 @@ from scripts.parsare import din_fisier
 ROOT = Path(__file__).resolve().parent.parent
 WEB = ROOT / "web"
 DATA = WEB / "data"
+# The databases the worker mounts from the data store when the build has one (`--depozit`). With a
+# store behind it the worker never reads them from the site's data/, so a build with `--depozit`
+# does not ship them: they only cost each visitor their download through the precache, and two of
+# them (initiative.db 35,7 MiB, corpus.db 32,0 MiB in date-2026-09-08) are over Cloudflare Pages'
+# 25 MiB file limit. Must match the worker's mount loop (tests/test_construieste_web.py checks it).
+BAZE_DIN_DEPOZIT = ("corpus.db", "graf.db", "initiative.db", "eu.db")
 SOURCES = ROOT / "sources"
 
 # Acts the demo cites, kept in the slice no matter where they fall in the corpus, plus the first
@@ -819,7 +825,7 @@ const CACHE = "legislativ-shell-" + VERSIUNE;
 const NUCLEU = [
   "./", "./index.html", "./worker.js", "./browser-workspace.js", "./browser-generation.js", "./__BUNDLE_URL__",
   __FONTURI__,
-  "./data/graf.db", "./data/initiative.db", "./data/eu.db",
+  __BAZE__
   "./data/index.json", "./data/termeni.json", "./data/manifest.json", "./data/vid.json",
   "./data/neconstitutional.json", "./data/norme_lovite.json", "./data/considerente.json",
   "./data/ue_acoperire.json"
@@ -1246,6 +1252,19 @@ def _worker(depozit: str = "", *, channel=PUBLIC_CHANNEL, allow_loopback=False) 
     print(f"  worker → {WEB / 'worker.js'} ({unde})")
 
 
+def _fara_bazele_din_depozit() -> list[str]:
+    """Leave out of the build the databases the worker mounts from the data store (BAZE_DIN_DEPOZIT)."""
+    scoase = []
+    for nume in BAZE_DIN_DEPOZIT:
+        cale = DATA / nume
+        if cale.is_file():
+            cale.unlink()
+            scoase.append(nume)
+    if scoase:
+        print(f"  din depozit, nu din build: {', '.join(scoase)}")
+    return scoase
+
+
 def _versiune_si_sw() -> str:
     """Version the runtime and public catalogs without scanning the monolithic corpus."""
     manifest = DATA / "manifest.json"
@@ -1294,8 +1313,14 @@ def _versiune_si_sw() -> str:
     # Precache exactly the fonts that were copied, rather than a list kept in sync by hand.
     fonturi = sorted(p.name for p in (WEB / "fonts").glob("*.woff2"))
     lista = ", ".join(f'"./fonts/{n}"' for n in fonturi)
+    # Precache only the databases this build ships: `addAll` is all-or-nothing, so a missing entry
+    # would leave the offline cache empty.
+    baze = "".join(
+        f'"./data/{n}", ' for n in ("graf.db", "initiative.db", "eu.db") if (DATA / n).is_file()
+    )
     sw = (
         SW.replace("__VERSION__", versiune)
+        .replace("__BAZE__", baze)
         .replace("__FONTURI__", lista)
         .replace("__BUNDLE_URL__", _bundle_url())
     )
@@ -1494,7 +1519,11 @@ def main(
         # The data is already in web/data — a dataset release was downloaded and extracted. Build
         # only the shell over it; do not rebuild or reshard what a slower job already produced.
         # The corpus itself is not needed here (the browser reads the shards); the catalog is.
-        if not (DATA / "index.json").is_file() or not (DATA / "graf.db").is_file():
+        # graf.db is needed only where the worker reads it from the site, i.e. without a store; a
+        # rebuild over a store build's output finds it already left out.
+        if not (DATA / "index.json").is_file() or (
+            not depozit and not (DATA / "graf.db").is_file()
+        ):
             raise SystemExit("--sursa gata: web/data este incomplet (release-ul nu a fost extras)")
         # A collection release may carry no initiatives; the engines still open initiative.db, so
         # give them an empty one rather than let the open fail.
@@ -1534,6 +1563,8 @@ def main(
     _client_cautare()
     _civic_ui()
     _pagina(depozit, felii_cautare, channel=channel, allow_loopback=allow_loopback)
+    if depozit:
+        _fara_bazele_din_depozit()
     _versiune_si_sw()
     print("gata. servește cu:  uv run python -m http.server -d web 8080")
 

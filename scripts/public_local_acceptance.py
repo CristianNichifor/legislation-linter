@@ -70,7 +70,7 @@ def _channel_contract_ok() -> bool:
 def run(root: Path) -> dict:
     root = root.resolve()
     smoke = release_smoke.run(root)
-    pages = _read(root, ".github/workflows/pages.yml")
+    pages = _read(root, ".github/workflows/deploy-pages-cloudflare.yml")
     package = _read(root, "scripts/build_runtime.py")
     local_launch = _read(root, "docs/local-launch.md")
     local_first = _read(root, "docs/LOCAL_FIRST.md")
@@ -92,15 +92,14 @@ def run(root: Path) -> dict:
             _has_all(
                 pages,
                 (
-                    "branches: [main]",
-                    "actions/deploy-pages",
+                    "branches: [main, dev]",
+                    "pages deploy",
                     "scripts.construieste_web",
                     "app/**",
                     "contents: read",
-                    "pages: write",
                 ),
             ),
-            "GitHub Pages deploys the committed browser app from main without private data",
+            "Cloudflare Pages deploys the committed browser app from main without private data",
         ),
         Check(
             "local:downloadable_package",

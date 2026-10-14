@@ -212,3 +212,17 @@ Test: `tests/test_design_screens.py` (to add with the implementation): every fil
 README exists, has no `ş`/`ţ`, no `<script>` and no `http` request in `src=`/`href` of
 stylesheets or scripts. Acceptance criteria 1–7 in the README become browser tests when the
 screens are implemented.
+
+### LL-DS-4 Dossier finding anatomy — done
+
+- Given a note in a dossier, then it reads, in DOM order: act and locator, the quote as a
+  `blockquote`, a „Sursa:” line whose link text is the host and path, the reasoning, a
+  „Stare de verificare” radio group with the five note states, and the SHA-256 behind a closed
+  `<details>` „Detalii tehnice”; the meta line carries the last revision date as zz.ll.aaaa.
+- Given the radio group, when a state is chosen, then the note is saved with that state and the
+  list re-renders; „Auto-revizuită” and „Rezolvată” are refused, with the missing items named,
+  when the note lacks quote, source or reasoning (same rule as the form).
+- Given the finding, then it prints no verdict word (legal, ilegal, conform, constituțional).
+
+Tests: `tests/browser/dossier.spec.js` (static suite); `tests/test_dossier_ui.py` (renderer
+escaping, node harness).

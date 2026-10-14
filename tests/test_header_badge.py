@@ -18,9 +18,12 @@ APP = ROOT / "app" / "index.html"
 def _source() -> str:
     html = APP.read_text(encoding="utf-8")
     assert "function datasetStatusHtml" in html, "header badge renderer missing"
-    return "function datasetStatusHtml" + html.split("function datasetStatusHtml", 1)[1].split(
-        "function datasetFreshnessHtml", 1
-    )[0]
+    return (
+        "function datasetStatusHtml"
+        + html.split("function datasetStatusHtml", 1)[1].split("function datasetFreshnessHtml", 1)[
+            0
+        ]
+    )
 
 
 @pytest.mark.skipif(not shutil.which("node"), reason="node runs the header renderer")

@@ -135,6 +135,23 @@ Test: `tests/browser/static.spec.js` › "english chrome toggle syncs html lang"
 at the end of the navigation and names the other language in that language. The main region and
 the data panels keep `lang="ro"`. English strings are marked *needs human review*.
 
+## Theme E: UX guidelines
+
+### LL-UXG UX guidelines with a conformance checklist — done
+
+- Given `docs/ux-guidelines.md`, then it refines `UX_UI_BIBLE.md`, `PROJECT_FINISH_BIBLE.md`,
+  `DESIGN.md` and `UX_ACCEPTANCE.md` without contradicting them (the bible wins on conflict),
+  links all four, and states users and top tasks, page anatomy, content, data-viz, state,
+  mobile and accessibility rules, the status vocabulary, a conformance checklist mapped to
+  tests and a deviations backlog (D-1…D-8).
+- Given the bible and the README docs index, then both link the guideline.
+- Given the checklist, when a test file or a quoted browser test title it names is renamed or
+  removed, then `tests/test_ux_guidelines.py` fails.
+- Agent-written Romanian in the guideline (status vocabulary, no-verdict phrasing): needs
+  human review.
+
+Test: `tests/test_ux_guidelines.py`.
+
 ## Workflow-only (maintainer applies the diff)
 
 ### LL-1 Data store prefix not hardcoded — needs human

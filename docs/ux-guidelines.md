@@ -133,5 +133,6 @@ and 390 px were not taken in this pass. Items in files other sessions were editi
   the open pull requests that edit it merge).
 - **D-7** Matrix workspace polish (UX-5): filters by domain, source family, lifecycle,
   quality and issue type; row density on a phone.
-- **D-8** Deeper panels (cockpit, tracker review, rule drafts) still show machine terms
-  (LL-5 note).
+- ~~**D-8** Deeper panels (cockpit, tracker review, rule drafts) still show machine terms
+  (LL-5 note).~~ Fixed by LL-5b: workbench → „Spațiu de lucru”, gate → „Criterii de lansare”,
+  law-as-code → „regulă verificabilă” / „de regulă”, locked by a text-node test.

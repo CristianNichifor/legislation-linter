@@ -1760,7 +1760,7 @@ def _matrice_graf(qs: dict, stare: Stare) -> dict:
         "edges": [],
         "trunchiat": selectie["total"] > len(acte),
         "limitari": [
-            "Scaffold de lucru pentru law-as-code: muchiile sunt relații extrase/indexate, "
+            "Schiță de lucru pentru reguli verificabile: muchiile sunt relații extrase/indexate, "
             "nu verdict juridic.",
             "Domeniul este orientativ și vine din aceleași filtre ca matricea.",
             (

@@ -10,7 +10,7 @@ first, no hidden network calls, no new third-party services.
 
 ## Theme A: baseline
 
-### LL-3 Page metadata and skip link — todo
+### LL-3 Page metadata and skip link — done
 
 - Given the built page, when a crawler or a link preview reads `<head>`, then it finds a
   `meta name="description"`, `og:title`, `og:description`, `og:type`, `og:url` and a
@@ -21,7 +21,7 @@ first, no hidden network calls, no new third-party services.
 
 Test: `tests/browser/static.spec.js` › "metadata, canonical and skip link" (all three engines).
 
-### LL-7 Privacy page — todo
+### LL-7 Privacy page — done
 
 - Given the built site, when a visitor opens `confidentialitate.html` (linked from the footer),
   then it states that the app is local first, that drafts and dossiers stay in the browser, that
@@ -33,7 +33,7 @@ Tests: `tests/test_confidentialitate.py` (every AI origin in `connect-src` is na
 the page is copied into `web/`; operator and contact present) and `tests/browser/static.spec.js`
 › "privacy page is linked and reachable".
 
-### LL-A11Y Automated accessibility check — todo
+### LL-A11Y Automated accessibility check — done
 
 - Given the built page in Chromium, when axe-core runs on the default view, then it reports
   0 violations of impact `serious` or `critical`.
@@ -43,7 +43,7 @@ injected from the `axe-core` dev dependency, not a CDN).
 
 ## Theme B: UX cleanup
 
-### LL-5 No internal terms in primary copy — todo
+### LL-5 No internal terms in primary copy — done
 
 - Given the default view, when a user reads the visible text, then none of the pipeline terms the
   bible glossary bans from primary copy appear (`rebuild`, `reindex`, `pack`, `gate`, `workbench`,
@@ -52,9 +52,14 @@ injected from the `axe-core` dev dependency, not a CDN).
   normal path.
 
 Test: `tests/browser/static.spec.js` › "primary copy uses no internal terms" (text denylist over
-visible text of the header, navigation and default pane).
+the visible text of the default view once the matrix workspace has rendered).
 
-### LL-4 Matrix as the default workspace — todo
+Done so far: the principles panel is gone, the daily flow is collapsed, the online data panel has
+its diacritics back, and the default view's matrix copy no longer shows contract ids, snake_case
+states, "law-as-code", "tracker" or "draft". Deeper panels (cockpit, tracker review, rule drafts)
+still use some machine terms; LL-NAV below finishes the navigation part.
+
+### LL-4 Matrix as the default workspace — done
 
 - Given a first load with no saved state, when the page settles, then the matrix pane is the
   selected tab and its rows are grouped by legal domain.
@@ -62,6 +67,40 @@ visible text of the header, navigation and default pane).
   view (the selected tab stays `Matrice`).
 
 Test: `tests/browser/static.spec.js` › "matrix is the default workspace and opens drafts in place".
+
+### LL-NAV One navigation and a thin breadcrumb — todo
+
+Coordinator review, 2026-10-14.
+
+- Given the default load, then there is one navigation: Start · Verifică · Caută · Matrice ·
+  Dosare · Surse · Redactare · Setări, with the remaining tools (Consolidat, Conexiuni,
+  Parlamentari, Cine face legea, Drept UE, Supraveghere) one click away under "Mai multe".
+- The "Flux principal" strip, the second "workflow" navigation and the collapsed "Flux zilnic"
+  are replaced by a one-line breadcrumb that says where the user is (pane, dossier, step).
+- The active tab is in the URL hash (`#matrice`, `#verifica`, ...); loading a URL with a hash
+  opens that tab, and the back button returns to the previous tab.
+
+Test: `tests/browser/static.spec.js` › "one navigation, breadcrumb and hash routing".
+
+### LL-ENGINE The check never hangs — todo
+
+- Given the in-browser engine has not answered within 20 s, when the user runs a check, then
+  the result area says "Motorul nu a pornit — reîncearcă" with a retry, instead of "se
+  verifică…" forever; the header stops saying "se încarcă…" and states the failure.
+- While a check runs, the result area shows staged progress (pornesc motorul → verific textul)
+  and a "Anulează" button that stops waiting.
+
+Test: `tests/browser/static.spec.js` › "engine timeout, progress and cancel" (the CDN runtime is
+blocked so the engine never starts).
+
+### LL-FORM Labels, targets and check-first layout — todo
+
+- Every visible input, select and textarea has an accessible name (axe `label` rule passes).
+- Interactive targets on the default view are at least 24×24 px (WCAG 2.5.8).
+- On the Verifică tab the draft textarea and the Verifică button are the first content under the
+  navigation, above the fold at 1440×900.
+
+Test: `tests/browser/static.spec.js` › "form labels, target size and check-first layout".
 
 ## Theme C: data freshness
 

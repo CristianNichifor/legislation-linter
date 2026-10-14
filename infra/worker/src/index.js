@@ -66,7 +66,9 @@ function json(obj, cors, status = 200) {
   });
 }
 
-const cheie = (act, loc, stil) => `${STILURI[stil] || STILURI.nou}/${act}/${loc || "act"}`;
+// CHEIE_PREFIX keeps the dev preview's cache and daily counter apart from production's in the
+// shared KV: a dev prompt or model change must never be served from the production cache.
+const cheie = (env, act, loc, stil) => `${env.CHEIE_PREFIX || ""}${STILURI[stil] || STILURI.nou}/${act}/${loc || "act"}`;
 
 function originPermis(request, env) {
   const lista = (env.ORIGINI || "*").split(",").map((s) => s.trim());
@@ -77,7 +79,7 @@ function originPermis(request, env) {
 
 async function subCap(env) {
   if (!env.CAP_ZILNIC) return true;
-  const k = `_zi/${new Date().toISOString().slice(0, 10)}`;
+  const k = `${env.CHEIE_PREFIX || ""}_zi/${new Date().toISOString().slice(0, 10)}`;
   const n = parseInt((await env.RESCRIERI.get(k)) || "0", 10);
   if (n >= Number(env.CAP_ZILNIC)) return false;
   await env.RESCRIERI.put(k, String(n + 1), { expirationTtl: 172800 });
@@ -148,7 +150,7 @@ export default {
     // Without 'act' (a general rewrite of the caller's own text) there is nothing safe to cache by,
     // so that path always generates fresh and stores nothing.
     if (act) {
-      const k = cheie(act, loc, stil);
+      const k = cheie(env, act, loc, stil);
       const cache = await env.RESCRIERI.get(k);
       if (cache) return json({ rescriere: cache, cached: true, stil }, cors);
       if (request.method === "GET") return json({ error: "negenerat", cached: false }, cors, 404);

@@ -251,3 +251,59 @@ def test_pagina_cu_depozit_incalzeste_banda_dupa_worker_ready(tmp_path, monkeypa
     assert "new Promise(res => setTimeout(() => res(null), RABDARE_BANDA))" in text
     assert "incalzesteBanda().catch(()=>{});" in text
     assert "const BANDA_TITLURI = 8, RABDARE_BANDA = 25000;" in text
+
+
+def test_bazele_din_depozit_sunt_cele_montate_de_worker():
+    """The build leaves out exactly what the worker mounts from the store: a database left out
+    but not mounted is missing; one mounted but still shipped costs every visitor its bytes."""
+    from scripts import construieste_web as cw
+
+    lista = ", ".join(f'"{n}"' for n in cw.BAZE_DIN_DEPOZIT)
+    assert f"for (const nume of [{lista}])" in cw.WORKER
+
+
+def _build_mic(tmp_path, monkeypatch, baze):
+    from scripts import construieste_web as cw
+
+    data = tmp_path / "data"
+    data.mkdir()
+    monkeypatch.setattr(cw, "WEB", tmp_path)
+    monkeypatch.setattr(cw, "DATA", data)
+    for nume in ("index.json", "termeni.json"):
+        (data / nume).write_text("{}", encoding="utf-8")
+    for nume in baze:
+        (data / nume).write_bytes(b"SQLite format 3\0" + nume.encode())
+    return cw, data
+
+
+def test_cu_depozit_bazele_nu_intra_in_build_si_nici_in_precache(tmp_path, monkeypatch):
+    cw, data = _build_mic(tmp_path, monkeypatch, ("corpus.db", "graf.db", "initiative.db", "eu.db"))
+
+    assert cw._fara_bazele_din_depozit() == list(cw.BAZE_DIN_DEPOZIT)
+    assert not any((data / n).exists() for n in cw.BAZE_DIN_DEPOZIT)
+    assert (data / "index.json").is_file()
+
+    cw._versiune_si_sw()
+    sw = (tmp_path / "sw.js").read_text(encoding="utf-8")
+    # addAll is all-or-nothing: one entry that 404s would leave the offline cache empty.
+    assert ".db" not in sw.split("const NUCLEU = [")[1].split("];")[0]
+    assert "__BAZE__" not in sw
+    assert '"./data/index.json"' in sw
+
+
+def test_fara_depozit_bazele_raman_in_precache(tmp_path, monkeypatch):
+    cw, _ = _build_mic(tmp_path, monkeypatch, ("graf.db", "initiative.db", "eu.db"))
+
+    cw._versiune_si_sw()
+    sw = (tmp_path / "sw.js").read_text(encoding="utf-8")
+    nucleu = sw.split("const NUCLEU = [")[1].split("];")[0]
+    assert '"./data/graf.db", "./data/initiative.db", "./data/eu.db",' in nucleu
+    assert "corpus.db" not in nucleu
+
+
+def test_versiunea_se_schimba_cand_bazele_ies_din_build(tmp_path, monkeypatch):
+    cw, data = _build_mic(tmp_path, monkeypatch, ("graf.db", "initiative.db", "eu.db"))
+    cu = cw._versiune_si_sw()
+    cw._fara_bazele_din_depozit()
+    fara = cw._versiune_si_sw()
+    assert cu != fara, "a new precache list must come with a new cache name"

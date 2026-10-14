@@ -7,7 +7,10 @@
     "test:browser": "playwright test",
     "test:browser:static": "playwright test --config playwright.static.config.js"
   },
-  "devDependencies": { "@playwright/test": "1.63.0" },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "axe-core": "4.14.0"
+  },
   "dependencies": {
     "pagefind": "1.5.2"
   }

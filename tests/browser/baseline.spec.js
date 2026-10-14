@@ -121,6 +121,7 @@ for (const width of [390, 1440]) {
     await expect(page.locator('#lint-out')).toContainText('verificat în');
     await expect(page.locator('#lint-out')).not.toContainText('Eroare:');
     await page.screenshot({ path: info.outputPath(`lint-${width}.png`), fullPage: true });
+    await page.locator('#tab-setari').click();
     await page.locator('#tema-btn').click();
     const theme = await page.evaluate(() => localStorage.getItem('tema'));
     expect(['light', 'dark']).toContain(theme);

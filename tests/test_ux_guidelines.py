@@ -40,3 +40,16 @@ def test_the_guideline_links_the_bibles() -> None:
     for doc in ("UX_UI_BIBLE.md", "PROJECT_FINISH_BIBLE.md", "DESIGN.md", "UX_ACCEPTANCE.md"):
         assert f"({doc})" in text
     assert "(ux-guidelines.md)" in Path("docs/UX_UI_BIBLE.md").read_text(encoding="utf-8")
+
+
+def test_deeper_panels_use_no_machine_terms_in_visible_text():
+    """D-8: workbench, gate and law-as-code stay out of every text node, not only the first view.
+
+    Attributes, ids and data contracts may keep the machine names; what a reader sees may not.
+    """
+    html = Path("app/index.html").read_text(encoding="utf-8")
+    # A text node sits between a closing ">" and the next "<" with no code in between: braces,
+    # backticks, semicolons and line breaks mark template code, not copy.
+    text_node = r">[^<>{}`;\n]*(?:workbench|gate produs|gate-ului|law-as-code)[^<>{}`;\n]*<"
+    offenders = [m.group(0).strip() for m in re.finditer(text_node, html, re.IGNORECASE)]
+    assert offenders == []

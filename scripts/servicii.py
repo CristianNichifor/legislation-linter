@@ -328,9 +328,13 @@ def rezumat(stare: Stare) -> dict:
         r["initiative"] = depozit.rezumat(con)["initiative"]
     # The dataset's own date, stamped at build time; the header warns when it is old.
     if cale is not None and cale.is_file():
-        data_set = json.loads(cale.read_text(encoding="utf-8")).get("data_set")
+        manifest = json.loads(cale.read_text(encoding="utf-8"))
+        data_set = manifest.get("data_set")
         if data_set:
             r["data_set"] = data_set
+        # Real or demo data is the build's word (ux-guidelines § 7); nothing else is a status.
+        if manifest.get("stare_date") in {"reale", "demonstrative"}:
+            r["stare_date"] = manifest["stare_date"]
     r |= _rezumat_ue(stare)
     return r
 

@@ -941,3 +941,22 @@ def test_rezumat_carries_the_dataset_date_from_the_manifest(tmp_path):
     stare.reports_dir = data
     out = rezumat(stare)
     assert out["data_set"] == "2026-09-05"
+
+
+def test_rezumat_carries_the_data_status_from_the_manifest(tmp_path):
+    """D-4: the header badge (real or demo data) is the build's word, passed through unchanged."""
+    stare = _build(tmp_path)
+    assert rezumat(stare).get("stare_date") is None
+    data = tmp_path / "rapoarte"
+    data.mkdir()
+    manifest = data / "manifest.json"
+    manifest.write_text(
+        '{"acte": 1, "provizii": 2, "stare_date": "demonstrative"}', encoding="utf-8"
+    )
+    stare.reports_dir = data
+    assert rezumat(stare)["stare_date"] == "demonstrative"
+    manifest.write_text('{"acte": 1, "provizii": 2, "stare_date": "reale"}', encoding="utf-8")
+    assert rezumat(stare)["stare_date"] == "reale"
+    # Anything else is not a status the header may show.
+    manifest.write_text('{"acte": 1, "provizii": 2, "stare_date": "prototip?"}', encoding="utf-8")
+    assert rezumat(stare).get("stare_date") is None

@@ -228,9 +228,15 @@ test('matrix is the default workspace and opens drafts in place', async ({ page 
   await expect(page.locator('#dossier-library')).toHaveAttribute('open', '');
   await expect(page.locator('#dossier-status')).toContainText('nota din matrice');
   // Creating the dossier resumes the pending note as a draft, still in the matrix view.
+  // Opening the library reloads the list and scrolls the page; the list's page line is what says
+  // the reload has finished. The "Dosar nou" section is opened without a pointer: a click on its
+  // summary during the smooth scroll landed on the library's own summary in WebKit and collapsed
+  // everything, so the title field was never visible and fill waited for the whole timeout.
   await expect(page.locator('#dossier-local')).toBeVisible();
+  await expect(page.locator('#dossier-page')).toContainText('Niciun dosar salvat.');
   const create = page.locator('#dossier-create');
-  await create.locator('xpath=..').locator('summary').click();
+  await create.locator('xpath=..').evaluate(details => { details.open = true; });
+  await expect(create.locator('input[name="titlu"]')).toBeVisible();
   await create.locator('input[name="titlu"]').fill('Dosar din matrice');
   await create.locator('button[type="submit"]').click();
   const title = page.locator('#dossier-notes [data-manual-note-form] input[name="title"]');

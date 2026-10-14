@@ -135,6 +135,37 @@ Test: `tests/browser/static.spec.js` › "english chrome toggle syncs html lang"
 at the end of the navigation and names the other language in that language. The main region and
 the data panels keep `lang="ro"`. English strings are marked *needs human review*.
 
+## Theme E: AI drafting
+
+### LL-9 BYOK draft from evidence, end to end — done
+
+Fleet round 2, 2026-10-14. Provider calls are mocked in the browser with `page.route`; no key
+and no text leave the test. The server never calls a model.
+
+- Given a dossier note with a quote and a source, when the user prepares the prompt with the
+  boundary "online BYOK", then the panel shows the evidence manifest, the token estimate, the
+  prompt hash and that external approval is mandatory.
+- Given a prepared prompt, when the user runs it, then a consent dialog names the provider,
+  model, evidence count and prompt hash, never the key; dismissing it sends nothing and says
+  "Anulat — promptul nu a fost trimis."
+- Given consent, then exactly one request goes to the configured endpoint, with the key only as
+  an `Authorization` header and the selected quote in the body; the result shows the insert
+  header, the stored audit line (`ai-draft-storage-audit-v1 · online_byok`), the draft with its
+  `[1]` citation, guardrail status `ok` and an enabled insert button. The key stays in
+  `sessionStorage`, never in `localStorage`.
+- Failure states create no draft and show "AI oprit · <state>", "ciornă creată: nu" and a
+  disabled insert button: no key in the session (`cheie invalidă`, no request, no consent dialog,
+  no retry), key rejected with 401 (`cheie invalidă`), 429 (`cotă/rate limit`, retry allowed),
+  and no answer within the configured wait (`timeout`). Raw provider error text is never shown.
+- The AI settings expose the provider wait in seconds (5–120, default 45) next to the endpoint.
+
+Test: `tests/browser/ai.spec.js` › "byok draft from evidence: consent, provider call, audit and
+citations" and "byok failure states: missing key, rejected key, quota and timeout create no
+draft" (all three engines, static config). Fixed on the way: a missing key and a timeout were
+both reported as "indisponibil", because the error codes carried no word boundary for the
+classifier. Romanian copy added here (timeout setting label) is agent-written: *needs human
+review*.
+
 ## Workflow-only (maintainer applies the diff)
 
 ### LL-1 Data store prefix not hardcoded — needs human
@@ -157,4 +188,4 @@ points the fixtures demo at the data store.
 - Data host serving the dated prefix (LL-1: `data.cristian-nichifor.com/2026-09-08` returns 404).
 - API worker route for the rewrite endpoint (LL-8).
 - Civic UI upgrade waits for the civic-ui 0.8 release.
-- Review of the English strings (LL-10) and of the privacy page wording (LL-7).
+- Review of the English strings (LL-10), the privacy page wording (LL-7) and the AI wait-time label (LL-9).

@@ -63,7 +63,7 @@ in this area" (LL-4, LL-FORM).
   because a red ring means *abrogat*. State is never colour alone: a ring plus a label.
 - The matrix and every list are the text alternative to the graph.
 - One y axis per chart, labels on bars, source and as-of on every chart (fleet rules).
-- Demo or fixture data is badged where it appears. *No badge on the fixtures demo — D-4.*
+- Demo or fixture data is badged where it appears: the header carries the build's §7 word.
 
 ## 5. States
 
@@ -125,7 +125,6 @@ and 390 px were not taken in this pass. Items in files other sessions were editi
   `legislation-linter`. Needs a naming decision and the hub URL.
 - ~~**D-2** The footer links only the privacy page.~~ Fixed by LL-UXG-2.
 - ~~**D-3** The header dataset date is ISO.~~ Fixed by LL-UXG-2.
-- **D-4** No status badge from §7; the fixtures demo is not marked as demo data.
 - ~~**D-5** Mobile tab list (live review): eight tabs plus „Mai multe” at 390 px; check with
   a screenshot and make it one scrollable row with a visible scroll cue if it wraps.~~ Fixed in
   `app/civic-ui-adapter.css` (one row, fade cue, overflow menu pinned) with a baseline test.

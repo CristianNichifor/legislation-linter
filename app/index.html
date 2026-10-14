@@ -1235,6 +1235,10 @@
   .cons-bar{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;margin:.5rem 0 .2rem}
 
   .stat-vechi{display:inline-block;margin-top:.2rem;color:var(--blocking);font-weight:600}
+  /* Status word from ux-guidelines § 7, one per header; the demo build must not read as live. */
+  .stat-badge{display:inline-block;padding:.05rem .45rem;border:1px solid var(--rule);border-radius:999px;
+    font-family:var(--sans);font-size:.78rem;font-weight:600;letter-spacing:.01em;vertical-align:1px;white-space:nowrap}
+  .stat-badge[data-dataset-status="demonstrative"]{color:var(--blocking);border-color:currentColor}
   .lint-progress{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-family:var(--sans);font-size:.85rem;margin:.6rem 0}
   .spin{display:inline-block;width:.9rem;height:.9rem;border:2px solid var(--rule);
     border-top-color:var(--accent);border-radius:50%;animation:s .7s linear infinite;vertical-align:-1px}
@@ -2080,6 +2084,13 @@ function datasetFreshness(dataSet, now=Date.now()){
   const days=Math.floor((now-at)/86400000);
   return {date:dataSet, days, stale:days>30};
 }
+// The header badge is the build's own word (ux-guidelines § 7, D-4): the summary carries
+// `stare_date` as "reale" or "demonstrative" and anything else gets no badge, never a guess.
+function datasetStatusHtml(stare){
+  const label={reale:"Date reale",demonstrative:"Date demonstrative"}[stare];
+  if(!label) return "";
+  return ` · <span class="stat-badge" data-dataset-status="${esc(stare)}" role="status">${esc(label)}</span>`;
+}
 function datasetFreshnessHtml(dataSet){
   const f=datasetFreshness(dataSet);
   if(!f) return "";
@@ -2108,7 +2119,7 @@ fetch("/api/rezumat").then(apiJson).then(d=>{
       + ` intră în socoteală — nu au articole de parsat.">`
       + `<b>${nf(structurate)}</b> cu articole `
       + `(${proc > 0 && proc < 1 ? "&lt;1" : Math.round(proc)}%)</span>` : ``)
-    + ue + datasetFreshnessHtml(d.data_set);
+    + ue + datasetStatusHtml(d.stare_date) + datasetFreshnessHtml(d.data_set);
 }).catch(err=>{
   const stat=$("#stat");
   stat.textContent=engineFailed(err.message)?ENGINE_FAILED+" ":"Date indisponibile: "+(err.message||"eroare")+" ";

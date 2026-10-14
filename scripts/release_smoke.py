@@ -73,12 +73,12 @@ def run(root: Path) -> dict:
         Check(
             key="pages:workflow",
             ok=_contains(
-                root / ".github/workflows/pages.yml",
-                "actions/deploy-pages",
+                root / ".github/workflows/deploy-pages-cloudflare.yml",
+                "pages deploy",
                 "scripts.construieste_web",
                 "app/**",
             ),
-            summary="GitHub Pages workflow builds and deploys the browser app",
+            summary="Cloudflare Pages workflow builds and deploys the browser app",
         ),
     ]
     return {

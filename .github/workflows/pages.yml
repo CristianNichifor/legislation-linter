@@ -1,17 +1,17 @@
 name: pages
 
-# Build the in-browser app (Pyodide, no server) from the committed fixtures and publish it to
-# GitHub Pages. The data is built by scripts/construieste_web.py --sursa fixturi, which needs
-# nothing git-ignored, so the deploy is reproducible from the repo alone. No secrets, no draft
-# ever leaves a visitor's browser — the page's CSP enforces it.
+# The app now lives on Cloudflare Pages (deploy-pages-cloudflare.yml), served at
+# https://projects.cristian-nichifor.com/legislation-linter/. What this workflow publishes to
+# GitHub Pages is the redirect in redirect/: index.html and 404.html carry the path, query and
+# hash across, so every link to cristiannichifor.github.io/legislation-linter/ pasted before the
+# move still opens the same place, and sw.js retires the app's old service worker and its caches.
+# Nothing is built here.
 
 on:
   push:
     branches: [main]
     paths:
-      - "app/**"
-      - "scripts/**"
-      - "sources/**"
+      - "redirect/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -30,47 +30,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
-      - name: Use the dataset release if published, else the committed fixtures
-        id: date
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # A redirect that points at nothing turns a working link into a loop through a 404.
+      # Checked here so the stub cannot go live before the site it forwards to.
+      - name: Check the destination is live
         run: |
-          # The newest dataset release, not a fixed tag. `date-latest` is immutable — GitHub
-          # refuses to replace an asset on it — so each build of the corpus is published as its
-          # own `date-YYYY-MM-DD`, which suits a legal corpus anyway: a snapshot somebody cited
-          # stays exactly as it was.
-          # Sorted by the tag itself rather than by creation time: `date-2026-09-08` beats
-          # `date-2026-09-05` by string order, and the legacy `date-latest` is excluded by name so
-          # it cannot win by having been re-created.
-          TAG=$(gh release list --limit 100 --json tagName \
-            -q '[.[].tagName | select(test("^date-[0-9]{4}-[0-9]{2}-[0-9]{2}$"))] | sort | reverse | .[0] // ""')
-          if [ -n "$TAG" ] && gh release download "$TAG" --pattern date.tar.gz -O date.tar.gz 2>/dev/null; then
-            echo "dataset: $TAG"
-            mkdir -p web && tar xzf date.tar.gz -C web
-            echo "sursa=gata" >> "$GITHUB_OUTPUT"
-            echo "building from the collected dataset release"
-          else
-            echo "sursa=fixturi" >> "$GITHUB_OUTPUT"
-            echo "no dataset release yet — building the 4-act fixtures demo"
-          fi
-      - name: Build the browser bundle
-        # The corpus itself is not in the build: the browser mounts it from object storage
-        # over byte-range requests. The prefix is dated, so publishing new data means
-        # uploading under a new prefix and changing this line — the old one stays readable.
-        #
-        # `--felii-cautare` says how many slices the search index at that prefix is in. The index
-        # is not in git, so nothing here can count them; get it wrong and search would answer from
-        # one slice while looking perfectly healthy. It belongs next to the prefix: they describe
-        # the same dataset and they change together.
-        run: >-
-          uv run python -m scripts.construieste_web
-          --sursa ${{ steps.date.outputs.sursa }}
-          --depozit https://data.cristian-nichifor.com/2026-09-08
-          --felii-cautare 8
+          url=https://projects.cristian-nichifor.com/legislation-linter/
+          code=$(curl -s -o /dev/null -w '%{http_code}' -L "$url")
+          echo "$url -> $code"
+          [ "$code" = "200" ] || { echo "destination is not serving; refusing to publish the redirect"; exit 1; }
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: web
+          path: redirect
 
   deploy:
     needs: build

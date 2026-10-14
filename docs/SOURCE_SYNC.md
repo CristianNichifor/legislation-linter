@@ -66,7 +66,7 @@ without starting a sync. The status object is read-only UI/API guidance:
 This selected-source status endpoint must not fetch upstream sources, rebuild
 datasets, recalculate dossiers or mutate the registry.
 
-Static GitHub Pages/browser workspaces do not fetch official sources. They may
+Static public/browser workspaces do not fetch official sources. They may
 show local/public snapshots, but one-source acquisition requires the local Python
 server because it writes the source registry and retained source databases.
 

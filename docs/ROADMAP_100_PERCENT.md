@@ -288,7 +288,7 @@ Goal: keep public deployment useful while avoiding multi-GB release churn.
 
 Deliverables:
 
-- Small base dataset for GitHub Pages.
+- Small base dataset for the public static app.
 - Optional source packs by domain or source family.
 - Incremental update manifests.
 - UI update button that can fetch only changed packs.

@@ -1241,6 +1241,10 @@
   .cons-bar{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;margin:.5rem 0 .2rem}
 
   .stat-vechi{display:inline-block;margin-top:.2rem;color:var(--blocking);font-weight:600}
+  /* Status word from ux-guidelines § 7, one per header; the demo build must not read as live. */
+  .stat-badge{display:inline-block;padding:.05rem .45rem;border:1px solid var(--rule);border-radius:999px;
+    font-family:var(--sans);font-size:.78rem;font-weight:600;letter-spacing:.01em;vertical-align:1px;white-space:nowrap}
+  .stat-badge[data-dataset-status="demonstrative"]{color:var(--blocking);border-color:currentColor}
   .lint-progress{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-family:var(--sans);font-size:.85rem;margin:.6rem 0}
   .spin{display:inline-block;width:.9rem;height:.9rem;border:2px solid var(--rule);
     border-top-color:var(--accent);border-radius:50%;animation:s .7s linear infinite;vertical-align:-1px}
@@ -1767,7 +1771,7 @@
             <div id="project-cockpit-body"></div>
           </details>
           <details id="project-workbench" class="tracker-timeline">
-            <summary>Workbench proiect</summary>
+            <summary>Spațiu de lucru · proiect</summary>
             <p id="project-workbench-status" class="hint" role="status">Alege un proiect urmărit.</p>
             <div id="project-workbench-body"></div>
           </details>
@@ -2087,6 +2091,13 @@ function datasetFreshness(dataSet, now=Date.now()){
   const days=Math.floor((now-at)/86400000);
   return {date:dataSet, days, stale:days>30};
 }
+// The header badge is the build's own word (ux-guidelines § 7, D-4): the summary carries
+// `stare_date` as "reale" or "demonstrative" and anything else gets no badge, never a guess.
+function datasetStatusHtml(stare){
+  const label={reale:"Date reale",demonstrative:"Date demonstrative"}[stare];
+  if(!label) return "";
+  return ` · <span class="stat-badge" data-dataset-status="${esc(stare)}" role="status">${esc(label)}</span>`;
+}
 function datasetFreshnessHtml(dataSet){
   const f=datasetFreshness(dataSet);
   if(!f) return "";
@@ -2115,7 +2126,7 @@ fetch("/api/rezumat").then(apiJson).then(d=>{
       + ` intră în socoteală — nu au articole de parsat.">`
       + `<b>${nf(structurate)}</b> cu articole `
       + `(${proc > 0 && proc < 1 ? "&lt;1" : Math.round(proc)}%)</span>` : ``)
-    + ue + datasetFreshnessHtml(d.data_set);
+    + ue + datasetStatusHtml(d.stare_date) + datasetFreshnessHtml(d.data_set);
 }).catch(err=>{
   const stat=$("#stat");
   stat.textContent=engineFailed(err.message)?ENGINE_FAILED+" ":"Date indisponibile: "+(err.message||"eroare")+" ";
@@ -3833,7 +3844,7 @@ const AI_DRAFT_TASK_LABELS={
   review_checklist:'listă de verificare reviewer',
   summarize_source_change:'rezumă schimbare sursă',
   compare_provisions:'compară două prevederi',
-  extract_rule_candidate:'extrage candidat law-as-code'
+  extract_rule_candidate:'extrage candidat de regulă'
 };
 function aiDraftTaskOptions(current='issue_note'){
   return Object.entries(AI_DRAFT_TASK_LABELS).map(([key,label])=>`<option value="${key}" ${key===current?'selected':''}>${label}</option>`).join('');
@@ -5829,7 +5840,7 @@ function aiDraftPayloadPreview(plan,boundary){
     review_checklist:'listă de verificare reviewer',
     summarize_source_change:'rezumă schimbare sursă',
     compare_provisions:'compară două prevederi',
-    extract_rule_candidate:'extrage candidat law-as-code'
+    extract_rule_candidate:'extrage candidat de regulă'
   };
   const taskKey=plan.task||plan.draft_request?.task||'issue_note';
   const task=taskLabels[taskKey]||taskKey;
@@ -6881,7 +6892,7 @@ function ruleCandidateQueueHtml(item,index){
     +`<p class="hint">Prevedere: ${esc(c.provision_id||'')} · metodă: ${esc(RULE_CANDIDATE_EXTRACTION_METHODS[c.extraction_method||'manual']||c.extraction_method||'manual')} · încredere: ${esc(RULE_CANDIDATE_CONFIDENCE[c.confidence]||c.confidence||'necunoscută')} · SHA-256 sursă: ${esc(c.source_hash||'')}</p>`
     +(c.applicability_scope?`<p class="hint">Domeniu aplicare: ${esc(c.applicability_scope)}</p>`:'')
     +`<div class="dossier-actions"><button type="button" class="ghost mini" data-rule-edit>Editează candidat</button></div><div data-rule-edit-host></div>`
-    +(item.actiuni?.promote_to_rule?'<details data-rule-promote><summary>Promovează în ciornă law-as-code</summary><form><label>Acceptat de<input name="accepted_by" maxlength="160" required></label><label>Notă acceptare<textarea name="acceptance_note" rows="2" maxlength="1200" required></textarea></label><div class="dossier-actions"><button type="submit" class="ghost mini">Acceptă ca regulă-ciornă</button><p class="hint" role="status" data-rule-promote-status></p></div></form></details>':'<p class="hint">Nu poate fi promovat până nu este revizuibil sau revizuit uman.</p>')
+    +(item.actiuni?.promote_to_rule?'<details data-rule-promote><summary>Promovează în ciornă de regulă</summary><form><label>Acceptat de<input name="accepted_by" maxlength="160" required></label><label>Notă acceptare<textarea name="acceptance_note" rows="2" maxlength="1200" required></textarea></label><div class="dossier-actions"><button type="submit" class="ghost mini">Acceptă ca regulă-ciornă</button><p class="hint" role="status" data-rule-promote-status></p></div></form></details>':'<p class="hint">Nu poate fi promovat până nu este revizuibil sau revizuit uman.</p>')
     +`<details><summary>Contract candidat</summary><pre>${esc(JSON.stringify(c,null,2))}</pre></details></article>`;
 }
 function lawRuleDraftHtml(draft){
@@ -6936,14 +6947,14 @@ function lawCodeLoopStatusHtml(queue,drafts,checks){
     {label:'3. Verificare deterministă',state:promoted?'disponibil':'blocată',hint:promoted?`${signals} semnale candidate din verificarea curentă.`:'Verificarea pornește numai după promovarea unei ciorne.'},
     {label:'4. Notă de lucru',state:signals?'necesară':'opțională',hint:signals?'Transformă semnalul într-o notă manuală cu citate.':'Fără semnal local nu înseamnă conformitate.'}
   ];
-  return '<section class="manual-note" data-law-code-loop><h4>Flux law-as-code</h4>'
+  return '<section class="manual-note" data-law-code-loop><h4>Flux regulă verificabilă</h4>'
     +'<p class="hint">Bucla este: revizuiește candidatul, promovează ciorna, rulează verificarea, apoi scrie nota. Totul rămâne candidat de lucru, nu verdict juridic.</p>'
     +`<div class="manual-note-summary">${stages.map(stage=>`<button type="button" class="ghost mini" disabled>${esc(stage.label)}<br><b>${esc(stage.state)}</b><br><small>${esc(stage.hint)}</small></button>`).join('')}</div></section>`;
 }
 function ruleDraftsPanelHtml(queue,drafts,checks,bucket,filters){
   const counts=Object.entries(RULE_QUEUE_BUCKETS).filter(([key])=>key!=='all').map(([key,label])=>`${esc(label)}: ${esc(queue.counts?.[key]||0)}`).join(' · ');
   const bucketOptions=Object.entries(RULE_QUEUE_BUCKETS).map(([key,label])=>`<option value="${key}" ${key===bucket?'selected':''}>${label}</option>`).join('');
-  return '<details class="manual-notes" open><summary>Reguli law-as-code · candidați și ciorne</summary>'
+  return '<details class="manual-notes" open><summary>Reguli verificabile · candidați și ciorne</summary>'
     +'<p class="hint">Flux local: candidat validat → revizie umană → ciornă law-rule-draft-v1 → verificare deterministă limitată. Rezultatele sunt candidate de lucru, nu verdict juridic.</p>'
     +`<div class="manual-note-summary"><button type="button" class="ghost mini" disabled>Candidați<br><b>${esc(queue.total||0)}</b></button><button type="button" class="ghost mini" disabled>Ciorne promovate<br><b>${esc(drafts.total||0)}</b></button><button type="button" class="ghost mini" disabled>Semnale reguli<br><b>${esc(checks?.candidate_issues||0)}</b></button></div>`
     +lawCodeLoopStatusHtml(queue,drafts,checks)
@@ -6960,7 +6971,7 @@ async function loadRuleDrafts(dossierId,offset=0,options={}){
   const valid=()=>seq===ruleDraftsSequence&&DOSARE_UI.selected?.id===dossierId;
   const bucket=options.bucket||host.querySelector?.('[name="bucket"]')?.value||'all';
   const filters={act:options.act??host.querySelector?.('[name="act"]')?.value??'',provision_id:options.provision_id??host.querySelector?.('[name="provision_id"]')?.value??''};
-  host.innerHTML='<details class="manual-notes" open><summary>Reguli law-as-code · candidați și ciorne</summary><p role="status">Încarc regulile…</p></details>';
+  host.innerHTML='<details class="manual-notes" open><summary>Reguli verificabile · candidați și ciorne</summary><p role="status">Încarc regulile…</p></details>';
   try{
     const queueParams=new URLSearchParams({id:dossierId,offset:String(offset),stare:bucket});
     const draftParams=new URLSearchParams({id:dossierId,offset:'0'});
@@ -7031,7 +7042,7 @@ async function loadRuleDrafts(dossierId,offset=0,options={}){
       };
     });
     host.querySelectorAll('[data-rule-check-note]').forEach(button=>button.onclick=()=>startManualNote(manualNoteFromRuleCheck(checks.rows[Number(button.closest('[data-rule-check-index]').dataset.ruleCheckIndex)])));
-  }catch(err){if(valid()){host.innerHTML='<details class="manual-notes" open><summary>Reguli law-as-code · candidați și ciorne</summary><p role="status">'+esc(err.message)+'</p><button type="button" class="ghost mini" data-rules-retry>Reîncearcă regulile</button></details>';host.querySelector('[data-rules-retry]').onclick=()=>loadRuleDrafts(dossierId,offset,options);}}
+  }catch(err){if(valid()){host.innerHTML='<details class="manual-notes" open><summary>Reguli verificabile · candidați și ciorne</summary><p role="status">'+esc(err.message)+'</p><button type="button" class="ghost mini" data-rules-retry>Reîncearcă regulile</button></details>';host.querySelector('[data-rules-retry]').onclick=()=>loadRuleDrafts(dossierId,offset,options);}}
 }
 async function loadProposalList(dossierId,offset=0){
   const host=$('#dossier-proposals'),seq=++proposalListSequence;
@@ -8450,7 +8461,7 @@ function acceptanceSourceActionHtml(data){
 function completionActionCenterHtml(data){
   const source=data.source_status||{}, caps=data.capabilities||[];
   const blocked=caps.filter(c=>c.state!=='ready');
-  if(data.completion_claim_allowed||!blocked.length)return '<section class="source-review" data-completion-action-center><h5>Acțiuni finalizare</h5><p class="hint">Toate capabilitățile obligatorii sunt gata conform gate-ului curent.</p></section>';
+  if(data.completion_claim_allowed||!blocked.length)return '<section class="source-review" data-completion-action-center><h5>Acțiuni finalizare</h5><p class="hint">Toate capabilitățile obligatorii sunt gata după criteriile curente.</p></section>';
   const items=new Map();
   const add=(key,label,action,detail)=>items.set(key,{label,action,detail});
   if(Number(source.missing_required||0)>0||Number(source.unsynced_required||0)>0){
@@ -8635,7 +8646,7 @@ function sourceWorkbenchHtml(data){
   const s=data.summary||{}, counts=Object.entries(data.counts||{}).map(([k,v])=>`${sourceWorkbenchKindLabel(k)}: ${v}`).join(' · ');
   const actions=(data.next_actions||[]).map(action=>`<li><strong>${esc(action.label||action.key)}</strong>${action.count?` · ${esc(action.count)}`:''}</li>`).join('');
   const rows=(data.rows||[]).map(sourceWorkbenchRowHtml).join('');
-  return `<section class="source-inventory"><h4>Starea surselor și stadiile proiectelor</h4><p><strong>${esc(s.attention_items||0)} elemente cu atenție</strong>${counts?` · ${esc(counts)}`:''}</p><div class="coverage-grid"><article class="coverage-card coverage-attention"><h4>Surse</h4><p>${esc(s.sources_attention||0)} cu atenție · ${esc(s.retryable_sources||0)} retry · ${esc(s.reviewable_sources||0)} revizuibile</p></article><article class="coverage-card coverage-attention"><h4>Tracker</h4><p>${esc(s.tracker_unreviewed||0)} evenimente nerevizuite</p></article><article class="coverage-card coverage-attention"><h4>Lifecycle</h4><p>${esc(s.projects_attention||0)} proiecte cu atenție · ${esc(s.evidence_links||0)} legături/hash dovezi</p></article></div>${actions?`<details open><summary>Ce trebuie făcut azi</summary><ul>${actions}</ul></details>`:''}${rows?`<div class="coverage-grid">${rows}</div>`:'<p class="hint">Nu există rânduri locale care cer acțiune în workbench.</p>'}${data.limitari?.length?`<p class="hint">${data.limitari.map(esc).join(' ')}</p>`:''}</section>`;
+  return `<section class="source-inventory"><h4>Starea surselor și stadiile proiectelor</h4><p><strong>${esc(s.attention_items||0)} elemente cu atenție</strong>${counts?` · ${esc(counts)}`:''}</p><div class="coverage-grid"><article class="coverage-card coverage-attention"><h4>Surse</h4><p>${esc(s.sources_attention||0)} cu atenție · ${esc(s.retryable_sources||0)} retry · ${esc(s.reviewable_sources||0)} revizuibile</p></article><article class="coverage-card coverage-attention"><h4>Tracker</h4><p>${esc(s.tracker_unreviewed||0)} evenimente nerevizuite</p></article><article class="coverage-card coverage-attention"><h4>Lifecycle</h4><p>${esc(s.projects_attention||0)} proiecte cu atenție · ${esc(s.evidence_links||0)} legături/hash dovezi</p></article></div>${actions?`<details open><summary>Ce trebuie făcut azi</summary><ul>${actions}</ul></details>`:''}${rows?`<div class="coverage-grid">${rows}</div>`:'<p class="hint">Nu există rânduri locale care cer acțiune în spațiul de lucru.</p>'}${data.limitari?.length?`<p class="hint">${data.limitari.map(esc).join(' ')}</p>`:''}</section>`;
 }
 async function loadSourceWorkbench(){
   const status=$('#source-coverage-status'),out=$('#source-workbench-result');
@@ -8998,7 +9009,7 @@ function lifecycleRowHtml(project,index=0){
   const review=['changed','needs_review'].includes(project.registry_source_state)?`<button type="button" class="ghost mini" data-lifecycle-review-source="${index}">Revizuiește sursa</button>`:'';
   const markWatch=project.watch_item?.needs_attention?`<button type="button" class="ghost mini" data-lifecycle-watch-review="${index}">Marchează follow revizuit</button>`:'';
   const evidence=(project.timeline_coverage?.missing||[]).length&&Number(project.timeline_coverage?.total_events||0)>0?`<button type="button" class="ghost mini" data-lifecycle-missing-evidence="${index}">Dovadă lipsă</button>`:'';
-  return `<article class="lifecycle-row lifecycle-row-${attention}" data-lifecycle-row="${index}"><h4>${esc(project.project_id||'Fără id')} · ${esc(project.title||'Fără titlu')}</h4>${lifecycleStatusSummaryHtml(project)}<p><strong>${esc(lifecycleStateLabel(project))}</strong> · ${esc(stage)}${stageDate}</p>${lifecycleTimelineHtml(project)}${lifecycleTimelineCoverageHtml(project)}${lifecycleParliamentEvidenceHtml(project)}${lifecyclePathCoverageHtml(project)}<p class="hint">Ultimul eveniment: ${esc(lifecycleEventText(project))}</p><p class="hint">${esc(lifecycleUncertaintyText(project))}</p><p class="hint">Sursă: ${esc(project.source_name||'necunoscută')} · Văzut: ${esc(dossierTime(project.last_seen))} · Actualizat: ${esc(dossierTime(project.last_updated))}</p>${registry}${affectedText}<p>${source}</p><div class="dossier-actions"><button type="button" class="ghost mini" data-lifecycle-watch="${index}">${esc(watch)}</button>${markWatch}<button type="button" class="ghost mini" data-lifecycle-watch-dossier="${index}">Urmărește în dosar</button><button type="button" class="ghost mini" data-lifecycle-cockpit="${index}">Cockpit</button><button type="button" class="ghost mini" data-lifecycle-workbench="${index}">Workbench</button><button type="button" class="ghost mini" data-lifecycle-coverage="${index}">Acoperire surse</button>${evidence}<button type="button" class="ghost mini" data-lifecycle-draft="${index}">Draft</button><button type="button" class="ghost mini" data-lifecycle-timeline="${index}">Timeline</button><button type="button" class="ghost mini" data-lifecycle-dossier="${index}">Pregătește dosar</button><button type="button" class="ghost mini" data-lifecycle-open="${index}">Deschide sursele proiectului</button>${sync}${review}</div></article>`;
+  return `<article class="lifecycle-row lifecycle-row-${attention}" data-lifecycle-row="${index}"><h4>${esc(project.project_id||'Fără id')} · ${esc(project.title||'Fără titlu')}</h4>${lifecycleStatusSummaryHtml(project)}<p><strong>${esc(lifecycleStateLabel(project))}</strong> · ${esc(stage)}${stageDate}</p>${lifecycleTimelineHtml(project)}${lifecycleTimelineCoverageHtml(project)}${lifecycleParliamentEvidenceHtml(project)}${lifecyclePathCoverageHtml(project)}<p class="hint">Ultimul eveniment: ${esc(lifecycleEventText(project))}</p><p class="hint">${esc(lifecycleUncertaintyText(project))}</p><p class="hint">Sursă: ${esc(project.source_name||'necunoscută')} · Văzut: ${esc(dossierTime(project.last_seen))} · Actualizat: ${esc(dossierTime(project.last_updated))}</p>${registry}${affectedText}<p>${source}</p><div class="dossier-actions"><button type="button" class="ghost mini" data-lifecycle-watch="${index}">${esc(watch)}</button>${markWatch}<button type="button" class="ghost mini" data-lifecycle-watch-dossier="${index}">Urmărește în dosar</button><button type="button" class="ghost mini" data-lifecycle-cockpit="${index}">Cockpit</button><button type="button" class="ghost mini" data-lifecycle-workbench="${index}">Spațiu de lucru</button><button type="button" class="ghost mini" data-lifecycle-coverage="${index}">Acoperire surse</button>${evidence}<button type="button" class="ghost mini" data-lifecycle-draft="${index}">Draft</button><button type="button" class="ghost mini" data-lifecycle-timeline="${index}">Timeline</button><button type="button" class="ghost mini" data-lifecycle-dossier="${index}">Pregătește dosar</button><button type="button" class="ghost mini" data-lifecycle-open="${index}">Deschide sursele proiectului</button>${sync}${review}</div></article>`;
 }
 function lifecycleSourceNote(project){
   const source=project.registry_source||{};
@@ -9704,7 +9715,7 @@ function writingWorkspaceHtml(dossier){
   return `<details class="leg-writing" open><summary>Spațiu de redactare legislativă</summary>`
     +'<p class="hint">Lucrează cu textul proiectului, pachetul de dovezi și verificări deterministe în același loc. Rezultatele sunt semnale de lucru, nu verdict juridic.</p>'
     +`<div data-writing-readiness>${writingReadinessHtml(dossier)}</div>`
-    +`<form data-writing-project-form class="dossier-actions"><label>Project ID<input name="project_id" maxlength="200" value="${esc(dossier.project_id||'')}"></label><button type="submit" class="ghost mini">Încarcă context proiect</button><button type="button" class="ghost mini" data-writing-open-workbench>Workbench</button><p class="hint" role="status" data-writing-status></p></form>`
+    +`<form data-writing-project-form class="dossier-actions"><label>Project ID<input name="project_id" maxlength="200" value="${esc(dossier.project_id||'')}"></label><button type="submit" class="ghost mini">Încarcă context proiect</button><button type="button" class="ghost mini" data-writing-open-workbench>Spațiu de lucru</button><p class="hint" role="status" data-writing-status></p></form>`
     +'<div class="leg-writing-grid"><section><label>Text proiect / amendament<textarea data-writing-draft maxlength="120000" placeholder="Lipește textul proiectului sau adu textul din fila Verifică."></textarea></label><div class="dossier-actions"><button type="button" class="ghost mini" data-writing-from-draft>Adu din Verifică</button><button type="button" class="ghost mini" data-writing-to-draft>Trimite în Verifică</button><button type="button" class="ghost mini" data-writing-run-rules>Rulează reguli</button><button type="button" class="ghost mini" data-writing-open-proposal>Propunere din redactare</button></div><label>Note de lucru<textarea data-writing-notes maxlength="120000" placeholder="Păstrează aici raționamentul, întrebările și fragmentele din pachetul de dovezi."></textarea></label><div class="dossier-actions"><button type="button" class="ghost mini" data-writing-insert-evidence disabled>Adaugă pachet în note</button><button type="button" class="ghost mini" data-writing-copy-evidence disabled>Copie pachet Markdown</button></div><form data-writing-ai-form>'+aiUnifiedDraftPanelHtml('pachetul dosarului')+'</form><div data-writing-rule-output>'+ruleDraftTextExecutionHtml(null)+'</div></section><aside class="leg-writing-context" data-writing-context>'+writingWorkspaceContextHtml(null)+'</aside></div></details>';
 }
 function currentProposalFindingId(){
@@ -9897,7 +9908,7 @@ function projectWorkbenchHtml(project,pack){
   const candidate=projectWorkbenchReviewCandidate(pack);
   const lifecycleMatches=pack.lifecycle?.projects||[];
   const title=project.title||lifecycleMatches[0]?.title||'Fără titlu';
-  return `<section class="source-review"><h4>Workbench · ${esc(pack.project_id||project.project_id||'proiect')}</h4>`
+  return `<section class="source-review"><h4>Spațiu de lucru · ${esc(pack.project_id||project.project_id||'proiect')}</h4>`
     +`<p><strong>${esc(title)}</strong></p>`
     +`<div class="lifecycle-overview"><section class="lifecycle-overview-card"><span class="hint">Evenimente</span><strong>${esc(summary.events||0)}</strong><span class="hint">${esc(summary.open_events||0)} nerevizuite</span></section><section class="lifecycle-overview-card"><span class="hint">Note dosar</span><strong>${esc(summary.notes||0)}</strong><span class="hint">${pack.dossier_id?esc(pack.dossier_id):'fără dosar ales'}</span></section><section class="lifecycle-overview-card"><span class="hint">Potriviri lifecycle</span><strong>${esc(summary.lifecycle_matches||0)}</strong><span class="hint">${esc(pack.source_status||'necunoscut')}</span></section></div>`
     +(warnings.length?`<h5>Atenție</h5><ul>${warnings.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>`:'')
@@ -10455,7 +10466,7 @@ function mGraphEndpointHtml(e, side){
 }
 function mGraphHtml(d){
   if(!d) return empty("Nu am putut citi graful matricei.");
-  let h=`<div class="parc-h">Graf matrice · scaffold law-as-code</div>`
+  let h=`<div class="parc-h">Graf matrice · schiță de reguli</div>`
     +`<p class="hint">${nf(d.acte_selectate||0)} acte selectate din ${nf(d.acte_total||0)}. `
     +`Relațiile sunt candidate extrase/indexate, nu verdict juridic.</p>`;
   if(d.graph_state==="indisponibil"){

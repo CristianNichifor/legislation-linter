@@ -6817,7 +6817,12 @@ async function loadManualNotes(dossierId,offset=0){
         status.textContent='Nu marca nota „'+(MANUAL_NOTE_STATUS[radio.value]||radio.value)+'” fără: '+missing.join(', ')+'.';return;
       }
       const group=radio.closest('[data-note-review]');group.querySelectorAll('input').forEach(i=>i.disabled=true);
-      try{await dossierApi('/api/dosare/note',{id:note.id,dosar_id:dossierId,revizie:note.revizie,title:note.title,type:note.type,act_id:note.act_id,locator:note.locator,evidence_quote:note.evidence_quote,source_url:note.source_url,source_hash:note.source_hash,reasoning:note.reasoning,status:radio.value});status.textContent='Starea notei a fost salvată.';await loadManualNotes(dossierId,offset);}
+      try{
+        await dossierApi('/api/dosare/note',{id:note.id,dosar_id:dossierId,revizie:note.revizie,title:note.title,type:note.type,act_id:note.act_id,locator:note.locator,evidence_quote:note.evidence_quote,source_url:note.source_url,source_hash:note.source_hash,reasoning:note.reasoning,status:radio.value});
+        await loadManualNotes(dossierId,offset);
+        // The reload rewrote the list and its status line; say what just happened on the new one.
+        const after=host.querySelector('[data-note-list-status]');if(after)after.textContent='Starea notei a fost salvată.';
+      }
       catch(err){group.querySelectorAll('input').forEach(i=>i.disabled=false);status.textContent=err.message+' Reîncarcă nota dacă a fost modificată în altă fereastră.';}
     });
     host.querySelectorAll('[data-note-draft-selected]').forEach(button=>button.onclick=()=>{

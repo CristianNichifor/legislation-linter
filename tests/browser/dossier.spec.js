@@ -70,7 +70,9 @@ test('review state is saved from the finding and survives a reload', async ({ pa
 test('a note without reasoning cannot be marked reviewed from the finding', async ({ page }) => {
   const finding = await createDossierWithNote(page, { reasoning: false });
   const group = finding.getByRole('radiogroup', { name: /stare/i });
-  await group.getByRole('radio', { name: 'Auto-revizuită' }).check();
+  // click(), not check(): the app puts the previous state back at once, which check() reads as
+  // "the click changed nothing".
+  await group.getByRole('radio', { name: 'Auto-revizuită' }).click();
   await expect(page.locator('#dossier-notes [data-note-list-status]')).toContainText('fără: raționament');
   await expect(group.getByRole('radio', { name: 'Ciornă' })).toBeChecked();
   await expect(finding.locator('[data-note-status]')).toHaveText('Ciornă');

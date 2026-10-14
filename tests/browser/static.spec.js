@@ -260,3 +260,22 @@ test('one navigation, breadcrumb and hash routing', async ({ page }) => {
   await expect(page.locator('#pane-cauta')).toBeVisible();
   await expect(page.getByRole('tab', { name: 'Caută' })).toHaveAttribute('aria-selected', 'true');
 });
+
+test('engine timeout, progress and cancel', async ({ page, context, browserName }) => {
+  test.skip(browserName !== 'chromium', 'Worker requests are routed reliably in Chromium only.');
+  test.setTimeout(150_000);
+  // The engine's runtime never answers, so the worker waits on it forever.
+  await context.route('https://cdn.jsdelivr.net/**', () => {});
+  await page.goto('/#verifica');
+  await page.locator('#draft').fill('In termen de 30 de zile, Guvernul aproba normele metodologice.');
+  await page.locator('#go').click();
+  await expect(page.locator('#lint-out')).toContainText('Pornesc motorul');
+  await page.locator('#lint-out [data-lint-cancel]').click();
+  await expect(page.locator('#lint-out')).toContainText('Verificare anulată');
+  await expect(page.locator('#go')).toBeEnabled();
+  await page.locator('#go').click();
+  await expect(page.locator('#lint-out')).toContainText('Motorul nu a pornit — reîncearcă', { timeout: 40_000 });
+  await expect(page.locator('#lint-out').getByRole('button', { name: 'Reîncearcă' })).toBeVisible();
+  await expect(page.locator('#stat')).not.toContainText('se încarcă');
+  await expect(page.locator('#stat')).toContainText('Motorul nu a pornit');
+});

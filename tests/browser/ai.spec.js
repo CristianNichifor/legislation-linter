@@ -2,16 +2,15 @@ import { test, expect } from '@playwright/test';
 
 // LL-9: the evidence-to-draft flow with the user's own provider (BYOK), end to end in the real
 // static app. The provider is mocked with page.route, so no key and no text leave the test.
-const PROVIDER = 'https://api.openai.com/v1/chat/completions';
+// The mock lives on the app's own origin, set through the endpoint field the settings pane
+// offers for exactly this (a proxy or a self-hosted provider): a cross-origin endpoint needs a
+// CORS preflight, and Playwright's WebKit does not route preflights, so the OPTIONS went to the
+// real api.openai.com, came back 401 without allow-origin headers, and the browser dropped the
+// POST before any route saw it. Same origin, no preflight, every engine routes the request.
+const PROVIDER_PATH = '/byok-mock/v1/chat/completions';
 const KEY = 'sk-test-fleet-never-sent-anywhere';
 const QUOTE = 'Prezenta lege reglementează modul de realizare a achizițiilor publice.';
-// WebKit follows the Fetch spec to the letter: `Authorization` is never covered by the `*`
-// wildcard, so the mocked preflight names every header the app sends.
-const CORS = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-headers': 'authorization, content-type, x-api-key, anthropic-version, anthropic-dangerous-direct-browser-access',
-  'access-control-allow-methods': 'POST, OPTIONS',
-};
+const JSON_HEADERS = { 'content-type': 'application/json' };
 
 // Settings live on another pane, and leaving the dossier pane re-renders the note form (WebKit
 // does it late enough to race a click), so the provider is configured before the dossier exists.
@@ -21,6 +20,7 @@ async function setOnlineProvider(page, { key = KEY, seconds = 5 } = {}) {
   await page.locator('#ai-mode').selectOption('online');
   await page.locator('#ai-provider').selectOption('openai');
   await expect(page.locator('#ai-key')).toBeVisible();
+  await page.locator('#ai-endpoint').fill(new URL(PROVIDER_PATH, page.url()).href);
   await page.locator('#ai-key').fill(key);
   await page.locator('#ai-timeout').fill(String(seconds));
   await expect(page.locator('#ai-contract')).toContainText(key ? 'cheie în sesiune' : 'cheie lipsă');
@@ -59,9 +59,8 @@ async function preparePrompt(panel) {
 
 function mockProvider(page, handler) {
   const calls = [];
-  return page.route(PROVIDER, async route => {
+  return page.route(`**${PROVIDER_PATH}`, async route => {
     const request = route.request();
-    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: CORS });
     calls.push({ headers: request.headers(), body: request.postDataJSON() });
     return handler(route, calls);
   }).then(() => calls);
@@ -82,7 +81,7 @@ async function run(panel, page, { accept = true } = {}) {
 test('byok draft from evidence: consent, provider call, audit and citations', async ({ page }) => {
   test.setTimeout(240_000);
   const calls = await mockProvider(page, route => route.fulfill({
-    status: 200, headers: { ...CORS, 'content-type': 'application/json' },
+    status: 200, headers: JSON_HEADERS,
     body: JSON.stringify({ choices: [{ message: { content:
       'Conform [1], legea reglementează realizarea achizițiilor publice. Termenul rămâne de verificat în textul sursă [1].' } }] }),
   }));
@@ -119,8 +118,8 @@ test('byok failure states: missing key, rejected key, quota and timeout create n
   test.setTimeout(240_000);
   let mode = 'bad_key';
   const calls = await mockProvider(page, route => {
-    if (mode === 'bad_key') return route.fulfill({ status: 401, headers: { ...CORS, 'content-type': 'application/json' }, body: JSON.stringify({ error: { message: 'Incorrect API key provided' } }) });
-    if (mode === 'quota') return route.fulfill({ status: 429, headers: { ...CORS, 'content-type': 'application/json' }, body: JSON.stringify({ error: { message: 'Rate limit reached' } }) });
+    if (mode === 'bad_key') return route.fulfill({ status: 401, headers: JSON_HEADERS, body: JSON.stringify({ error: { message: 'Incorrect API key provided' } }) });
+    if (mode === 'quota') return route.fulfill({ status: 429, headers: JSON_HEADERS, body: JSON.stringify({ error: { message: 'Rate limit reached' } }) });
     return new Promise(() => {}); // timeout: the provider never answers
   });
   await setOnlineProvider(page, { key: '' });

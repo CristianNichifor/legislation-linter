@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
 
 async function lint(page, days = 30) {
   await page.locator('#tab-lint').click();
@@ -141,4 +142,29 @@ test('privacy page is linked and reachable', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('Confidențialitate');
   await expect(page.locator('main')).toContainText('api.anthropic.com');
   await expect(page.locator('a[href="./"]')).toBeVisible();
+});
+
+const AXE = fileURLToPath(new URL('../../node_modules/axe-core/axe.min.js', import.meta.url));
+
+async function seriousViolations(page) {
+  await page.addScriptTag({ path: AXE });
+  const result = await page.evaluate(() => globalThis.axe.run(document, {
+    resultTypes: ['violations'],
+  }));
+  return result.violations
+    .filter(violation => ['serious', 'critical'].includes(violation.impact))
+    .map(violation => ({
+      id: violation.id,
+      impact: violation.impact,
+      targets: violation.nodes.slice(0, 5).map(node => node.target.join(' ')),
+    }));
+}
+
+test('axe: no serious or critical violations', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'One engine is enough for the rule set.');
+  await page.goto('/');
+  await expect(page.locator('#stat')).toContainText('acte');
+  expect(await seriousViolations(page)).toEqual([]);
+  await page.goto('/confidentialitate.html');
+  expect(await seriousViolations(page)).toEqual([]);
 });

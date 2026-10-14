@@ -307,3 +307,13 @@ def test_versiunea_se_schimba_cand_bazele_ies_din_build(tmp_path, monkeypatch):
     cw._fara_bazele_din_depozit()
     fara = cw._versiune_si_sw()
     assert cu != fara, "a new precache list must come with a new cache name"
+
+
+def test_limitarile_surselor_apar_o_singura_data():
+    """The online data panel already lists the missing optional sources; the boot note is the
+    fallback for a page without that panel, not a second copy of the same sentence."""
+    boot = cw.BOOT
+    nota = boot.index("browser-source-limitations")
+    garda = boot.rfind("if (window.browserSourceLimitations.length", 0, nota)
+    assert garda != -1
+    assert "!document.getElementById('browser-generation')" in boot[garda:nota]

@@ -1,0 +1,120 @@
+<!DOCTYPE html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Redactare asistată — Linter legislativ</title><style>
+:root{--paper:#f0f2f5;--surface:#fff;--sunk:#e5e9ee;--ink:#0a1f38;--ink-mid:#365170;--ink-mute:#526984;--rule:#b2bfcd;--rule-soft:#e5e9ee;--accent:#00458c;--accent-wash:#e3ecf7;--on-accent:#fff;--brand-red:#ff0021;--blocking:#c00019;--material:#8a5c14;--note:#0f5f78;--good:#2f6b43;--navy:#002a59;
+--s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--r:6px;
+--t0:.8125rem;--t1:.9375rem;--t2:1.0625rem;--t3:1.25rem;--t4:1.5rem;--t5:2rem;
+--sans:"Aileron",system-ui,-apple-system,"Segoe UI",sans-serif;--serif:"Spectral",Georgia,serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0a1420;--surface:#111d2c;--sunk:#16232f;--ink:#e5e9ee;--ink-mid:#b2bfcd;--ink-mute:#7f94ac;--rule:#24374e;--rule-soft:#1a2a3c;--accent:#6ea8e8;--accent-wash:#12283f;--on-accent:#0a1420;--blocking:#ff5c70;--material:#d7ab6b;--note:#6fb3cc;--good:#7fb98f;--navy:#e5e9ee}}
+:root[data-theme="dark"]{--paper:#0a1420;--surface:#111d2c;--sunk:#16232f;--ink:#e5e9ee;--ink-mid:#b2bfcd;--ink-mute:#7f94ac;--rule:#24374e;--rule-soft:#1a2a3c;--accent:#6ea8e8;--accent-wash:#12283f;--on-accent:#0a1420;--blocking:#ff5c70;--material:#d7ab6b;--note:#6fb3cc;--good:#7fb98f;--navy:#e5e9ee}
+*{box-sizing:border-box}html{font-size:16px}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 var(--t1)/1.5 var(--sans)}
+a{color:var(--accent)}a:focus-visible,button:focus-visible,[tabindex]:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.skip{position:absolute;left:var(--s4);top:-40px;background:var(--surface);padding:var(--s2) var(--s3);border:1px solid var(--rule)}.skip:focus{top:var(--s2)}
+.fam{background:var(--navy);color:#fff;font-size:var(--t0);padding:0 var(--s4)}
+.fam .in{max-width:1200px;margin:0 auto;min-height:32px;display:flex;align-items:center;gap:var(--s4);flex-wrap:wrap}
+.fam a{color:#fff;text-decoration:none;min-height:24px;display:inline-flex;align-items:center}.fam a:hover{text-decoration:underline}.fam .sep{opacity:.6}.fam .now{font-weight:600}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fam{background:#16232f;color:var(--ink)} :root:not([data-theme="light"]) .fam a{color:var(--ink)}}
+header.top{background:var(--surface);border-bottom:1px solid var(--rule-soft)}
+header.top .in,main .in,footer .in{max-width:1200px;margin:0 auto;padding:var(--s4)}
+h1{font-size:var(--t5);line-height:1.15;margin:0 0 var(--s2)}
+.purpose{margin:0;color:var(--ink-mid);max-width:60ch}
+.prov{margin:var(--s2) 0 0;font-size:var(--t0);color:var(--ink-mute);display:flex;gap:var(--s2) var(--s4);flex-wrap:wrap;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;font-size:var(--t0);font-weight:600;border:1px solid var(--rule);background:var(--sunk);color:var(--ink-mid);min-height:24px}
+.badge.demo{border-color:var(--material);color:var(--material)}.badge.real{border-color:var(--good);color:var(--good)}
+.badge.warn{border-color:var(--material);color:var(--material)}
+nav.tabs{background:var(--surface);border-bottom:1px solid var(--rule)}
+nav.tabs .in{display:flex;gap:var(--s1);padding:0 var(--s4);overflow-x:auto;scrollbar-width:thin;-webkit-overflow-scrolling:touch;position:relative}
+nav.tabs a{flex:0 0 auto;display:inline-flex;align-items:center;min-height:44px;padding:0 var(--s3);color:var(--ink-mid);text-decoration:none;border-bottom:3px solid transparent;font-weight:600;white-space:nowrap}
+nav.tabs a[aria-current="page"]{color:var(--accent);border-bottom-color:var(--accent)}
+nav.tabs .lang{margin-left:auto;font-weight:400}
+.crumb{font-size:var(--t0);color:var(--ink-mute);margin:0 0 var(--s4)}.crumb a{color:var(--ink-mute)}
+.card{background:var(--surface);border:1px solid var(--rule-soft);border-radius:var(--r);padding:var(--s4)}
+.grid{display:grid;gap:var(--s4)}
+h2{font-size:var(--t3);margin:0 0 var(--s3)}h3{font-size:var(--t2);margin:0 0 var(--s2)}
+label{display:block;font-weight:600;margin-bottom:var(--s1)}
+.hint{font-size:var(--t0);color:var(--ink-mute);margin:var(--s1) 0 var(--s2)}
+textarea,input[type=text],input[type=password],select{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:var(--s2) var(--s3);min-height:44px}
+textarea{min-height:200px;font-family:var(--serif);font-size:var(--t2);resize:vertical}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:44px;padding:0 var(--s4);border-radius:var(--r);font:600 var(--t1) var(--sans);border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);cursor:pointer;text-decoration:none}
+.btn.sec{background:var(--surface);color:var(--accent)}.btn.sm{min-height:32px;padding:0 var(--s3);font-size:var(--t0)}
+.btn.danger{border-color:var(--blocking);color:var(--blocking);background:var(--surface)}
+.row{display:flex;gap:var(--s3);flex-wrap:wrap;align-items:center}
+.sev{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:var(--t0)}
+.sev::before{content:"";width:10px;height:10px;border-radius:2px;border:2px solid currentColor;background:currentColor}
+.sev.blocking{color:var(--blocking)}.sev.blocking::before{border-radius:50%}
+.sev.material{color:var(--material)}.sev.material::before{background:transparent}
+.sev.note{color:var(--note)}.sev.note::before{transform:rotate(45deg);width:9px;height:9px}
+.sev.good{color:var(--good)}.sev.good::before{border-radius:50%;background:transparent}
+.rail{border-left:3px solid var(--rule);padding-left:var(--s3)}.rail.blocking{border-left-color:var(--brand-red)}.rail.material{border-left-color:var(--material)}.rail.note{border-left-color:var(--note)}
+table{width:100%;border-collapse:collapse;font-size:var(--t1)}th,td{text-align:left;padding:var(--s2) var(--s3);border-bottom:1px solid var(--rule-soft);vertical-align:top}th{font-size:var(--t0);color:var(--ink-mute);font-weight:600}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);font-size:var(--t0)}
+.law{font-family:var(--serif);font-size:var(--t2);line-height:1.6}
+.state{border:1px dashed var(--rule);border-radius:var(--r);padding:var(--s4);background:var(--sunk)}
+.state h3{margin-top:0}
+.prog{height:8px;background:var(--sunk);border-radius:4px;overflow:hidden;border:1px solid var(--rule-soft)}.prog>span{display:block;height:100%;background:var(--accent)}
+.steps{list-style:none;padding:0;margin:var(--s2) 0;display:grid;gap:var(--s1);font-size:var(--t0)}
+.steps li::before{content:"○ ";color:var(--ink-mute)}.steps li.done::before{content:"● ";color:var(--good)}.steps li.now::before{content:"◐ ";color:var(--accent)}
+.err{border:1px solid var(--blocking);border-left:3px solid var(--brand-red);background:var(--surface);border-radius:var(--r);padding:var(--s3) var(--s4)}
+.err strong{color:var(--blocking)}
+details{border:1px solid var(--rule-soft);border-radius:var(--r);padding:var(--s2) var(--s3);background:var(--surface)}summary{cursor:pointer;font-weight:600;min-height:24px}
+.filters{display:flex;gap:var(--s2);flex-wrap:wrap}.filters select{width:auto;min-width:140px}
+.chip{display:inline-flex;align-items:center;min-height:24px;padding:0 8px;border-radius:999px;background:var(--accent-wash);color:var(--accent);font-size:var(--t0);font-weight:600}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+footer{border-top:1px solid var(--rule-soft);color:var(--ink-mute);font-size:var(--t0);margin-top:var(--s7)}footer .in{display:flex;gap:var(--s4);flex-wrap:wrap}
+.spec{background:var(--accent-wash);color:var(--ink);border-radius:var(--r);padding:var(--s3) var(--s4);font-size:var(--t0);margin:0 0 var(--s4);border:1px dashed var(--accent)}
+.spec b{color:var(--accent)}
+.two{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ws{grid-template-columns:260px minmax(0,1fr)}
+@media (max-width:900px){.two,.three,.ws{grid-template-columns:1fr}.hide-m{display:none}
+ table.resp thead{display:none}table.resp tr{display:grid;grid-template-columns:1fr auto;gap:0 var(--s3);padding:var(--s2) 0;border-bottom:1px solid var(--rule-soft)}table.resp td{border:0;padding:2px 0}table.resp td.full{grid-column:1/-1}
+ h1{font-size:var(--t4)}
+ nav.tabs .in::after{content:"";position:sticky;right:0;flex:0 0 24px;margin-left:-24px;background:linear-gradient(90deg,transparent,var(--surface));pointer-events:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media (forced-colors:active){.rail,.sev::before,.badge,.btn{forced-color-adjust:none;border-color:CanvasText}.rail.blocking{border-left-color:Highlight}}
+</style></head><body>
+<a class="skip" href="#main">Sari la conținut</a>
+<div class="fam"><div class="in"><a href="https://projects.cristian-nichifor.com/">← Toate proiectele</a><span class="sep">·</span><span class="now">Linter legislativ</span><span class="sep hide-m">·</span><a class="hide-m" href="https://projects.cristian-nichifor.com/">Despre și metodă</a></div></div>
+<header class="top"><div class="in">
+<h1>Ce spune legea despre proiectul tău</h1>
+<p class="purpose">Lipește textul unui proiect și vezi ce acte și articole atinge, ce dovezi lipsesc și ce pare în conflict. Fără verdicte: fiecare constatare are sursă, citat și stare de verificare.</p>
+<p class="prov"><span class="badge demo">Date demonstrative</span><span>Date: legislatie.just.ro, Monitorul Oficial · date la zi pe — (data setului din manifest)</span><span>— acte în corpus</span></p>
+</div></header>
+<nav class="tabs" aria-label="Spații de lucru"><div class="in"><a href="#start">Start</a><a href="#verifică">Verifică</a><a href="#caută">Caută</a><a href="#matrice">Matrice</a><a href="#dosare">Dosare</a><a href="#surse">Surse</a><a href="#redactare" aria-current="page">Redactare</a><a href="#setări">Setări</a><a class="lang" href="#en" lang="en" hreflang="en">English</a></div></nav>
+<main id="main"><div class="in">
+<p class="crumb"><a href="#start">Start</a> › Redactare › art. 58</p>
+<div class="spec"><b>Machetă de proiectare</b> · reformulare asistată: consimțământ înainte de apel, destinație, cost, jurnal de audit, text neverificat până la acceptare (UX-7, UX-8, LL-9).</div>
+
+<div class="grid two">
+<section class="card">
+<h2>Propune o reformulare</h2>
+<p class="hint">Pentru constatarea <b>art. 58 — clarificare necesară</b>. Textul propus este asistat și rămâne „neverificat” până îl acceptă un om.</p>
+<div class="card" style="background:var(--sunk)"><h3 style="margin-top:0">Înainte de a trimite</h3>
+<table><tr><th>Destinație</th><td>Furnizorul tău: <span class="mono">api.anthropic.com</span> (cheie proprie, din Setări)</td></tr><tr><th>Ce pleacă</th><td>Citatul din art. 58 și textul tău (412 caractere). Nu pleacă dosarul, notele sau alte constatări.</td></tr><tr><th>Cost estimat</th><td>— (afișat după estimarea furnizorului)</td></tr><tr><th>Confidențialitate</th><td><a href="#">Politica furnizorului</a> · <a href="#">a noastră</a></td></tr></table>
+<label style="margin-top:var(--s3)"><input type="checkbox"> Sunt de acord să trimit acest text furnizorului ales</label>
+<div class="row" style="margin-top:var(--s3)"><button class="btn" disabled aria-disabled="true">Trimite și propune</button><button class="btn sec">Renunță</button></div></div>
+<section style="margin-top:var(--s4)" aria-live="polite"><h3>Propunere (neverificată)</h3>
+<p class="hint">Primită la 07:21 · furnizor: cheie proprie · <span class="badge warn">Text asistat, neverificat</span></p>
+<p class="law state" style="border-style:solid">— propunerea apare aici; textul este asistat și nu înlocuiește consultarea juridică —</p>
+<div class="row"><button class="btn">Acceptă în dosar</button><button class="btn sec">Cere altă variantă</button><button class="btn sec">Respinge</button></div>
+<p class="hint">Acceptarea marchează textul „acceptat de om la zz.ll.aaaa” și păstrează varianta originală.</p></section>
+</section>
+<aside class="grid" style="align-content:start">
+<section class="card"><h2>Jurnal de audit</h2>
+<table class="resp"><thead><tr><th>Când</th><th>Ce</th></tr></thead><tbody>
+<tr><td class="mono">14.10.2026 07:20</td><td class="full">Consimțământ dat · destinație api.anthropic.com · 412 caractere</td></tr>
+<tr><td class="mono">14.10.2026 07:21</td><td class="full">Propunere primită · neverificată</td></tr>
+<tr><td class="mono">—</td><td class="full">Acceptată de om / respinsă</td></tr></tbody></table>
+<p class="hint">Jurnalul se păstrează local, în dosar, și se exportă cu el.</p></section>
+<section class="card"><h2>Fără cheie configurată</h2><p>Reformularea asistată are nevoie de o cheie proprie la un furnizor. <a class="btn sm sec" href="#setari">Configurează în Setări</a></p><p class="hint">Fără cheie poți redacta manual; nimic nu pleacă pe internet.</p></section>
+</aside></div>
+<h2 style="margin-top:var(--s6)">Stări</h2>
+<div class="grid three">
+<div class="state"><h3>Aștept răspunsul</h3><ol class="steps"><li class="done">Consimțământ dat</li><li class="now">Aștept furnizorul — 6 s</li></ol><button class="btn sm danger">Anulează</button><p class="hint">După 60 s oprim și păstrăm tot ce ai local.</p></div>
+<div class="state"><h3>Refuzat sau eșuat</h3><div class="err"><strong>Furnizorul nu a răspuns (eroare 429).</strong> Nimic nu s-a pierdut; textul tău și dosarul sunt intacte. <button class="btn sm sec">Reîncearcă</button></div></div>
+<div class="state"><h3>Acceptat de om</h3><p><span class="badge real">Acceptat de om · 14.10.2026</span> Varianta originală rămâne în dosar; jurnalul notează cine și când.</p></div>
+</div>
+
+</div></main>
+<footer><div class="in"><a href="#">Confidențialitate</a><a href="https://github.com/CristianNichifor/legislation-linter">Cod sursă și metodă</a><a href="https://github.com/CristianNichifor/legislation-linter/issues">Contact (GitHub issues)</a><span>Fără verdicte juridice: fiecare constatare necesită verificare umană.</span></div></footer>
+</body></html>

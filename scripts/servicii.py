@@ -326,6 +326,15 @@ def rezumat(stare: Stare) -> dict:
             r = depozit.rezumat(con)
     with depozit.deschide(stare.initiative, readonly=True) as con:
         r["initiative"] = depozit.rezumat(con)["initiative"]
+    # The dataset's own date, stamped at build time; the header warns when it is old.
+    if cale is not None and cale.is_file():
+        manifest = json.loads(cale.read_text(encoding="utf-8"))
+        data_set = manifest.get("data_set")
+        if data_set:
+            r["data_set"] = data_set
+        # Real or demo data is the build's word (ux-guidelines § 7); nothing else is a status.
+        if manifest.get("stare_date") in {"reale", "demonstrative"}:
+            r["stare_date"] = manifest["stare_date"]
     r |= _rezumat_ue(stare)
     return r
 
@@ -1123,7 +1132,7 @@ def _matrix_workspace_summary(
         },
         {
             "kind": "filter_tracker",
-            "label": "Vezi trackerul nerevizuit",
+            "label": "Vezi urmărirea nerevizuită",
             "enabled": bool(tracker.get("unreviewed")),
         },
     ]
@@ -1184,7 +1193,7 @@ def _matrix_workspace_summary(
         "actions": actions,
         "next_actions": [
             "Alege un domeniu sau o problemă, apoi deschide rândul cu cele mai multe semnale.",
-            "Pentru fiecare rând, pornește din dovezi și salvează o notă înainte de draft.",
+            "Pentru fiecare rând, pornește din dovezi și salvează o notă înainte de ciornă.",
             "Dacă sursele sunt lipsă sau schimbate, tratează rândul ca incomplet.",
         ],
         "not_legal_verdict": True,
@@ -1751,7 +1760,7 @@ def _matrice_graf(qs: dict, stare: Stare) -> dict:
         "edges": [],
         "trunchiat": selectie["total"] > len(acte),
         "limitari": [
-            "Scaffold de lucru pentru law-as-code: muchiile sunt relații extrase/indexate, "
+            "Schiță de lucru pentru reguli verificabile: muchiile sunt relații extrase/indexate, "
             "nu verdict juridic.",
             "Domeniul este orientativ și vine din aceleași filtre ca matricea.",
             (

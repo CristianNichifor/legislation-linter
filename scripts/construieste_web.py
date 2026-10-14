@@ -65,6 +65,9 @@ CURATE = ["lege-98-2016", "lege-99-2016", "lege-100-2016", "lege-24-2000", "oug-
 # 150 KB an act once structured, so this is the size dial for the published build.
 N_ACTE = 400
 N_INITIATIVE = 300
+# When the committed `sources/` fixtures were captured (their last change). The demo shows this as
+# its dataset date, so it reads as old data rather than as fresh data built today.
+FIXTURI_DATA_SET = "2026-09-05"
 
 # The privacy boundary, made a rule the page obeys rather than a claim it makes. `connect-src` is the
 # load-bearing line: deterministic checks can reach only this origin and the Pyodide/WebLLM assets.
@@ -79,7 +82,7 @@ CSP = (
     #  · `api.openai.com` / `api.anthropic.com` — explicit BYOK rewrite providers;
     #  · `*.workers.dev` — a user-owned Worker rewrite endpoint;
     #  · `projects.cristian-nichifor.com` — the project's own rewrite Worker, the "Worker propriu"
-    #    default; the app is also served from GitHub Pages, where it is not 'self';
+    #    default; listed so a build served from another origin (pages.dev) still reaches it;
     #  · huggingface.co / hf.co — WebLLM's on-device model weights, for the opt-in local AI. The
     #    provision text stays on the device; only the model is downloaded.
     "connect-src 'self' https://cdn.jsdelivr.net https://esm.run https://api.openai.com "
@@ -724,6 +727,19 @@ BOOT = """
 
   let resolveReady, rejectReady;
   const ready = new Promise((res, rej)=>{ resolveReady=res; rejectReady=rej; });
+  // The page reads this to say whether a check is waiting for the engine or running.
+  const engine = window.legislativEngine = {state: "starting"};
+  const engineState = (state, error) => {
+    engine.state = state; engine.error = error || "";
+    window.dispatchEvent(new CustomEvent("legislativ-engine", {detail: {state}}));
+  };
+  ready.then(() => engineState("ready"), e => engineState("failed", String(e && e.message || e)));
+  // A worker that never answers must not leave a request waiting forever: each call waits at most
+  // ENGINE_TIMEOUT_MS, then answers 503 so the page can offer a retry. A slow start may still finish
+  // and serve the next attempt.
+  const ENGINE_TIMEOUT_MS = 20000;
+  const readyWithin = () => Promise.race([ready, new Promise((_, rej) => setTimeout(
+    () => rej(new Error("Motorul nu a pornit în " + ENGINE_TIMEOUT_MS / 1000 + " s")), ENGINE_TIMEOUT_MS))]);
   const worker = new Worker("worker.js");
   let selectedGeneration = null;
   const pending = new Map(); let seq = 0;
@@ -732,11 +748,12 @@ BOOT = """
     if (m.type === "ready"){
       selectedGeneration = m.generation;
       window.browserSourceLimitations = m.limitations || [];
-      if (window.browserSourceLimitations.length) {
+      // The online data panel lists the same sources; this note is for pages without it.
+      if (window.browserSourceLimitations.length && !document.getElementById('browser-generation')) {
         const note = document.createElement('p'); note.id = 'browser-source-limitations';
         note.className = 'hint'; note.setAttribute('role', 'status');
         note.style.overflowWrap = 'anywhere';
-        note.textContent = 'Acoperire indisponibila pentru sursele optionale: ' + window.browserSourceLabels(window.browserSourceLimitations);
+        note.textContent = 'Acoperire indisponibilă pentru sursele opționale: ' + window.browserSourceLabels(window.browserSourceLimitations);
         document.querySelector('header')?.after(note);
       }
       resolveReady(); return;
@@ -776,7 +793,7 @@ BOOT = """
     }
     if (u && u.indexOf("/api/cauta") === 0) {
       try {
-        await ready;
+        await readyWithin();
         if (!selectedGeneration) {
         const parsed = new URL(u, location.origin);
         const out = await cauta(parsed.searchParams);
@@ -788,7 +805,7 @@ BOOT = """
       }
     }
     if (u && u.indexOf("/api/") === 0) {
-      try { if (!u.startsWith('/api/browser-generation')) await ready; }
+      try { if (!u.startsWith('/api/browser-generation')) await readyWithin(); }
       catch(e){ return new Response(JSON.stringify({error:"motor indisponibil: "+e}), {status:503}); }
       try {
         const parsed = new URL(u, location.origin);
@@ -1265,6 +1282,43 @@ def _fara_bazele_din_depozit() -> list[str]:
     return scoase
 
 
+def _stampileaza_data_setului(*, sursa: str, depozit: str) -> None:
+    """Record in `manifest.json` which date the dataset describes, for the header's freshness line.
+
+    The data store prefix is the dataset's date; a downloaded release names its own; the fixtures
+    carry their capture date. Anything else gets no date rather than an invented one. The same
+    evidence sets `stare_date` ("reale" or "demonstrative", the header badge of
+    docs/ux-guidelines.md § 7), so the browser never has to guess whether it shows demo data.
+    """
+    manifest = DATA / "manifest.json"
+    if not manifest.is_file():
+        return
+    date = json.loads(manifest.read_text(encoding="utf-8"))
+    date.pop("data_set", None)
+    date.pop("stare_date", None)
+    zi = None
+    potrivire = (
+        re.search(r"/(\d{4}-\d{2}-\d{2})(?:[-/]|$)", urlparse(depozit).path) if depozit else None
+    )
+    release = DATA / "dataset-release.json"
+    stare = None
+    if potrivire:
+        zi = potrivire.group(1)
+        stare = "reale"
+    elif release.is_file():
+        eticheta = str(json.loads(release.read_text(encoding="utf-8")).get("release", ""))
+        zi = eticheta[:10] if re.fullmatch(r"\d{4}-\d{2}-\d{2}", eticheta[:10]) else None
+        stare = "reale"
+    elif sursa == "fixturi":
+        zi = FIXTURI_DATA_SET
+        stare = "demonstrative"
+    if zi:
+        date["data_set"] = zi
+    if stare:
+        date["stare_date"] = stare
+    manifest.write_text(json.dumps(date, ensure_ascii=False), encoding="utf-8")
+
+
 def _versiune_si_sw() -> str:
     """Version the runtime and public catalogs without scanning the monolithic corpus."""
     manifest = DATA / "manifest.json"
@@ -1496,6 +1550,7 @@ def _pagina(
     )
     shutil.copy2(ROOT / "app" / "browser-workspace.js", WEB / "browser-workspace.js")
     shutil.copy2(ROOT / "app" / "browser-generation.js", WEB / "browser-generation.js")
+    shutil.copy2(ROOT / "app" / "confidentialitate.html", WEB / "confidentialitate.html")
     # Local update controls own their unsupported-endpoint state in the shared page.
     updates = ROOT / "app" / "dataset-updates.js"
     if updates.is_file():
@@ -1565,6 +1620,7 @@ def main(
     _pagina(depozit, felii_cautare, channel=channel, allow_loopback=allow_loopback)
     if depozit:
         _fara_bazele_din_depozit()
+    _stampileaza_data_setului(sursa=sursa, depozit=depozit)
     _versiune_si_sw()
     print("gata. servește cu:  uv run python -m http.server -d web 8080")
 

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Confidențialitate · Linter legislativ</title>
+<meta name="description" content="Ce date folosește Linterul legislativ: aplicația rulează local, în browser; ciornele, dosarele și cheile BYOK rămân pe dispozitivul tău.">
+<link rel="canonical" href="https://projects.cristian-nichifor.com/legislation-linter/confidentialitate.html">
+<style>
+  :root{--ink:#002a59;--text:#1f2a37;--mute:#4c5b6b;--accent:#0b5cad;--paper:#f0f2f5;--surface:#fff;--rule:#b2bfcd}
+  @media (prefers-color-scheme:dark){:root{--ink:#e5e9ee;--text:#e5e9ee;--mute:#b2bfcd;--accent:#8cc4ff;--paper:#0d1724;--surface:#132132;--rule:#4c698a}}
+  body{margin:0;background:var(--paper);color:var(--text);font:1rem/1.6 system-ui,sans-serif}
+  main{max-width:46rem;margin:0 auto;padding:2rem 1rem 3rem;background:var(--surface)}
+  h1,h2{color:var(--ink);line-height:1.25}
+  a{color:var(--accent)}
+  code{font-size:.92em;overflow-wrap:anywhere}
+  li{margin:.25rem 0}
+  .back{display:inline-block;margin-bottom:1rem}
+  footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--rule);color:var(--mute);font-size:.9rem}
+</style>
+</head>
+<body>
+<main id="main">
+  <a class="back" href="./">← Înapoi la aplicație</a>
+  <h1>Confidențialitate</h1>
+  <p>Linterul legislativ este o aplicație care rulează local, în browserul tău. Verificările
+    deterministe se fac pe dispozitivul tău; textul pe care îl lipești nu este trimis unui server
+    al proiectului.</p>
+
+  <h2>Cine operează aplicația</h2>
+  <p>Cristian Nichifor, ca proiect personal cu cod sursă deschis. Pentru întrebări sau cereri
+    privind datele, deschide o discuție la
+    <a href="https://github.com/CristianNichifor/legislation-linter/issues">https://github.com/CristianNichifor/legislation-linter/issues</a>.</p>
+
+  <h2>Ce rămâne pe dispozitivul tău</h2>
+  <ul>
+    <li>Ciornele, dosarele, notele și propunerile se salvează în spațiul de stocare al browserului
+      (IndexedDB și sistemul de fișiere privat al browserului). Ștergerea datelor site-ului le
+      elimină; exportă copii de siguranță din aplicație.</li>
+    <li>Preferințele (tema, modul AI ales, furnizorul și modelul) se păstrează în
+      <code>localStorage</code>.</li>
+    <li>Cheile API pentru modul BYOK („adu cheia ta”) se păstrează doar în
+      <code>sessionStorage</code>, adică în sesiunea curentă a browserului. Nu se salvează în
+      dosare, nu se exportă și nu se trimit infrastructurii proiectului.</li>
+  </ul>
+
+  <h2>Fără cookie-uri și fără analiză de trafic</h2>
+  <p>Aplicația nu setează cookie-uri și nu folosește instrumente de analiză a traficului,
+    urmărire sau publicitate.</p>
+
+  <h2>Conexiunile pe care pagina le poate face</h2>
+  <p>Politica de securitate a conținutului (CSP, directiva <code>connect-src</code>) limitează
+    pagina la aceste destinații. Browserul blochează orice altă conexiune.</p>
+  <ul>
+    <li>Originea aplicației și <code>data.cristian-nichifor.com</code>: setul public de date
+      legislative (acte, inițiative, index de căutare). Se descarcă date publice; nu se trimite
+      nimic din lucrul tău.</li>
+    <li><code>cdn.jsdelivr.net</code> și <code>esm.run</code>: codul Pyodide, care rulează
+      verificările în browser, și, la cerere, biblioteca pentru AI local.</li>
+    <li><code>huggingface.co</code>, <code>*.huggingface.co</code>, <code>hf.co</code>,
+      <code>*.hf.co</code> și <code>raw.githubusercontent.com</code>: doar dacă alegi AI local,
+      de aici biblioteca de AI local descarcă modelul și fișierele lui compilate. Textul rămâne pe
+      dispozitiv.</li>
+  </ul>
+
+  <h2>AI online: doar când îl alegi</h2>
+  <p>Rescrierea „Limbaj clar” și ciornele asistate pot folosi un furnizor online numai dacă îl
+    alegi explicit. Atunci textul selectat și cheia ta se trimit direct, din browser, către
+    destinația aleasă:</p>
+  <ul>
+    <li><code>api.openai.com</code> (OpenAI);</li>
+    <li><code>api.anthropic.com</code> (Anthropic);</li>
+    <li>un Worker propriu pe <code>*.workers.dev</code>, pe care îl controlezi tu;</li>
+    <li><code>projects.cristian-nichifor.com</code>, Worker-ul de rescriere al proiectului.</li>
+  </ul>
+  <p>Furnizorul ales prelucrează textul conform propriilor condiții. Fără această alegere, nicio
+    destinație AI nu primește conținut.</p>
+
+  <h2>Găzduire</h2>
+  <p>Paginile statice sunt servite prin GitHub Pages și Cloudflare Pages, iar setul public de date
+    prin Cloudflare R2. Acești furnizori pot înregistra, ca orice server web, date tehnice ale
+    cererilor (de exemplu adresa IP), conform politicilor lor.</p>
+
+  <footer>Pagina descrie comportamentul codului din depozitul public. Dacă găsești o diferență,
+    semnaleaz-o la adresa de mai sus.</footer>
+</main>
+</body>
+</html>

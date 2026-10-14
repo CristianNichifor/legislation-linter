@@ -11,7 +11,7 @@ npm run test:browser:static
 ```
 
 The smoke check is intentionally small. It verifies that the repo has the public browser app,
-local launchers, private local data-home wiring, browser test scripts and GitHub Pages workflow
+local launchers, private local data-home wiring, browser test scripts and Cloudflare Pages workflow
 wiring.
 
 The public/local acceptance gate is the product-facing release check for this slice. It verifies

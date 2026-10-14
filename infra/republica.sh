@@ -6,8 +6,8 @@
 # republish that overwrote them in place would serve a mix of old and new to anyone mid-session.
 # A new prefix is a new dataset; the old one keeps working until nothing points at it.
 #
-# The last line of output is the change to make in `.github/workflows/pages.yml`. Nothing here
-# edits the live site configuration: the site follows `--depozit`, a one-line commit.
+# The last line of output is the change to make in `.github/workflows/deploy-pages-cloudflare.yml`.
+# Nothing here edits the live site configuration: the site follows `--depozit`, a one-line commit.
 # Optional --latest advances /channel.json only after remote release verification.
 #
 #   CF_ACCOUNT=… CF_R2_TOKEN_OP=op://vault/item/credential ./infra/republica.sh
@@ -140,5 +140,5 @@ fi
 echo "channel proposal: $LUCRU/channel.json (publish only with explicit --latest)"
 
 echo
-echo "încărcat. Ultimul pas, un singur rând în .github/workflows/pages.yml:"
+echo "încărcat. Ultimul pas, un singur rând în .github/workflows/deploy-pages-cloudflare.yml:"
 echo "  --depozit https://data.cristian-nichifor.com/$PREFIX"

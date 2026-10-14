@@ -307,3 +307,71 @@ def test_versiunea_se_schimba_cand_bazele_ies_din_build(tmp_path, monkeypatch):
     cw._fara_bazele_din_depozit()
     fara = cw._versiune_si_sw()
     assert cu != fara, "a new precache list must come with a new cache name"
+
+
+def test_limitarile_surselor_apar_o_singura_data():
+    """The online data panel already lists the missing optional sources; the boot note is the
+    fallback for a page without that panel, not a second copy of the same sentence."""
+    from scripts import construieste_web as cw
+
+    boot = cw.BOOT
+    nota = boot.index("browser-source-limitations")
+    garda = boot.rfind("if (window.browserSourceLimitations.length", 0, nota)
+    assert garda != -1
+    assert "!document.getElementById('browser-generation')" in boot[garda:nota]
+
+
+def test_manifest_poarta_data_setului(tmp_path, monkeypatch):
+    """The header's "date la zi pe" comes from the manifest; the build says which date it is."""
+    from scripts import construieste_web as cw
+
+    data = tmp_path / "data"
+    data.mkdir()
+    (data / "manifest.json").write_text('{"acte": 4}', encoding="utf-8")
+    monkeypatch.setattr(cw, "DATA", data)
+    monkeypatch.setattr(cw, "ROOT", tmp_path)
+
+    def stampila(**kw):
+        cw._stampileaza_data_setului(**kw)
+        return json.loads((data / "manifest.json").read_text(encoding="utf-8"))
+
+    # The data store prefix names the dataset it serves.
+    m = stampila(sursa="gata", depozit="https://data.exemplu.ro/2026-09-08")
+    assert m == {"acte": 4, "data_set": "2026-09-08", "stare_date": "reale"}
+    # Without a store, a downloaded release says its own date.
+    (data / "dataset-release.json").write_text('{"release": "2026-10-01-b"}', encoding="utf-8")
+    assert stampila(sursa="gata", depozit="")["data_set"] == "2026-10-01"
+    (data / "dataset-release.json").unlink()
+    # The committed fixtures carry the date they were captured, not the build date.
+    assert stampila(sursa="fixturi", depozit="")["data_set"] == cw.FIXTURI_DATA_SET
+    # Nothing to go on: no date rather than an invented one.
+    assert "data_set" not in stampila(sursa="gata", depozit="")
+
+
+def test_manifest_poarta_starea_datelor(tmp_path, monkeypatch):
+    """D-4 (docs/ux-guidelines.md): the header badge says whether the data is real or a demo.
+
+    The status comes from the build, not from a guess in the browser: the committed fixtures are
+    demonstrative, a dated store or release is real, and anything else carries no status.
+    """
+    from scripts import construieste_web as cw
+
+    data = tmp_path / "data"
+    data.mkdir()
+    (data / "manifest.json").write_text('{"acte": 4}', encoding="utf-8")
+    monkeypatch.setattr(cw, "DATA", data)
+    monkeypatch.setattr(cw, "ROOT", tmp_path)
+
+    def stampila(**kw):
+        cw._stampileaza_data_setului(**kw)
+        return json.loads((data / "manifest.json").read_text(encoding="utf-8"))
+
+    assert stampila(sursa="fixturi", depozit="")["stare_date"] == "demonstrative"
+    stocat = stampila(sursa="gata", depozit="https://data.exemplu.ro/2026-09-08")
+    assert stocat["stare_date"] == "reale"
+    (data / "dataset-release.json").write_text('{"release": "2026-10-01-b"}', encoding="utf-8")
+    assert stampila(sursa="gata", depozit="")["stare_date"] == "reale"
+    (data / "dataset-release.json").unlink()
+    # A rebuild from fixtures over a real manifest drops the old status, and vice versa.
+    assert stampila(sursa="fixturi", depozit="")["stare_date"] == "demonstrative"
+    assert "stare_date" not in stampila(sursa="gata", depozit="")

@@ -49,7 +49,7 @@ for (const width of [390, 1440]) {
     await page.locator('[data-lifecycle-workbench]').first().click();
     expect((await workbenchResponse).ok()).toBe(true);
     await expect(page.locator('#project-workbench-status')).toContainText('Pachet încărcat');
-    await expect(page.locator('#project-workbench-body')).toContainText('Workbench · plx-999999-2026');
+    await expect(page.locator('#project-workbench-body')).toContainText('Spațiu de lucru · plx-999999-2026');
     await expect(page.locator('#project-workbench-body')).toContainText('Raport depus');
     await page.locator('#project-workbench-body [data-workbench-copy]').evaluate(button => button.click());
     await expect.poll(() => page.evaluate(() => window.__workbenchClipboard)).toContain('# Pachet dovezi proiect: plx-999999-2026');
@@ -121,6 +121,7 @@ for (const width of [390, 1440]) {
     await expect(page.locator('#lint-out')).toContainText('verificat în');
     await expect(page.locator('#lint-out')).not.toContainText('Eroare:');
     await page.screenshot({ path: info.outputPath(`lint-${width}.png`), fullPage: true });
+    await page.locator('#tab-setari').click();
     await page.locator('#tema-btn').click();
     const theme = await page.evaluate(() => localStorage.getItem('tema'));
     expect(['light', 'dark']).toContain(theme);
@@ -140,3 +141,69 @@ for (const width of [390, 1440]) {
     await page.screenshot({ path: info.outputPath(`local-${width}.png`), fullPage: true });
   });
 }
+
+test('reduced motion and forced colours keep state visible', async ({ page, browserName }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await expect(page.locator('#tab-matrice')).toBeVisible();
+  const motion = await page.evaluate(() => {
+    const spin = document.createElement('span');
+    spin.className = 'spin';
+    document.body.append(spin);
+    const result = {
+      animation: getComputedStyle(spin).animationName,
+      scroll: getComputedStyle(document.documentElement).scrollBehavior,
+    };
+    spin.remove();
+    return result;
+  });
+  expect(motion.animation).toBe('none');
+  expect(motion.scroll).toBe('auto');
+
+  const declaresForcedColours = await page.evaluate(() =>
+    [...document.styleSheets].some(sheet => {
+      try {
+        return [...sheet.cssRules].some(rule => rule.conditionText?.includes('forced-colors'));
+      } catch { return false; }
+    })
+  );
+  expect(declaresForcedColours).toBe(true);
+
+  if (browserName === 'webkit') return; // WebKit does not implement forced-colors emulation.
+  await page.emulateMedia({ forcedColors: 'active' });
+  const active = page.locator('.tab[aria-selected="true"]');
+  await expect(active).toBeVisible();
+  const border = await active.evaluate(el => {
+    const style = getComputedStyle(el);
+    return { width: style.borderBottomWidth, color: style.borderBottomColor };
+  });
+  expect(border.width).toBe('3px');
+  expect(border.color).not.toBe('rgba(0, 0, 0, 0)');
+});
+
+test('phone tab list is one scrollable row', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('#tab-matrice')).toBeVisible();
+  const layout = await page.evaluate(() => {
+    const tabs = [...document.querySelectorAll('.tablist .tab')];
+    const list = document.querySelector('.tablist');
+    const tops = new Set(tabs.map(tab => Math.round(tab.getBoundingClientRect().top)));
+    const more = document.getElementById('more-toggle').getBoundingClientRect();
+    return {
+      rows: tops.size,
+      scrolls: list.scrollWidth > list.clientWidth,
+      pageScroll: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      moreInView: more.right <= window.innerWidth && more.width > 0,
+      minHeight: Math.min(...tabs.map(tab => tab.getBoundingClientRect().height)),
+    };
+  });
+  expect(layout.rows).toBe(1);
+  expect(layout.scrolls).toBe(true);
+  expect(layout.pageScroll).toBeLessThanOrEqual(0);
+  expect(layout.moreInView).toBe(true);
+  expect(layout.minHeight).toBeGreaterThanOrEqual(44);
+  await page.locator('#tab-setari').scrollIntoViewIfNeeded();
+  await page.locator('#tab-setari').click();
+  await expect(page.locator('#tab-setari')).toHaveAttribute('aria-selected', 'true');
+});

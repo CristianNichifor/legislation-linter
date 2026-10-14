@@ -1,12 +1,14 @@
 name: deploy-pages-cloudflare
 
-# Build the in-browser app exactly as pages.yml does and publish it to Cloudflare Pages in
-# CN Webify Customers, laid out as on GitHub Pages (`/legislation-linter/`), so the projects hub
-# proxies the path 1:1. main is public behind projects.cristian-nichifor.com/legislation-linter/;
+# Build the in-browser app (Pyodide, no server) and publish it to Cloudflare Pages in
+# CN Webify Customers under `/legislation-linter/`, so the projects hub proxies the path 1:1. The
+# data is built by scripts/construieste_web.py; with no dataset release it falls back to the
+# committed fixtures, which need nothing git-ignored. No draft ever leaves a visitor's browser —
+# the page's CSP enforces it. main is public behind projects.cristian-nichifor.com/legislation-linter/;
 # dev is the protected preview behind projects-dev.cristian-nichifor.com, reached only through the
 # CN Webify preview gate (ADR-022; functions/_middleware.js refuses everything else). No secrets:
 # a one-hour Cloudflare token comes from the CN Webify token broker, which accepts this exact file
-# on main and dev. pages.yml (GitHub Pages) stays until the hub proxies Cloudflare Pages.
+# on main and dev. GitHub Pages (pages.yml) only redirects to the hub now.
 
 on:
   push:
@@ -41,13 +43,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # The newest dated dataset release, as pages.yml picks it.
+          # The newest dataset release, not a fixed tag. `date-latest` is immutable — GitHub
+          # refuses to replace an asset on it — so each build of the corpus is published as its
+          # own `date-YYYY-MM-DD`, which suits a legal corpus anyway: a snapshot somebody cited
+          # stays exactly as it was. Sorted by the tag itself rather than by creation time, and
+          # the legacy `date-latest` is excluded by name so it cannot win by being re-created.
           TAG=$(gh release list --limit 100 --json tagName \
             -q '[.[].tagName | select(test("^date-[0-9]{4}-[0-9]{2}-[0-9]{2}$"))] | sort | reverse | .[0] // ""')
           if [ -n "$TAG" ] && gh release download "$TAG" --pattern date.tar.gz -O date.tar.gz 2>/dev/null; then
             echo "dataset: $TAG"
             mkdir -p web && tar xzf date.tar.gz -C web
             echo "sursa=gata" >> "$GITHUB_OUTPUT"
+            # The data store prefix is the release date, so it follows the release it serves.
+            echo "depozit=https://data.cristian-nichifor.com/${TAG#date-}" >> "$GITHUB_OUTPUT"
           else
             echo "sursa=fixturi" >> "$GITHUB_OUTPUT"
             echo "no dataset release yet — building the 4-act fixtures demo"
@@ -63,20 +71,27 @@ jobs:
           sed -i "s#${prod}#https://projects-dev.cristian-nichifor.com/legislation-linter/api/rewrite#g" app/index.html
           ! grep -qF "$prod" app/index.html
       - name: Build the browser bundle
-        # Same data location and slice count as pages.yml; they change together there.
+        # The corpus itself is not in the build: the browser mounts it from object storage
+        # over byte-range requests. The prefix is dated, so publishing new data means
+        # uploading under a new prefix and changing this line — the old one stays readable.
+        # infra/curata-prefixe.sh reads this pin to know which prefix it must never delete.
+        #
+        # `--felii-cautare` says how many slices the search index at that prefix is in. The index
+        # is not in git, so nothing here can count them; get it wrong and search would answer from
+        # one slice while looking perfectly healthy. It belongs next to the prefix: they describe
+        # the same dataset and they change together.
         run: >-
           uv run python -m scripts.construieste_web
           --sursa ${{ steps.date.outputs.sursa }}
-          --depozit https://data.cristian-nichifor.com/2026-09-08
-          --felii-cautare 8
-      - name: Lay out the site as on GitHub Pages
+          ${{ steps.date.outputs.depozit && format('--depozit {0} --felii-cautare 8', steps.date.outputs.depozit) || '' }}
+      - name: Lay out the site under the project path
         run: |
           set -euo pipefail
           mkdir -p site
           cp -r web "site/$PROJECT_NAME"
           printf '/ /%s/ 302\n' "$PROJECT_NAME" > site/_redirects
       - name: Refuse files Cloudflare Pages cannot hold
-        # Pages rejects any file over 25 MiB (GitHub Pages took up to 100 MB). Name them here
+        # Cloudflare Pages rejects any file over 25 MiB. Name them here
         # rather than let the upload fail midway.
         run: |
           set -euo pipefail

@@ -81,7 +81,7 @@ const listen = server => new Promise(resolve => server.listen(0, '127.0.0.1', re
       const missing = await page.evaluate(() => window.browserSourceLimitations);
       for (const file of ['vid.json', 'eu.db', 'graf.db', 'initiative.db']) assert.ok(missing.includes(file));
       if (noCatalog) assert.ok(missing.includes('manifest.json'));
-      assert.ok(await page.locator('#browser-source-limitations').isVisible());
+      assert.ok(await page.locator('#browser-source-limitations, #browser-generation [data-coverage]').first().isVisible());
       assert.ok(!requests.some(url => url.endsWith('/vid.json')), 'Undeclared reports must not be fetched or borrowed');
       await context.close();
     }

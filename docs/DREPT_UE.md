@@ -76,7 +76,7 @@ Panoul **Surse UE · Import și istoric** expune același contract fără import
 5. acțiunea **Folosește în dosar** duce utilizatorul către legătura UE a unei propuneri salvate,
    unde CELEX-ul, instantaneea și articolul sunt selectate explicit.
 
-Versiunea statică GitHub Pages nu importă CELEX-uri. Ea poate arăta coada și acoperirea publicată,
+Versiunea statică publică nu importă CELEX-uri. Ea poate arăta coada și acoperirea publicată,
 dar descărcarea oficială rămâne numai în aplicația locală.
 
 ## Instantanee locale și dosare

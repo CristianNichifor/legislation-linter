@@ -1,0 +1,66 @@
+"""docs/ux-guidelines.md maps each rule to the test that enforces it.
+
+A checklist pointing at tests that were renamed or deleted gives false comfort, so every
+test file and every quoted browser test title it names must exist.
+"""
+
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+GHID = Path("docs/ux-guidelines.md")
+ROW = r"`(tests/browser/[\w.-]+\.spec\.js)` ((?:› \"[^\"]+\"(?:, )?)+)"
+
+
+def _lista() -> str:
+    text = GHID.read_text(encoding="utf-8")
+    return text.split("## 8. Conformance checklist")[1].split("\n## ")[0]
+
+
+def test_every_test_file_in_the_checklist_exists() -> None:
+    files = set(re.findall(r"`(tests/[\w/.-]+\.(?:py|js))`", _lista()))
+    assert files
+    assert [f for f in files if not Path(f).is_file()] == []
+
+
+def test_every_browser_test_title_in_the_checklist_exists() -> None:
+    missing = []
+    for row in _lista().splitlines():
+        for spec, titles in re.findall(ROW, row):
+            source = Path(spec).read_text(encoding="utf-8")
+            for title in re.findall(r"› \"([^\"]+)\"", titles):
+                if f"'{title}'" not in source and f"`{title}`" not in source:
+                    missing.append(f"{spec} › {title}")
+    assert missing == []
+
+
+def test_the_guideline_links_the_bibles() -> None:
+    text = GHID.read_text(encoding="utf-8")
+    for doc in ("UX_UI_BIBLE.md", "PROJECT_FINISH_BIBLE.md", "DESIGN.md", "UX_ACCEPTANCE.md"):
+        assert f"({doc})" in text
+    assert "(ux-guidelines.md)" in Path("docs/UX_UI_BIBLE.md").read_text(encoding="utf-8")
+
+
+def test_deeper_panels_use_no_machine_terms_in_visible_text():
+    """D-8: workbench, gate and law-as-code stay out of every text node, not only the first view.
+
+    Attributes, ids and data contracts may keep the machine names; what a reader sees may not.
+    """
+    html = Path("app/index.html").read_text(encoding="utf-8")
+    # A text node sits between a closing ">" and the next "<" with no code in between: braces,
+    # backticks, semicolons and line breaks mark template code, not copy.
+    text_node = r">[^<>{}`;\n]*(?:workbench|gate produs|gate-ului|law-as-code)[^<>{}`;\n]*<"
+    offenders = [m.group(0).strip() for m in re.finditer(text_node, html, re.IGNORECASE)]
+    assert offenders == []
+
+
+def test_matrix_folds_columns_on_a_phone_and_design_suite_hands_off_landed_screens():
+    """D-7 closes in two halves: the phone rule in the app, and no fixme left for screens 03/04."""
+    html = Path("app/index.html").read_text(encoding="utf-8")
+    phone = re.search(r"@media\(max-width:650px\)\{\s*\.matrix-head,\.matrix-row\{[^}]*\}", html)
+    assert phone, "matrix phone rule missing"
+    assert ".matrix-row>:nth-child(n+5){display:none}" in html
+    spec = Path("tests/browser/design.spec.js").read_text(encoding="utf-8")
+    assert spec.count("test.fixme(") == 1, "only the D-1 family-bar test may stay fixme"
+    assert "matrix.spec.js" in spec and "dossier.spec.js" in spec

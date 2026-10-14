@@ -10,8 +10,8 @@ import pytest
 def test_daily_workflow_exposes_start_real_project_action():
     html = (Path(__file__).parents[1] / "app/index.html").read_text()
 
-    assert 'id="start-real-project"' in html
-    assert "Start proiect real" in html
+    assert 'id="source-start"' in html
+    assert "Pornește dintr-o sursă publică" in html
     assert 'id="real-workflow-start"' in html
     assert 'id="real-workflow-handoff"' in html
     assert "Sursă publică reală" in html
@@ -589,7 +589,7 @@ def test_lifecycle_renderer_filters_and_opens_project_sources():
         "assert.ok(h.includes('data-lifecycle-watch-dossier=\"0\"'));"
         "assert.ok(h.includes('Cockpit'));"
         "assert.ok(h.includes('data-lifecycle-cockpit=\"0\"'));"
-        "assert.ok(h.includes('Workbench'));"
+        "assert.ok(h.includes('Spațiu de lucru'));"
         "assert.ok(h.includes('data-lifecycle-workbench=\"0\"'));"
         "assert.ok(h.includes('Acoperire surse'));"
         "assert.ok(h.includes('data-lifecycle-coverage=\"0\"'));"
@@ -632,7 +632,7 @@ def test_lifecycle_renderer_filters_and_opens_project_sources():
         "deadline:'15.10.2026',status:'open',source_url:'https://sgg.gov.ro/'}],"
         "dossier_notes:[{title:'Notă <x>',type:'necorelare',status:'ready_for_review',"
         "locator:'art1',reasoning:'Raționament <x>'}],limitari:['nu verdict <x>']});"
-        "assert.ok(wb.includes('Workbench · PL-x 1'));"
+        "assert.ok(wb.includes('Spațiu de lucru · PL-x 1'));"
         "assert.ok(wb.includes('Atenție'));"
         "assert.ok(wb.includes('data-workbench-review-next'));"
         "assert.ok(wb.includes('data-workbench-cockpit'));"
@@ -881,7 +881,7 @@ def test_matrix_graph_renderer_labels_scaffold_edges_and_drilldowns():
         "to:{act_id:'lege-2',locator:'art2',actiuni:[{fel:'prevedere',act_id:'lege-2',"
         "locator:'art2',eticheta:'Text țintă'}]}}]};"
         "const h=mGraphHtml(data);"
-        "assert.ok(h.includes('Graf matrice · scaffold law-as-code'));"
+        "assert.ok(h.includes('Graf matrice · schiță de reguli'));"
         "assert.ok(h.includes('nu verdict juridic'));"
         "assert.ok(h.includes('Baza locală de graf este indisponibilă'));"
         "assert.ok(h.includes('Sursă indisponibilă'));"
@@ -1118,7 +1118,7 @@ def test_matrix_workspace_queue_renders_daily_items_and_routes_actions():
         "dossierButtons[0].onclick();"
         "assert.equal(library.open,true);"
         "assert.ok(status.textContent.includes('d1'));"
-        "assert.deepEqual(calls.slice(-2),[['tab','dosare'],['scroll','dossier','start']]);"
+        "assert.deepEqual(calls.slice(-1),[['scroll','dossier','start']]);"
         "draftButtons[0].onclick();"
         "let note=calls.find(c=>c[0]==='note');"
         "assert.equal(note[2].draft,true);"

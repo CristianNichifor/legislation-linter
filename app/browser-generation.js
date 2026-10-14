@@ -5,12 +5,12 @@
   const REPORTS = ['termeni.json', 'manifest.json', 'vid.json', 'neconstitutional.json',
     'norme_lovite.json', 'considerente.json', 'parlament.json', 'ue_acoperire.json'];
   const DATABASES = ['corpus.db', 'initiative.db', 'graf.db', 'eu.db'];
-  const LABELS = {'index.json':'Cautare legislativa', 'termeni.json':'Dictionar de terminologie',
-    'manifest.json':'Indicatori de acoperire', 'vid.json':'Rapoarte privind obligatiile',
-    'neconstitutional.json':'Rapoarte de constitutionalitate', 'norme_lovite.json':'Prevederi afectate de decizii',
-    'considerente.json':'Motivarile deciziilor', 'parlament.json':'Traseu parlamentar',
-    'initiative.db':'Traseu parlamentar', 'graf.db':'Legaturi intre acte',
-    'eu.db':'Legislatie UE', 'ue_acoperire.json':'Acoperirea legislatiei UE'};
+  const LABELS = {'index.json':'Căutare legislativă', 'termeni.json':'Dicționar de terminologie',
+    'manifest.json':'Indicatori de acoperire', 'vid.json':'Rapoarte privind obligațiile',
+    'neconstitutional.json':'Rapoarte de constituționalitate', 'norme_lovite.json':'Prevederi afectate de decizii',
+    'considerente.json':'Motivările deciziilor', 'parlament.json':'Traseu parlamentar',
+    'initiative.db':'Traseu parlamentar', 'graf.db':'Legături între acte',
+    'eu.db':'Legislație UE', 'ue_acoperire.json':'Acoperirea legislației UE'};
   scope.browserSourceLabels = files => [...new Set(files.map(name => LABELS[name] || 'Surse suplimentare'))].join(', ');
   const decode = bytes => new TextDecoder('utf-8', {fatal: true}).decode(bytes);
   const digest = async bytes => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)),
@@ -22,7 +22,7 @@
       request.onupgradeneeded = () => request.result.createObjectStore('state');
       request.onsuccess = () => {if (blocked) request.result.close(); else resolve(request.result);};
       request.onerror = () => reject(request.error);
-      request.onblocked = () => {blocked = true; reject(new Error('Stocarea publica este blocata de alta fila. Inchideti fila respectiva si reincercati.'));};
+      request.onblocked = () => {blocked = true; reject(new Error('Stocarea publică este blocată de altă filă. Închideți fila respectivă și reîncercați.'));};
     });
   }
   async function state(next) {
@@ -31,17 +31,17 @@
       const tx = db.transaction('state', next ? 'readwrite' : 'readonly', {durability: 'strict'});
       const request = next ? tx.objectStore('state').put(next, 'selection') : tx.objectStore('state').get('selection');
       tx.oncomplete = () => resolve(next || request.result || {selected: null, previous: null});
-      tx.onabort = () => reject(tx.error || new Error('Selectia publica nu a putut fi pastrata.'));
+      tx.onabort = () => reject(tx.error || new Error('Selecția publică nu a putut fi păstrată.'));
     }); } finally { db.close(); }
   }
   async function bytes(response, limit) {
-    if (Number(response.headers.get('Content-Length') || 0) > limit) throw new Error('Fisier peste limita declarata.');
+    if (Number(response.headers.get('Content-Length') || 0) > limit) throw new Error('Fișier peste limita declarată.');
     const reader = response.body.getReader(), chunks = []; let length = 0;
     try {
       while (true) {
         const {value, done} = await reader.read(); if (done) break;
         length += value.length;
-        if (length > limit) throw new Error('Fisier peste limita declarata.');
+        if (length > limit) throw new Error('Fișier peste limita declarată.');
         chunks.push(value);
       }
     } finally { await reader.cancel().catch(() => {}); }
@@ -56,10 +56,10 @@
   scope.BrowserGeneration = class {
     constructor(config, contract) {this.config = config; this.contract = contract; this.active = null; this.offer = null; this.candidate = null;}
     async fetch(url, options = {}) {
-      if (new URL(url).origin !== new URL(this.config.channel).origin) throw new Error('Origine publica nepermisa.');
+      if (new URL(url).origin !== new URL(this.config.channel).origin) throw new Error('Origine publică nepermisă.');
       const response = await fetch(url, {credentials: 'omit', redirect: 'error', cache: 'no-store',
         signal: AbortSignal.timeout(30000), ...options});
-      if (!response.ok || response.url !== url) throw new Error(`Sursa publica indisponibila: HTTP ${response.status}`);
+      if (!response.ok || response.url !== url) throw new Error(`Sursa publică indisponibilă: HTTP ${response.status}`);
       return response;
     }
     validate(kind, raw) {return JSON.parse(this.contract(kind, raw, this.config.channel, this.config.allowLoopback));}
@@ -87,7 +87,7 @@
         const url = item.folder + entry.name;
         const head = await this.fetch(url, {method: 'HEAD'});
         if (head.headers.get('Accept-Ranges') !== 'bytes' || Number(head.headers.get('Content-Length')) !== entry.bytes) {
-          throw new Error(`${entry.name}: HEAD/Range sau lungime incompatibila.`);
+          throw new Error(`${entry.name}: HEAD/Range sau lungime incompatibilă.`);
         }
         const end = Math.min(99, entry.bytes - 1);
         const part = await this.fetch(url, {headers: {Range: `bytes=0-${end}`}});
@@ -102,7 +102,7 @@
     }
     async prepare(hash, stored = null) {
       const offer = stored || this.offer;
-      if (!offer || offer.sha256 !== hash) throw new Error('Verificati din nou oferta publica.');
+      if (!offer || offer.sha256 !== hash) throw new Error('Verificați din nou oferta publică.');
       const candidate = {...offer, reports: {}};
       for (const entry of offer.manifest.files.filter(f => REPORTS.includes(f.name))) {
         const raw = stored ? stored.reports?.[entry.name] : await bytes(await this.fetch(offer.folder + entry.name), entry.bytes);
@@ -115,11 +115,11 @@
       this.candidate = candidate; return brief(candidate);
     }
     async select(hash, expected) {
-      if (!navigator.locks) throw new Error('Selectia necesita Web Locks.');
+      if (!navigator.locks) throw new Error('Selecția necesită Web Locks.');
       return navigator.locks.request(STORE, async () => {
         const current = await state();
-        if ((current.selected?.sha256 || null) !== expected) throw new Error('Alta fila a schimbat selectia. Reincarcati starea.');
-        if (!this.candidate || this.candidate.sha256 !== hash) throw new Error('Oferta nu este pregatita.');
+        if ((current.selected?.sha256 || null) !== expected) throw new Error('Altă filă a schimbat selecția. Reîncărcați starea.');
+        if (!this.candidate || this.candidate.sha256 !== hash) throw new Error('Oferta nu este pregătită.');
         if (current.selected?.sha256 !== hash) await state({selected: this.candidate, previous: current.selected});
         return this.status();
       });
@@ -127,7 +127,7 @@
     async clear(expected) {
       return navigator.locks.request(STORE, async () => {
         const current = await state();
-        if ((current.selected?.sha256 || null) !== expected) throw new Error('Alta fila a schimbat selectia.');
+        if ((current.selected?.sha256 || null) !== expected) throw new Error('Altă filă a schimbat selecția.');
         await state({selected: null, previous: current.selected || current.previous}); return this.status();
       });
     }
@@ -147,24 +147,24 @@
     async request(method, body) {
       const action = JSON.parse(body || '{}');
       if (method === 'GET') return JSON.stringify(await this.status());
-      if (method !== 'POST') throw new Error('Metoda nesuportata.');
+      if (method !== 'POST') throw new Error('Metodă nesuportată.');
       if (action.action === 'check') await this.check();
       else if (action.action === 'prepare') await this.prepare(action.sha256);
       else if (action.action === 'select') await this.select(action.sha256, action.expected);
       else if (action.action === 'clear') await this.clear(action.expected);
       else if (action.action === 'previous') {
-        const current = await state(); if (!current.previous) throw new Error('Nu exista o versiune precedenta.');
+        const current = await state(); if (!current.previous) throw new Error('Nu există o versiune precedentă.');
         const previous = await this.validateStored(current.previous);
         await this.prepare(previous.sha256, previous);
-      } else throw new Error('Actiune necunoscuta.');
+      } else throw new Error('Acțiune necunoscută.');
       return JSON.stringify(await this.status());
     }
   };
   if (typeof document === 'undefined') return;
   document.addEventListener('DOMContentLoaded', () => {
-    const panel = document.createElement('section'); panel.id = 'browser-generation';
+    const panel = document.createElement('section'); panel.id = 'browser-generation'; panel.lang = 'ro';
     panel.style.cssText = 'margin:0 0 1rem;padding:.75rem 0;border-bottom:1px solid var(--rule);min-width:0;font: .85rem var(--sans);letter-spacing:0';
-    panel.innerHTML = '<h2 style="font-size:1rem;margin:0">Date legislative online</h2><p data-active></p><p data-offer></p><p class="hint" data-coverage></p><p class="hint">Citire online a bazelor SQLite; hash-ul integral al bazelor nu este verificat. Fara copie offline a corpusului complet.</p><p role="status" data-status></p><div class="dossier-actions"><button type="button" class="ghost mini" data-check>Cauta versiune noua</button><button type="button" class="ghost mini" data-select hidden>Alege versiunea online</button><button type="button" class="ghost mini" data-previous hidden>Alege versiunea precedenta</button><button type="button" class="ghost mini" data-clear hidden>Revino la datele incluse</button><button type="button" class="ghost mini" data-reload hidden>Aplica datele in pagina</button></div>';
+    panel.innerHTML = '<h2 style="font-size:1rem;margin:0">Date legislative online</h2><p data-active></p><p data-offer></p><p class="hint" data-coverage></p><p class="hint">Datele se citesc online, pe măsură ce sunt cerute; amprenta integrală a bazelor nu este verificată. Fără copie offline a corpusului complet.</p><p role="status" data-status></p><div class="dossier-actions"><button type="button" class="ghost mini" data-check>Caută versiune nouă</button><button type="button" class="ghost mini" data-select hidden>Alege versiunea online</button><button type="button" class="ghost mini" data-previous hidden>Alege versiunea precedentă</button><button type="button" class="ghost mini" data-clear hidden>Revino la datele incluse</button><button type="button" class="ghost mini" data-reload hidden>Aplică datele în pagină</button></div>';
     document.querySelector('header').after(panel);
     panel.querySelector('.dossier-actions').style.cssText = 'display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem';
     panel.querySelectorAll('p').forEach(p => {p.style.overflowWrap = 'anywhere'; p.style.margin = '.4rem 0';});
@@ -177,15 +177,15 @@
     }
     function render(data) {
       current = data;
-      const included = data.legacy_root ? 'versiunea publicata ' + data.legacy_root.split('/').filter(Boolean).pop() : 'datele incluse';
-      node('active').textContent = `In aceasta fila: ${data.active?.release || included}. Pregatita pentru aplicare: ${data.selected?.release || included}.`;
-      node('offer').textContent = data.offer ? `Oferta: ${data.offer.release} · publicata ${data.offer.created_at} · verificata ${data.offer.checked_at} · rapoarte: ${(data.offer.report_bytes / 1048576).toFixed(2)} MiB` : '';
+      const included = data.legacy_root ? 'versiunea publicată ' + data.legacy_root.split('/').filter(Boolean).pop() : 'datele incluse';
+      node('active').textContent = `În această filă: ${data.active?.release || included}. Pregătită pentru aplicare: ${data.selected?.release || included}.`;
+      node('offer').textContent = data.offer ? `Oferta: ${data.offer.release} · publicată ${data.offer.created_at} · verificată ${data.offer.checked_at} · rapoarte: ${(data.offer.report_bytes / 1048576).toFixed(2)} MiB` : '';
       const missing = data.active?.missing || data.legacy_missing || [];
       const coverage = [];
-      if (data.boot_error) coverage.push('Sursele acestei file nu sunt disponibile: pornirea a esuat.');
-      else if (missing.length) coverage.push(`In aceasta fila, acoperire indisponibila: ${scope.browserSourceLabels(missing)}.`);
+      if (data.boot_error) coverage.push('Sursele acestei file nu sunt disponibile: pornirea a eșuat.');
+      else if (missing.length) coverage.push(`În această filă, acoperire indisponibilă: ${scope.browserSourceLabels(missing)}.`);
       if (data.selected && data.selected.sha256 !== data.active?.sha256 && data.selected.missing.length) {
-        coverage.push(`Versiunea pregatita pentru aplicare, surse absente: ${scope.browserSourceLabels(data.selected.missing)}.`);
+        coverage.push(`Versiunea pregătită pentru aplicare, surse absente: ${scope.browserSourceLabels(data.selected.missing)}.`);
       }
       if (data.offer?.missing.length) coverage.push(`Oferta, surse absente: ${scope.browserSourceLabels(data.offer.missing)}.`);
       node('coverage').textContent = coverage.join(' ');
@@ -195,11 +195,11 @@
     }
     async function act(fn) {
       if (busy) return; busy = true; panel.querySelectorAll('button').forEach(b => b.disabled = true);
-      node('status').textContent = 'Operatie in curs...';
-      try { await fn(); render(await api()); node('status').textContent = 'Operatie incheiata. Datele alese se aplica dupa confirmarea din pagina.'; }
+      node('status').textContent = 'Operație în curs…';
+      try { await fn(); render(await api()); node('status').textContent = 'Operație încheiată. Datele alese se aplică după confirmarea din pagină.'; }
       catch (e) {
-        node('status').textContent = 'Operatia nu a fost confirmata; verificati starea selectiei. ' + e.message;
-        try {render(await api());} catch (_) {node('status').textContent += ' Starea selectiei este indisponibila.';}
+        node('status').textContent = 'Operația nu a fost confirmată; verificați starea selecției. ' + e.message;
+        try {render(await api());} catch (_) {node('status').textContent += ' Starea selecției este indisponibilă.';}
       }
       finally {busy = false; panel.querySelectorAll('button').forEach(b => b.disabled = false);}
     }

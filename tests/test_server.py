@@ -928,3 +928,16 @@ def test_law_code_delegated_norm_check_keeps_found_implementation_review_only(tm
         "legal_effect": "unknown",
         "not_legal_verdict": True,
     }
+
+
+def test_rezumat_carries_the_dataset_date_from_the_manifest(tmp_path):
+    stare = _build(tmp_path)
+    assert rezumat(stare).get("data_set") is None
+    data = tmp_path / "rapoarte"
+    data.mkdir()
+    (data / "manifest.json").write_text(
+        '{"acte": 1, "provizii": 2, "data_set": "2026-09-05"}', encoding="utf-8"
+    )
+    stare.reports_dir = data
+    out = rezumat(stare)
+    assert out["data_set"] == "2026-09-05"

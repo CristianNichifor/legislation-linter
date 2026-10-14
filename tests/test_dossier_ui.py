@@ -1911,3 +1911,20 @@ def test_workspace_navigation_guard_restores_selectors():
         "dirty=false;assert.equal(dossierMayNavigate(),true);"
     )
     run_node(code)
+
+
+@pytest.mark.skipif(not shutil.which("node"), reason="Node unavailable")
+def test_dataset_freshness_warns_after_thirty_days():
+    source = APP.read_text().split("function datasetFreshness", 1)[1].split("\n}\n", 1)[0]
+    code = (
+        "const assert=require('node:assert/strict');"
+        "function datasetFreshness" + source + "\n}\n"
+        "const now=Date.parse('2026-10-14T12:00:00Z');"
+        "assert.equal(datasetFreshness('',now),null);"
+        "assert.equal(datasetFreshness('nu-e-data',now),null);"
+        "let f=datasetFreshness('2026-09-14',now);"
+        "assert.equal(f.days,30);assert.equal(f.stale,false);"
+        "f=datasetFreshness('2026-09-13',now);"
+        "assert.equal(f.days,31);assert.equal(f.stale,true);"
+    )
+    run_node(code)

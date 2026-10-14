@@ -321,3 +321,13 @@ test('form labels, target size and check-first layout', async ({ page, browserNa
   }
 });
 });
+
+test('dataset date and stale warning', async ({ page }) => {
+  await page.goto('/');
+  const stat = page.locator('#stat');
+  await expect(stat).toContainText('4 acte');
+  // The committed fixtures were captured on this date, more than 30 days ago.
+  await expect(stat).toContainText('date la zi pe 2026-09-05');
+  await expect(page.locator('#stat [data-dataset-stale]')).toBeVisible();
+  await expect(page.locator('#stat [data-dataset-stale]')).toContainText('peste 30 de zile');
+});

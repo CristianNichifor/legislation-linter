@@ -319,3 +319,30 @@ def test_limitarile_surselor_apar_o_singura_data():
     garda = boot.rfind("if (window.browserSourceLimitations.length", 0, nota)
     assert garda != -1
     assert "!document.getElementById('browser-generation')" in boot[garda:nota]
+
+
+def test_manifest_poarta_data_setului(tmp_path, monkeypatch):
+    """The header's "date la zi pe" comes from the manifest; the build says which date it is."""
+    from scripts import construieste_web as cw
+
+    data = tmp_path / "data"
+    data.mkdir()
+    (data / "manifest.json").write_text('{"acte": 4}', encoding="utf-8")
+    monkeypatch.setattr(cw, "DATA", data)
+    monkeypatch.setattr(cw, "ROOT", tmp_path)
+
+    def stampila(**kw):
+        cw._stampileaza_data_setului(**kw)
+        return json.loads((data / "manifest.json").read_text(encoding="utf-8"))
+
+    # The data store prefix names the dataset it serves.
+    m = stampila(sursa="gata", depozit="https://data.exemplu.ro/2026-09-08")
+    assert m == {"acte": 4, "data_set": "2026-09-08"}
+    # Without a store, a downloaded release says its own date.
+    (data / "dataset-release.json").write_text('{"release": "2026-10-01-b"}', encoding="utf-8")
+    assert stampila(sursa="gata", depozit="")["data_set"] == "2026-10-01"
+    (data / "dataset-release.json").unlink()
+    # The committed fixtures carry the date they were captured, not the build date.
+    assert stampila(sursa="fixturi", depozit="")["data_set"] == cw.FIXTURI_DATA_SET
+    # Nothing to go on: no date rather than an invented one.
+    assert "data_set" not in stampila(sursa="gata", depozit="")

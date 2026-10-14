@@ -160,11 +160,17 @@ async function seriousViolations(page) {
     }));
 }
 
+test.describe('axe', () => {
+// The privacy page's CSP forbids inline scripts; let the test inject axe anyway.
+test.use({ bypassCSP: true });
 test('axe: no serious or critical violations', async ({ page, browserName }) => {
   test.skip(browserName !== 'chromium', 'One engine is enough for the rule set.');
   await page.goto('/');
   await expect(page.locator('#stat')).toContainText('acte');
   expect(await seriousViolations(page)).toEqual([]);
+  await page.emulateMedia({ colorScheme: 'dark' });
+  expect(await seriousViolations(page)).toEqual([]);
   await page.goto('/confidentialitate.html');
   expect(await seriousViolations(page)).toEqual([]);
+});
 });

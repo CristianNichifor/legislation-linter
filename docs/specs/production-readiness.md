@@ -227,6 +227,22 @@ screens are implemented.
   acts present but no candidate problem gives `data-coverage-state="none"` with the act count.
 
 Test: `tests/browser/matrix.spec.js` (static suite). Phone row density (D-7) stays open.
+### LL-DS-4 Dossier finding anatomy — done
+
+- Given a note in a dossier, then it reads, in DOM order: act and locator, the quote as a
+  `blockquote`, a „Sursa:” line whose link text is the host and path, the reasoning, a
+  „Stare de verificare” radio group with the five note states, and the SHA-256 behind a closed
+  `<details>` „Detalii tehnice”; the meta line carries the last revision date as zz.ll.aaaa.
+- Given the radio group, when a state is chosen, then the note is saved with that state and the
+  list re-renders; „Auto-revizuită” and „Rezolvată” are refused, with the missing items named,
+  when the note lacks quote, source or reasoning (same rule as the form).
+- Given the finding, then it prints no verdict word (legal, ilegal, conform, constituțional).
+- Given the note form, when „Salvează nota” is pressed, then the note is stored: the payload is
+  read before the controls are locked (a disabled control is left out of FormData, so the old
+  order sent every field empty and the store answered „Cerere invalidă”).
+
+Tests: `tests/browser/dossier.spec.js` (static suite; the first test is also the regression test
+for the save); `tests/test_dossier_ui.py` (renderer escaping, node harness).
 ## Theme G: AI drafting
 
 ### LL-9 BYOK draft from evidence, end to end — done

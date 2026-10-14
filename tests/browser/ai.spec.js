@@ -16,7 +16,8 @@ async function openDossierWithEvidence(page) {
   await expect(page.locator('#stat')).toContainText('4 acte');
   await expect(page.locator('#dossier-library')).toHaveAttribute('open', '');
   const create = page.locator('#dossier-create');
-  await create.locator('xpath=..').locator('summary').click();
+  // The "Dosar nou" section may already be open when no dossier exists; opening is idempotent.
+  await create.locator('xpath=..').evaluate(details => { details.open = true; });
   await create.locator('input[name="titlu"]').fill('Dosar AI BYOK');
   await create.locator('button[type="submit"]').click();
   const form = page.locator('#dossier-notes [data-manual-note-form]');
@@ -27,7 +28,7 @@ async function openDossierWithEvidence(page) {
   await form.locator('input[name="source_url"]').fill('https://legislatie.just.ro/Public/DetaliiDocument/178667');
   await form.locator('textarea[name="evidence_quote"]').fill(QUOTE);
   const panel = form.locator('[data-ai-note-draft]');
-  await panel.locator('summary').first().click();
+  await panel.evaluate(details => { details.open = true; });
   await panel.locator('select[name="ai_boundary"]').selectOption('online_byok');
   return { form, panel };
 }

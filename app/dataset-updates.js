@@ -45,11 +45,11 @@
   let initialGeneration, reloadNeeded = false, message = '';
   let pendingMutation = '', uncertain = false, locked = [];
   const labels = {
-    'corpus.db': 'Legislatie romana',
+    'corpus.db': 'Legislație română',
     'initiative.db': 'Traseu parlamentar',
-    'graf.db': 'Legaturi intre acte',
-    'eu.db': 'Legislatie UE',
-    'ue_acoperire.json': 'Acoperirea legislatiei UE',
+    'graf.db': 'Legături între acte',
+    'eu.db': 'Legislație UE',
+    'ue_acoperire.json': 'Acoperirea legislației UE',
   };
   const optional = ['initiative.db', 'graf.db', 'eu.db', 'ue_acoperire.json'];
   const missing = manifest => {
@@ -84,8 +84,8 @@
       ? `Versiune disponibilă: ${offer.manifest.release} · ${size(offerSize())}` : '';
     const absent = missing(offer?.manifest);
     node('coverage').textContent = absent.length
-      ? `Surse indisponibile in aceasta versiune: ${sourceLabels(absent)}.`
-      : offer ? 'Sursele optionale publicabile sunt incluse in aceasta versiune.' : '';
+      ? `Surse indisponibile în această versiune: ${sourceLabels(absent)}.`
+      : offer ? 'Sursele opționale publicabile sunt incluse în această versiune.' : '';
     const labels = {
       idle: '', checked: offer ? 'Căutare încheiată.' : 'Nicio versiune nouă disponibilă.',
       downloading: `Se descarcă: ${size(progress.bytes)} / ${size(progress.total)}`,

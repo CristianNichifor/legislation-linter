@@ -7,8 +7,8 @@
 #
 # De ce nu o regulă de lifecycle: regulile R2 expiră după *vârstă*. Ele nu pot deosebi prefixul
 # pe care site-ul îl servește chiar acum de unul abandonat. Site-ul este construit cu un prefix
-# fixat în `.github/workflows/pages.yml` (`--depozit`), iar canalul de date trimite cititorii
-# către prefixul din `channel.json`; cele două pot fi diferite, și au fost. O regulă „șterge ce
+# fixat în `.github/workflows/deploy-pages-cloudflare.yml` (`--depozit`), iar canalul de date
+# trimite cititorii către prefixul din `channel.json`; cele două pot fi diferite, și au fost. O regulă „șterge ce
 # e mai vechi de N zile" ar fi ștears exact prefixul pe care se sprijină căutarea, lăsând
 # canalul intact — o cădere care arată sănătoasă din afară.
 #
@@ -33,7 +33,7 @@ BUCKET=${BUCKET:-legislation-linter}
 DOMENIU=${DOMENIU:-data.cristian-nichifor.com}
 PASTREAZA=${PASTREAZA:-2}
 CONFIRMA=${CONFIRMA:-nu}
-FLUX_PAGES=${FLUX_PAGES:-.github/workflows/pages.yml}
+FLUX_PAGES=${FLUX_PAGES:-.github/workflows/deploy-pages-cloudflare.yml}
 
 [ -n "${CF_ACCOUNT:-}" ] || { echo "lipsește CF_ACCOUNT" >&2; exit 2; }
 
@@ -62,7 +62,7 @@ recente=("${toate[@]:0:$PASTREAZA}")
 protejat() {
   local p=$1
   [ "$p" = "$prefix_canal" ] && { echo "channel.json"; return; }
-  [ "$p" = "$prefix_site" ] && { echo "pages.yml --depozit"; return; }
+  [ "$p" = "$prefix_site" ] && { echo "deploy-pages-cloudflare.yml --depozit"; return; }
   for r in "${recente[@]}"; do [ "$p" = "$r" ] && { echo "între cele mai recente $PASTREAZA"; return; }; done
   echo ""
 }

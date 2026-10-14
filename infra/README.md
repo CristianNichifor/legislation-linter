@@ -38,7 +38,7 @@ Pagefind slice is thousands of fragments.
 |---|---|---|---|---|
 | `2026-09-11` | 7,08 GB | 7 | corpus, graf, initiative, release — **no search index** | `channel.json` → `dataset-release.json` |
 | `2026-09-10` | 6,90 GB | 6 | corpus, graf, release — **no search index** | nothing found; superseded by `2026-09-11` |
-| `2026-09-08` | 9,96 GB | 256.180 | full publish: corpus + `idx/` + `pagefind-0…7` | the published page — `--depozit` in `.github/workflows/pages.yml` |
+| `2026-09-08` | 9,96 GB | 256.180 | full publish: corpus + `idx/` + `pagefind-0…7` | the published page — `--depozit` in `.github/workflows/deploy-pages-cloudflare.yml` |
 
 That table answers a question this file used to get wrong. The page does not read `2026-09-08`
 because someone forgot to move the pin: **it is the only prefix that can serve the page at all.**
@@ -76,7 +76,7 @@ Two things follow, and one thing that looks like a fix is not one:
   would still look healthy. That is the most expensive kind of outage: silent on the surface.
 
   `infra/curata-prefixe.sh` does the pruning instead. It reads the prefix out of `channel.json`
-  and the `--depozit` pin out of `pages.yml`, keeps both plus the most recent `PASTREAZA` (2 by
+  and the `--depozit` pin out of `deploy-pages-cloudflare.yml`, keeps both plus the most recent `PASTREAZA` (2 by
   default), and refuses to run at all if it cannot determine either reference. Without
   `CONFIRMA=da` it only reports. Run with the defaults today it protects all three prefixes and
   deletes nothing. The one genuinely redundant prefix is `2026-09-10`: superseded by `2026-09-11`,

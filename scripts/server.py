@@ -139,6 +139,7 @@ MAX_DATE_CERERE = 4096
 ASSETS = {
     "/dataset-updates.js": ("dataset-updates.js", "text/javascript; charset=utf-8"),
     "/browser-workspace.js": ("browser-workspace.js", "text/javascript; charset=utf-8"),
+    "/confidentialitate.html": ("confidentialitate.html", "text/html; charset=utf-8"),
     **{
         f"/fonts/{name}.woff2": (f"fonts/{name}.woff2", "font/woff2")
         for name in (

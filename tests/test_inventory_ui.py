@@ -10,8 +10,8 @@ import pytest
 def test_daily_workflow_exposes_start_real_project_action():
     html = (Path(__file__).parents[1] / "app/index.html").read_text()
 
-    assert 'id="start-real-project"' in html
-    assert "Start proiect real" in html
+    assert 'id="source-start"' in html
+    assert "Pornește dintr-o sursă publică" in html
     assert 'id="real-workflow-start"' in html
     assert 'id="real-workflow-handoff"' in html
     assert "Sursă publică reală" in html
@@ -1118,7 +1118,7 @@ def test_matrix_workspace_queue_renders_daily_items_and_routes_actions():
         "dossierButtons[0].onclick();"
         "assert.equal(library.open,true);"
         "assert.ok(status.textContent.includes('d1'));"
-        "assert.deepEqual(calls.slice(-2),[['tab','dosare'],['scroll','dossier','start']]);"
+        "assert.deepEqual(calls.slice(-1),[['scroll','dossier','start']]);"
         "draftButtons[0].onclick();"
         "let note=calls.find(c=>c[0]==='note');"
         "assert.equal(note[2].draft,true);"

@@ -2110,6 +2110,10 @@ fetch("/api/rezumat").then(apiJson).then(d=>{
   const retry=document.createElement("button");retry.type="button";retry.className="ghost mini";retry.textContent="Reîncearcă";
   retry.onclick=()=>{stat.innerHTML='<span class="spin"></span> se încarcă…';loadRezumat();};
   stat.append(retry);
+  // A slow first start is not a failure: when the engine does come up, load the header by itself.
+  if(engineFailed(err.message)&&window.legislativEngine?.state==="starting"){
+    window.addEventListener("legislativ-engine",e=>{if(e.detail?.state==="ready")loadRezumat();},{once:true});
+  }
 });
 }
 loadRezumat();

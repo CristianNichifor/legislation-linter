@@ -63,7 +63,10 @@ test('review state is saved from the finding and survives a reload', async ({ pa
   const saved = page.locator('#dossier-notes [data-finding]').first();
   await expect(saved.locator('[data-note-status]')).toHaveText('Rezolvată');
   await expect(saved.getByRole('radio', { name: 'Rezolvată' })).toBeChecked();
+  // The chosen dossier is not remembered across a reload; pick it again and read the stored state.
   await page.reload();
+  await expect(page.locator('#dossier-library')).toHaveAttribute('open', '');
+  await page.locator('#dossier-select').selectOption({ label: 'Achiziții publice' });
   await expect(page.locator('#dossier-notes [data-finding]').first().locator('[data-note-status]')).toHaveText('Rezolvată');
 });
 

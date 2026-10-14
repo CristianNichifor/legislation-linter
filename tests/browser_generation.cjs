@@ -124,7 +124,7 @@ const pub = '/api/browser-generation', priv = '/api/browser-workspace';
       };
     });
     await page.locator('#browser-generation [data-select]').click(); await idle(page);
-    assert.ok((await page.locator('#browser-generation [data-status]').innerText()).includes('nu a fost confirmata'));
+    assert.ok((await page.locator('#browser-generation [data-status]').innerText()).includes('nu a fost confirmată'));
     assert.ok((await page.locator('#browser-generation [data-active]').innerText()).includes('2026-09-10-b'), 'Unknown acknowledgement reconciles actual committed selection');
     status = await good(page, pub); assert.equal(status.selected.release, '2026-09-10-b'); assert.equal(status.previous.release, '2026-09-10-a');
     await page.locator('#browser-generation [data-reload]').click(); await page.waitForLoadState('domcontentloaded');

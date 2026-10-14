@@ -21,7 +21,7 @@ const cases = [
 
 for (const [name, html] of pages) {
   test(`${name}: the script carries path, query and hash`, () => {
-    const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)];
+    const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\b[^>]*>/gi)];
     assert.equal(scripts.length, 1, 'expected one redirect script');
     for (const [pathname, search, hash, expected] of cases) {
       const went = [];
@@ -34,7 +34,7 @@ for (const [name, html] of pages) {
   test(`${name}: canonical, noindex, refresh and visible link agree`, () => {
     assert.ok(html.includes(`<link rel="canonical" href="${target}" />`));
     assert.ok(html.includes('<meta name="robots" content="noindex" />'));
-    const fallback = html.match(/<noscript\b[^>]*>([\s\S]*?)<\/noscript\s*>/i);
+    const fallback = html.match(/<noscript\b[^>]*>([\s\S]*?)<\/noscript\b[^>]*>/i);
     assert.ok(fallback, 'no-JavaScript fallback is required');
     assert.ok(fallback[1].includes(`http-equiv="refresh" content="0; url=${target}"`));
     assert.ok(html.includes(`<a href="${target}">`));

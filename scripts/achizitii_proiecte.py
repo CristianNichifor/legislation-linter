@@ -203,7 +203,7 @@ def parliamentary_evidence_summary(*, documents=(), events=()):
         "next_action": (
             "Verifică fișa parlamentară pentru: " + ", ".join(missing[:4]) + "."
             if missing
-            else "Dovezile parlamentare principale există în trackerul local."
+            else "Dovezile parlamentare principale există în urmărirea locală."
         ),
         "limitari": [
             "Rezumatul folosește numai date locale deja extrase.",

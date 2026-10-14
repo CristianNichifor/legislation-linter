@@ -1286,27 +1286,36 @@ def _stampileaza_data_setului(*, sursa: str, depozit: str) -> None:
     """Record in `manifest.json` which date the dataset describes, for the header's freshness line.
 
     The data store prefix is the dataset's date; a downloaded release names its own; the fixtures
-    carry their capture date. Anything else gets no date rather than an invented one.
+    carry their capture date. Anything else gets no date rather than an invented one. The same
+    evidence sets `stare_date` ("reale" or "demonstrative", the header badge of
+    docs/ux-guidelines.md § 7), so the browser never has to guess whether it shows demo data.
     """
     manifest = DATA / "manifest.json"
     if not manifest.is_file():
         return
     date = json.loads(manifest.read_text(encoding="utf-8"))
     date.pop("data_set", None)
+    date.pop("stare_date", None)
     zi = None
     potrivire = (
         re.search(r"/(\d{4}-\d{2}-\d{2})(?:[-/]|$)", urlparse(depozit).path) if depozit else None
     )
     release = DATA / "dataset-release.json"
+    stare = None
     if potrivire:
         zi = potrivire.group(1)
+        stare = "reale"
     elif release.is_file():
         eticheta = str(json.loads(release.read_text(encoding="utf-8")).get("release", ""))
         zi = eticheta[:10] if re.fullmatch(r"\d{4}-\d{2}-\d{2}", eticheta[:10]) else None
+        stare = "reale"
     elif sursa == "fixturi":
         zi = FIXTURI_DATA_SET
+        stare = "demonstrative"
     if zi:
         date["data_set"] = zi
+    if stare:
+        date["stare_date"] = stare
     manifest.write_text(json.dumps(date, ensure_ascii=False), encoding="utf-8")
 
 

@@ -200,3 +200,29 @@ test('primary copy uses no internal terms', async ({ page }) => {
   await expect(page.locator('#legislative-workflow')).not.toHaveAttribute('open', '');
   await expect(page.locator('#legislative-workflow .daily-flow-steps')).toBeHidden();
 });
+
+test('matrix is the default workspace and opens drafts in place', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#tab-matrice')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#pane-matrice')).toBeVisible();
+  const groups = page.locator('[data-matrix-workspace-group]');
+  await expect(groups.first()).toBeVisible();
+  await expect(groups.first().locator('h4').first()).toContainText('intrări');
+  // Send the first cell to a dossier before one exists: the library opens in the matrix view.
+  await groups.first().locator('[data-matrix-workspace-open-dossier]').first().click();
+  await expect(page.locator('#tab-matrice')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#pane-matrice')).toBeVisible();
+  await expect(page.locator('#dossier-library')).toHaveAttribute('open', '');
+  await expect(page.locator('#dossier-status')).toContainText('nota din matrice');
+  // Creating the dossier resumes the pending note as a draft, still in the matrix view.
+  await expect(page.locator('#dossier-local')).toBeVisible();
+  const create = page.locator('#dossier-create');
+  await create.locator('xpath=..').locator('summary').click();
+  await create.locator('input[name="titlu"]').fill('Dosar din matrice');
+  await create.locator('button[type="submit"]').click();
+  const title = page.locator('#dossier-notes input[name="title"]');
+  await expect(title).toBeVisible();
+  await expect(title).toHaveValue(/^Notă matrice · /);
+  await expect(page.locator('#tab-matrice')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#pane-matrice')).toBeVisible();
+});

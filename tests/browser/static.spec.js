@@ -355,3 +355,16 @@ test('english chrome toggle syncs html lang', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('lang', 'ro');
   await expect(page.getByRole('tab', { name: 'Matrice' })).toBeVisible();
 });
+
+test('header recovers when a slow engine starts after the timeout', async ({ page, context, browserName }) => {
+  test.skip(browserName !== 'chromium', 'Worker requests are routed reliably in Chromium only.');
+  test.setTimeout(150_000);
+  // Hold the runtime back past the 20 s wait, then let it through.
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  await context.route('https://cdn.jsdelivr.net/**', async route => { await held; await route.continue(); });
+  await page.goto('/');
+  await expect(page.locator('#stat')).toContainText('Motorul nu a pornit', { timeout: 40_000 });
+  release();
+  await expect(page.locator('#stat')).toContainText('4 acte');
+});

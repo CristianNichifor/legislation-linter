@@ -54,6 +54,8 @@ jobs:
             echo "dataset: $TAG"
             mkdir -p web && tar xzf date.tar.gz -C web
             echo "sursa=gata" >> "$GITHUB_OUTPUT"
+            # The data store prefix is the release date, so it follows the release it serves.
+            echo "depozit=https://data.cristian-nichifor.com/${TAG#date-}" >> "$GITHUB_OUTPUT"
           else
             echo "sursa=fixturi" >> "$GITHUB_OUTPUT"
             echo "no dataset release yet — building the 4-act fixtures demo"
@@ -81,8 +83,7 @@ jobs:
         run: >-
           uv run python -m scripts.construieste_web
           --sursa ${{ steps.date.outputs.sursa }}
-          --depozit https://data.cristian-nichifor.com/2026-09-08
-          --felii-cautare 8
+          ${{ steps.date.outputs.depozit && format('--depozit {0} --felii-cautare 8', steps.date.outputs.depozit) || '' }}
       - name: Lay out the site under the project path
         run: |
           set -euo pipefail

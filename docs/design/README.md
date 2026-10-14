@@ -1,7 +1,7 @@
 # Design screens — target state
 
 Static mockups of the five screens that matter most, for implementation sessions to build
-from. They follow [ux-guidelines.md](../ux-guidelines.md) (which refines
+from. Six mockups; they follow [ux-guidelines.md](../ux-guidelines.md) (which refines
 [UX_UI_BIBLE.md](../UX_UI_BIBLE.md); the bible wins on conflict), the tokens in
 [DESIGN.md](../DESIGN.md) and the fleet guideline in civic-ui `docs/ux-guidelines.md`.
 
@@ -32,6 +32,7 @@ and need human review (spec LL-DS).
 | [03 Matrice](screens/03-matrice.html) | See what is missing or conflicting in a domain | §4 viz, §5 empty states, D-7 | Filter rail (domain, source family, lifecycle, issue type, quality); table as the text alternative to the graph; legend with shapes; two distinct empty states (coverage missing vs nothing found) | At 390 px the rail stacks above the table and rows become two-column cards (`table.resp`); the tab row scrolls with a fade cue (D-5) |
 | [04 Dosar](screens/04-dosar.html) | Review one finding and record a state | UX-6, §2 details last | Source, quote, uncertainty, reviewer note and hash in that order; hash under `<details>`; review state as radios with a local-save note; „sursa s-a schimbat” error with a reconfirm action | Save is local; export JSON keeps the audit trail |
 | [05 Redactare asistată](screens/05-redactare-ai.html) | Ask for a rewrite with consent and keep an audit trail | UX-7, UX-8, LL-9, §5 external actions | Consent card before the call: destination, what leaves the device, cost, privacy links; checkbox gates the button; result badged „Text asistat, neverificat” until accepted; audit log table; refused/failed call keeps local work | No-key state links to Setări; 60 s timeout with cancel |
+| [06 Setări](screens/06-setari.html) | Update the data, choose local or own-key assisted text, theme and language | §5 states, §7 status, UX-7, LL-9 | Data card with status badge, date and „Actualizează datele” with staged progress and the public/private separation note; local vs own-key mode as radios with the key kept in session only, endpoint and wait time; connection test; theme and language selects; privacy actions | Key never persisted or exported; „Șterge datele locale” asks for confirmation and leaves public data alone; update failure keeps the old dataset in use |
 
 ## Shared rules applied
 

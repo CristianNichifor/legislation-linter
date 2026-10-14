@@ -331,3 +331,27 @@ test('dataset date and stale warning', async ({ page }) => {
   await expect(page.locator('#stat [data-dataset-stale]')).toBeVisible();
   await expect(page.locator('#stat [data-dataset-stale]')).toContainText('peste 30 de zile');
 });
+
+test('english chrome toggle syncs html lang', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ro');
+  const tabs = page.getByRole('tablist').getByRole('tab');
+  await expect(tabs.first()).toHaveText('Start');
+  const toggle = page.locator('#lang-toggle');
+  await expect(toggle).toHaveText('English');
+  await expect(toggle).toHaveAttribute('lang', 'en');
+  await toggle.click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(tabs).toHaveText(['Start', 'Check', 'Search', 'Matrix', 'Dossiers', 'Sources', 'Drafting', 'Settings']);
+  await expect(page.locator('h1')).toHaveText('What the law says about your draft');
+  await expect(page.locator('a.skip-link')).toHaveText('Skip to content');
+  await expect(page.locator('footer a[href="confidentialitate.html"]')).toHaveText('Privacy');
+  await expect(toggle).toHaveText('Română');
+  await expect(toggle).toHaveAttribute('lang', 'ro');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.getByRole('tab', { name: 'Matrix' })).toHaveAttribute('aria-selected', 'true');
+  await page.locator('#lang-toggle').click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ro');
+  await expect(page.getByRole('tab', { name: 'Matrice' })).toBeVisible();
+});

@@ -135,6 +135,21 @@ Test: `tests/browser/static.spec.js` › "english chrome toggle syncs html lang"
 at the end of the navigation and names the other language in that language. The main region and
 the data panels keep `lang="ro"`. English strings are marked *needs human review*.
 
+### LL-EN English leftovers and internal terms — done
+
+- Given English mode, then no text, `aria-label` or `title` outside the `lang="ro"` regions is
+  Romanian: the flow summary, the connections panel, its toggle, the back-to-top button and the
+  language toggle's title switch with the language. The local-data panel and the workflow
+  status messages are marked `lang="ro"`, like the other data panels.
+- Given the Dossiers and Sources views, then their first screen uses none of the internal
+  terms: "Workbench surse", "Gate produs", "tracker" and "cockpit" give way to plain Romanian
+  ("Starea surselor", "Verificare de completitudine", "urmărire", "fișa proiectului"), and
+  "Reîncarcă" gives way to "Reîmprospătează".
+- The denylist also covers `cockpit`, `drilldown`, `lifecycle` and `metadata-first`.
+
+Test: `tests/browser/static.spec.js` › "english mode leaves no romanian chrome" and "dossiers
+and sources views use no internal terms"; `tests/test_app_completeness.py`. The English strings
+and the new Romanian labels need human review.
 ## Theme E: UX guidelines
 
 ### LL-UXG UX guidelines with a conformance checklist — done
@@ -163,32 +178,6 @@ Test: `tests/test_ux_guidelines.py`.
 
 Test: `tests/browser/static.spec.js` › "footer links source code and contact" and
 "dataset date and stale warning".
-
-## Workflow-only (maintainer applies the diff)
-
-### LL-1 Data store prefix not hardcoded — needs human
-
-- Given `pages.yml` and `deploy-pages-cloudflare.yml`, then `--depozit` is derived from the newest
-  `date-*` release, not a hardcoded `https://data.cristian-nichifor.com/YYYY-MM-DD`.
-
-Test: `tests/test_workflows_depozit.py` (strict xfail until the maintainer applies the diff in the
-PR body; agent pull requests do not change workflows). Without a release the build no longer
-points the fixtures demo at the data store.
-
-### LL-2 Collect job on a self-hosted runner — needs human
-
-- `collect.yml` runs on `self-hosted`, because the portal refuses GitHub-hosted runner IPs.
-  Needs a registered runner on an accepted IP first. Diff in the PR body.
-
-## Needs human
-
-- Self-hosted runner on an IP legislatie.just.ro accepts (LL-2).
-- Data host serving the dated prefix (LL-1: `data.cristian-nichifor.com/2026-09-08` returns 404).
-- API worker route for the rewrite endpoint (LL-8).
-- Civic UI upgrade waits for the civic-ui 0.8 release.
-- Review of the English strings (LL-10) and of the privacy page wording (LL-7).
-- Review of the Romanian copy in the design mockups and the mockup screenshots (LL-DS); hub URL and product name (D-1).
-
 ## Theme F: design screens
 
 ### LL-DS Target-state screen designs — done (docs)
@@ -229,3 +218,58 @@ screens are implemented.
 
 Tests: `tests/browser/dossier.spec.js` (static suite; the first test is also the regression test
 for the save); `tests/test_dossier_ui.py` (renderer escaping, node harness).
+## Theme G: AI drafting
+
+### LL-9 BYOK draft from evidence, end to end — done
+
+Fleet round 2, 2026-10-14. Provider calls are mocked in the browser with `page.route`; no key
+and no text leave the test. The server never calls a model.
+
+- Given a dossier note with a quote and a source, when the user prepares the prompt with the
+  boundary "online BYOK", then the panel shows the evidence manifest, the token estimate, the
+  prompt hash and that external approval is mandatory.
+- Given a prepared prompt, when the user runs it, then a consent dialog names the provider,
+  model, evidence count and prompt hash, never the key; dismissing it sends nothing and says
+  "Anulat — promptul nu a fost trimis."
+- Given consent, then exactly one request goes to the configured endpoint, with the key only as
+  an `Authorization` header and the selected quote in the body; the result shows the insert
+  header, the stored audit line (`ai-draft-storage-audit-v1 · online_byok`), the draft with its
+  `[1]` citation, guardrail status `ok` and an enabled insert button. The key stays in
+  `sessionStorage`, never in `localStorage`.
+- Failure states create no draft and show "AI oprit · <state>", "ciornă creată: nu" and a
+  disabled insert button: no key in the session (`cheie invalidă`, no request, no consent dialog,
+  no retry), key rejected with 401 (`cheie invalidă`), 429 (`cotă/rate limit`, retry allowed),
+  and no answer within the configured wait (`timeout`). Raw provider error text is never shown.
+- The AI settings expose the provider wait in seconds (5–120, default 45) next to the endpoint.
+
+Test: `tests/browser/ai.spec.js` › "byok draft from evidence: consent, provider call, audit and
+citations" and "byok failure states: missing key, rejected key, quota and timeout create no
+draft" (all three engines, static config). Fixed on the way: a missing key and a timeout were
+both reported as "indisponibil", because the error codes carried no word boundary for the
+classifier. Romanian copy added here (timeout setting label) is agent-written: *needs human
+review*.
+
+## Workflow-only (maintainer applies the diff)
+
+### LL-1 Data store prefix not hardcoded — needs human
+
+- Given `pages.yml` and `deploy-pages-cloudflare.yml`, then `--depozit` is derived from the newest
+  `date-*` release, not a hardcoded `https://data.cristian-nichifor.com/YYYY-MM-DD`.
+
+Test: `tests/test_workflows_depozit.py` (strict xfail until the maintainer applies the diff in the
+PR body; agent pull requests do not change workflows). Without a release the build no longer
+points the fixtures demo at the data store.
+
+### LL-2 Collect job on a self-hosted runner — needs human
+
+- `collect.yml` runs on `self-hosted`, because the portal refuses GitHub-hosted runner IPs.
+  Needs a registered runner on an accepted IP first. Diff in the PR body.
+
+## Needs human
+
+- Self-hosted runner on an IP legislatie.just.ro accepts (LL-2).
+- Data host serving the dated prefix (LL-1: `data.cristian-nichifor.com/2026-09-08` returns 404).
+- API worker route for the rewrite endpoint (LL-8).
+- Civic UI upgrade waits for the civic-ui 0.8 release.
+- Review of the English strings (LL-10), the privacy page wording (LL-7) and the AI wait-time label (LL-9).
+- Review of the Romanian copy in the design mockups and the mockup screenshots (LL-DS); hub URL and product name (D-1).

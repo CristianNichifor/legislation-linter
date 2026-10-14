@@ -169,7 +169,7 @@ def test_app_completeness_reports_unsynced_bootstrapped_sources(state):
 def test_app_completeness_is_visible_in_ui():
     html = (Path(__file__).parents[1] / "app/index.html").read_text(encoding="utf-8")
 
-    assert "Gate produs" in html
+    assert "Verificare de completitudine" in html
     assert "app-completeness-gate-v1" in html
     assert "fetch('/api/app-completeness')" in html
     assert "completion_claim_allowed" in html

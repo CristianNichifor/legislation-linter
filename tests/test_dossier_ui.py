@@ -526,7 +526,10 @@ def test_workflow_empty_states_point_to_next_action():
     source = APP.read_text()
     assert "function workflowEmptyState" in source
     assert "data-workflow-empty-state" in source
-    assert "Niciun rând în matrice" in source
+    # The matrix tells missing coverage apart from nothing found (design screen 03).
+    assert "Acoperire lipsă" in source
+    assert "Nu este o absență de probleme." in source
+    assert "Nimic găsit" in source
     assert "Șterge căutarea, schimbă aria/rangul" in source
     assert "Nicio analiză salvată" in source
     assert "Rulează analiza pe dosar" in source

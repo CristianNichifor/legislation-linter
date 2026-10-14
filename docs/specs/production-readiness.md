@@ -226,7 +226,13 @@ screens are implemented.
   `data-coverage-state="missing"`, names the domain and says it is not an absence of problems;
   acts present but no candidate problem gives `data-coverage-state="none"` with the act count.
 
-Test: `tests/browser/matrix.spec.js` (static suite). Phone row density (D-7) stays open.
+- Given a 390 px viewport, then the table keeps the emitter, acts, sources and gaps columns and
+  folds the Curte, inițiative and amendări columns away (`@media (max-width: 650px)`), so a row
+  fits the width without sideways scroll; the row still opens its detail.
+
+Tests: `tests/browser/matrix.spec.js` (static suite); `tests/test_ux_guidelines.py` (the phone
+rule and the design-suite hand-off). The `fixme` acceptance tests for screens 03 and 04 in
+`tests/browser/design.spec.js` are retired in favour of the static-suite specs.
 ### LL-DS-2 Verifică: staged progress and a timeout that keeps the text — done
 
 - Given a running check, then `#lint-out` holds an `aria-live="polite"` section with a

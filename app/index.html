@@ -577,6 +577,13 @@
   .matrix-ranks{font-size:.7rem;color:var(--ink-mute)}
   .matrix-cell{font-family:var(--mono);white-space:nowrap}
   .matrix-zero{color:var(--ink-mute)}
+  /* D-7, row density on a phone: the three columns a reader acts on least (Curte, inițiative,
+     amendări) fold away under 650 px, padding tightens, and the row still opens the detail. */
+  @media(max-width:650px){
+    .matrix-head,.matrix-row{grid-template-columns:minmax(0,1fr) 3.6rem 4.2rem 3.6rem;padding:.4rem .5rem;gap:.35rem}
+    .matrix-head>:nth-child(n+5),.matrix-row>:nth-child(n+5){display:none}
+    .matrix-row{font-size:.76rem}
+  }
   .matrix-detail{margin-top:.7rem}
   .matrix-ex{font-size:.78rem;margin:.25rem 0;padding-left:.55rem;border-left:2px solid var(--rule);
     line-height:1.45}

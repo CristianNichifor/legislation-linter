@@ -131,8 +131,9 @@ and 390 px were not taken in this pass. Items in files other sessions were editi
 - ~~**D-6** No forced-colours or reduced-motion test.~~ Fixed: forced-colours rules in
   `app/civic-ui-adapter.css` and a baseline test (spec item deferred to the readiness spec once
   the open pull requests that edit it merge).
-- **D-7** Matrix workspace polish (UX-5): row density on a phone. *The filter rail, the table
-  and the two empty states landed (LL-DS-3).*
+- ~~**D-7** Matrix workspace polish (UX-5): filters by domain, source family, lifecycle,
+  quality and issue type; row density on a phone.~~ Fixed by LL-DS-3: filter rail, table and
+  coverage states, then under 650 px the three least-used columns fold away.
 - ~~**D-8** Deeper panels (cockpit, tracker review, rule drafts) still show machine terms
   (LL-5 note).~~ Fixed by LL-5b: workbench → „Spațiu de lucru”, gate → „Criterii de lansare”,
   law-as-code → „regulă verificabilă” / „de regulă”, locked by a text-node test.

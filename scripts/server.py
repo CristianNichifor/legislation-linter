@@ -140,6 +140,19 @@ ASSETS = {
     "/dataset-updates.js": ("dataset-updates.js", "text/javascript; charset=utf-8"),
     "/browser-workspace.js": ("browser-workspace.js", "text/javascript; charset=utf-8"),
     "/confidentialitate.html": ("confidentialitate.html", "text/html; charset=utf-8"),
+    # Every stylesheet the shell links, or the local server paints an unstyled Civic UI layer.
+    **{
+        f"/{name}": (name, "text/css; charset=utf-8")
+        for name in (
+            "civic-ui-adapter.css",
+            "vendor/civic-ui/styles.css",
+            "vendor/civic-ui/foundations.css",
+            "vendor/civic-ui/controls.css",
+            "vendor/civic-ui/native.css",
+            "vendor/civic-ui/themes/neutral.css",
+            "vendor/civic-ui/themes/usr.css",
+        )
+    },
     **{
         f"/fonts/{name}.woff2": (f"fonts/{name}.woff2", "font/woff2")
         for name in (

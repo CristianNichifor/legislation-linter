@@ -5220,7 +5220,7 @@ async function loadDossiers(offset=DOSARE_UI.offset){
     $('#dossier-select').value=selected?.id||'';
     $('#dossier-prev').disabled=offset===0;$('#dossier-next').disabled=offset+50>=d.total;
     $('#dossier-page').textContent=d.total?`${Math.min(offset+1,d.total)}–${Math.min(offset+50,d.total)} din ${d.total}`:'Niciun dosar salvat.';
-    status.textContent=selected?'Dosar ales: '+selected.titlu:'Alege sau creează un dosar.';
+    status.textContent=selected?'Dosar ales: '+selected.titlu:MANUAL_NOTES_UI.pending?'Alege sau creează un dosar; nota din matrice se deschide apoi aici.':'Alege sau creează un dosar.';
   }catch(err){if(token===DOSARE_UI.listSequence){DOSARE_UI.supported=false;$('#dossier-local').hidden=true;status.textContent=err.message;}}
 }
 function dossierSnapshotHtml(run){
@@ -5454,7 +5454,7 @@ const RULE_QUEUE_BUCKETS={
   all:'Toți candidații',needs_more_structure:'Necesită structurare',needs_legal_review:'Necesită revizie juridică',
   not_codeable:'Nepotrivit pentru codificare',reviewable:'Revizuibil',human_reviewed:'Revizuit uman'
 };
-const MANUAL_NOTES_UI={offset:0,sequence:0,editing:null,draft:null,rule:null};
+const MANUAL_NOTES_UI={offset:0,sequence:0,editing:null,draft:null,rule:null,pending:null};
 let ruleDraftsSequence=0;
 
 function manualNoteExportMarkdown(note){
@@ -6549,13 +6549,22 @@ function manualNoteFromRuleCheck(row){
     reasoning,status:quote?'ready_for_review':'needs_evidence',revizie:0};
 }
 async function startManualNote(prefill,options={}){
-  if(!DOSARE_UI.selected?.id){$('#dossier-library').open=true;$('#dossier-status').textContent='Alege sau creează un dosar înainte de a salva nota.';return;}
+  if(!DOSARE_UI.selected?.id){
+    // Keep the note: choosing or creating a dossier opens it as a draft, in the same view.
+    MANUAL_NOTES_UI.pending={prefill,options};
+    const library=$('#dossier-library');library.open=true;library.scrollIntoView({block:'start'});
+    $('#dossier-status').textContent='Alege sau creează un dosar înainte de a salva nota; nota din matrice se deschide apoi aici.';
+    return;
+  }
+  MANUAL_NOTES_UI.pending=null;
   MANUAL_NOTES_UI.editing=prefill;
   MANUAL_NOTES_UI.draft=options.draft?{task:options.task||'issue_note'}:null;
   MANUAL_NOTES_UI.rule=options.rule?true:null;
   await loadManualNotes(DOSARE_UI.selected.id,0);
-  $('#dossier-notes').scrollIntoView({block:'start'});
-  $('#dossier-notes input[name="title"]')?.focus();
+  // The note form, not the first title field: the collapsed EU note builder has one too.
+  const title=$('#dossier-notes [data-manual-note-form] input[name="title"]')||$('#dossier-notes input[name="title"]');
+  (title?.closest('form')||$('#dossier-notes')).scrollIntoView({block:'start'});
+  title?.focus();
 }
 async function openManualNoteSource(button,note){
   const out=button.closest('.manual-note').querySelector('[data-note-source]');
@@ -7466,7 +7475,9 @@ async function selectDossier(id,runId,checkId=null,findingId=null){
     bindWritingWorkspace(meta);
     if(typeof refreshMainFlowContext==='function')refreshMainFlowContext('dossier');
     loadDossierWatchlist(id);
-    loadManualNotes(id);
+    const pendingNote=MANUAL_NOTES_UI.pending;
+    if(pendingNote) startManualNote(pendingNote.prefill,pendingNote.options);
+    else loadManualNotes(id);
     loadRuleDrafts(id);
     loadProposalList(id);
     const picker=$('#dossier-select');
@@ -8331,7 +8342,7 @@ function openCompletionTarget(action){
     $('#lifecycle-tracker').open=true;$('#tracker-review-queue').open=true;loadTrackerReviewQueue();
     $('#tracker-review-queue').scrollIntoView({block:'nearest'});
   }else if(action==='open-dossiers'){
-    selectTab('dosare');$('#dossier-library')?.scrollIntoView({block:'start'});
+    selectTab('matrice');$('#dossier-library')?.scrollIntoView({block:'start'});
   }else if(action==='open-matrix'){
     $('#m-q')?.focus();
   }else if(action==='open-eu'){
@@ -9602,10 +9613,10 @@ function openMatrixEvidenceWritingWorkspace(row,context={}){
   if(!DOSARE_UI.selected?.id){
     $('#dossier-library').open=true;
     $('#dossier-status').textContent='Alege sau creează un dosar înainte de redactarea din matrice.';
-    selectTab('dosare');
+    selectTab('matrice');
     return;
   }
-  selectTab('dosare');
+  selectTab('matrice');
   const library=$('#dossier-library');if(library)library.open=true;
   const host=$('#dossier-writing');
   if(!host)return;
@@ -9650,7 +9661,7 @@ async function openProjectWritingWorkspace(project={},cockpit=null){
       $('#draft').value=seed.text||'';$('#draft').dispatchEvent(new Event('input',{bubbles:true}));
       $('#dossier-status').textContent=`Dosarul este pregătit pentru ${projectId}. Draftul factual este în fila Verifică; creează sau alege dosarul pentru spațiul de redactare.`;
     }catch(err){$('#dossier-status').textContent=`Dosarul este pregătit pentru ${projectId}. ${err.message}`;}
-    selectTab('dosare');
+    selectTab('matrice');
     return;
   }
   if(status)status.textContent='Deschid spațiul de redactare legislativă…';
@@ -10069,7 +10080,7 @@ function mWorkspaceItemHtml(item,index){
     ? `<button type="button" class="ghost mini" data-matrix-workspace-open-row="${esc(item.scope)}">Dovezi rând</button>`:"";
   const dossierAction=item.dossier_id
     ? `<button type="button" class="ghost mini" data-matrix-workspace-open-dossier="${esc(item.dossier_id)}">Dosar local</button>`
-    : `<button type="button" class="ghost mini" data-matrix-workspace-open-dossier="">Alege dosar</button>`;
+    : `<button type="button" class="ghost mini" data-matrix-workspace-open-dossier="" data-matrix-workspace-index="${esc(index)}">Alege dosar</button>`;
   const noteAction=`<button type="button" class="ghost mini" data-matrix-workspace-note="${esc(item.scope||item.id||String(index))}" data-matrix-workspace-index="${esc(index)}">Creează notă</button>`;
   const draftAction=`<button type="button" class="ghost mini" data-matrix-workspace-draft="${esc(item.scope||item.id||String(index))}" data-matrix-workspace-index="${esc(index)}">Redactare</button>`;
   const ruleAction=`<button type="button" class="ghost mini" data-matrix-workspace-rule="${esc(item.scope||item.id||String(index))}" data-matrix-workspace-index="${esc(index)}">Regulă candidată</button>`;
@@ -10151,7 +10162,12 @@ function bindMatrixWorkspacePanel(){
     if(match){match.click();match.scrollIntoView({block:"nearest"});}
   });
   host.querySelectorAll("[data-matrix-workspace-open-dossier]").forEach(button=>button.onclick=()=>{
-    selectTab("dosare");
+    // Sending a cell to a dossier starts its note draft without leaving the matrix (LL-4).
+    if(!button.dataset.matrixWorkspaceOpenDossier){
+      const item=MATRIX_WORKSPACE_ITEMS[Number(button.dataset.matrixWorkspaceIndex)]||{};
+      startManualNote(mWorkspaceItemNote(item,"note"));
+      return;
+    }
     const library=$("#dossier-library");
     if(library){library.open=true;library.scrollIntoView({block:"start"});}
     const status=$("#dossier-status");

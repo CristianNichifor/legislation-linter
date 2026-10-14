@@ -220,9 +220,10 @@ test('matrix is the default workspace and opens drafts in place', async ({ page 
   await create.locator('xpath=..').locator('summary').click();
   await create.locator('input[name="titlu"]').fill('Dosar din matrice');
   await create.locator('button[type="submit"]').click();
-  const title = page.locator('#dossier-notes input[name="title"]');
+  const title = page.locator('#dossier-notes [data-manual-note-form] input[name="title"]');
   await expect(title).toBeVisible();
   await expect(title).toHaveValue(/^Notă matrice · /);
+  await expect(title).toBeFocused();
   await expect(page.locator('#tab-matrice')).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('#pane-matrice')).toBeVisible();
 });

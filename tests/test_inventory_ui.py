@@ -1118,7 +1118,7 @@ def test_matrix_workspace_queue_renders_daily_items_and_routes_actions():
         "dossierButtons[0].onclick();"
         "assert.equal(library.open,true);"
         "assert.ok(status.textContent.includes('d1'));"
-        "assert.deepEqual(calls.slice(-2),[['tab','dosare'],['scroll','dossier','start']]);"
+        "assert.deepEqual(calls.slice(-1),[['scroll','dossier','start']]);"
         "draftButtons[0].onclick();"
         "let note=calls.find(c=>c[0]==='note');"
         "assert.equal(note[2].draft,true);"

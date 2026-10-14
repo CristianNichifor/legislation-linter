@@ -1378,7 +1378,7 @@ def test_matrix_evidence_opens_dossier_writing_workspace():
         "openMatrixEvidenceWritingWorkspace(row,context);"
         "assert.equal(library.open,true);"
         "assert.ok(dossierStatus.textContent.includes('Alege sau creează'));"
-        "assert.deepEqual(calls,[['tab','dosare']]);"
+        "assert.deepEqual(calls,[['tab','matrice']]);"
         "calls.length=0;DOSARE_UI={selected:{id:'d1',titlu:'Dosar'}};"
         "openMatrixEvidenceWritingWorkspace(row,context);"
         "assert.ok(notesBox.value.includes('Redactare din matrice: Lacună <x>'));"
@@ -1389,7 +1389,7 @@ def test_matrix_evidence_opens_dossier_writing_workspace():
         "assert.ok(notesBox.value.includes('Nu este verdict juridic.'));"
         "assert.equal(writingStatus.textContent,"
         "'Dovada din matrice a fost adăugată în spațiul de redactare al dosarului.');"
-        "assert.deepEqual(calls,[['tab','dosare'],['input','input'],['scroll','start']]);"
+        "assert.deepEqual(calls,[['tab','matrice'],['input','input'],['scroll','start']]);"
     )
     run_node(code)
 

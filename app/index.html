@@ -688,6 +688,7 @@
   .tabs{margin-bottom:.4rem;display:flex;gap:.35rem;flex-wrap:wrap;align-items:flex-start}
   .tablist{display:flex;gap:.35rem;flex-wrap:wrap}
   .more-tools{position:relative}
+  .lang-toggle{margin-left:auto}
   .more-toggle::after{content:" ▾"}
   .more-menu{position:absolute;z-index:30;top:100%;left:0;min-width:12rem;display:flex;flex-direction:column;
     padding:.3rem;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r1);box-shadow:var(--e1)}
@@ -1263,57 +1264,60 @@
   // No value = follow the OS (prefers-color-scheme); "light"/"dark" pin it.
   (function(){ try{ var t=localStorage.getItem("tema");
     if(t==="light"||t==="dark") document.documentElement.dataset.theme=t; }catch(e){} })();
+  // Interface language: Romanian unless the reader picked English (LL-10).
+  (function(){ try{ if(localStorage.getItem("limba")==="en") document.documentElement.lang="en"; }catch(e){} })();
 </script>
 </head>
   <body class="civic-scope civic-legislativ">
-<a class="skip-link" href="#main">Sari la conținut</a>
+<a class="skip-link" href="#main" data-i18n="skip">Sari la conținut</a>
 <div class="wrap">
   <header>
-    <p class="eyebrow">legislativ · verificare și redactare de acte normative</p>
-    <h1>Ce spune legea despre proiectul tău</h1>
-    <p class="stat" id="stat"><span class="spin"></span> se încarcă…</p>
+    <p class="eyebrow" data-i18n="eyebrow">legislativ · verificare și redactare de acte normative</p>
+    <h1 data-i18n="title">Ce spune legea despre proiectul tău</h1>
+    <p class="stat" id="stat" lang="ro"><span class="spin"></span> se încarcă…</p>
   </header>
 
   <section id="dataset-updates" hidden aria-label="Date legislative locale"></section>
 
   <div class="tabs">
-    <div class="tablist" role="tablist" aria-label="Spații de lucru">
-    <button class="tab" id="tab-start" role="tab" aria-selected="false" aria-controls="pane-start">Start</button>
-    <button class="tab" id="tab-lint" role="tab" aria-selected="false" aria-controls="pane-lint">Verifică</button>
-    <button class="tab" id="tab-cauta" role="tab" aria-selected="false" aria-controls="pane-cauta">Caută</button>
-    <button class="tab" id="tab-matrice" role="tab" aria-selected="true" aria-controls="pane-matrice">Matrice</button>
-    <button class="tab" id="tab-dosare" role="tab" aria-selected="false" aria-controls="pane-matrice">Dosare</button>
-    <button class="tab" id="tab-surse" role="tab" aria-selected="false" aria-controls="pane-matrice">Surse</button>
-    <button class="tab" id="tab-redacteaza" role="tab" aria-selected="false" aria-controls="pane-redacteaza">Redactare</button>
-    <button class="tab" id="tab-setari" role="tab" aria-selected="false" aria-controls="pane-setari">Setări</button>
+    <div class="tablist" role="tablist" aria-label="Spații de lucru" data-i18n-aria-label="tablist">
+    <button class="tab" id="tab-start" role="tab" aria-selected="false" aria-controls="pane-start" data-i18n="tab.start">Start</button>
+    <button class="tab" id="tab-lint" role="tab" aria-selected="false" aria-controls="pane-lint" data-i18n="tab.lint">Verifică</button>
+    <button class="tab" id="tab-cauta" role="tab" aria-selected="false" aria-controls="pane-cauta" data-i18n="tab.cauta">Caută</button>
+    <button class="tab" id="tab-matrice" role="tab" aria-selected="true" aria-controls="pane-matrice" data-i18n="tab.matrice">Matrice</button>
+    <button class="tab" id="tab-dosare" role="tab" aria-selected="false" aria-controls="pane-matrice" data-i18n="tab.dosare">Dosare</button>
+    <button class="tab" id="tab-surse" role="tab" aria-selected="false" aria-controls="pane-matrice" data-i18n="tab.surse">Surse</button>
+    <button class="tab" id="tab-redacteaza" role="tab" aria-selected="false" aria-controls="pane-redacteaza" data-i18n="tab.redacteaza">Redactare</button>
+    <button class="tab" id="tab-setari" role="tab" aria-selected="false" aria-controls="pane-setari" data-i18n="tab.setari">Setări</button>
     </div>
     <div class="more-tools">
-      <button type="button" class="tab more-toggle" id="more-toggle" aria-haspopup="menu" aria-expanded="false" aria-controls="more-menu">Mai multe</button>
+      <button type="button" class="tab more-toggle" id="more-toggle" aria-haspopup="menu" aria-expanded="false" aria-controls="more-menu" data-i18n="more">Mai multe</button>
       <div class="more-menu" id="more-menu" role="menu" aria-labelledby="more-toggle" hidden>
-        <button type="button" role="menuitem" id="tab-consolidat" data-pane="consolidat">Consolidat</button>
-        <button type="button" role="menuitem" id="tab-graf" data-pane="graf">Conexiuni</button>
-        <button type="button" role="menuitem" id="tab-parlamentari" data-pane="parlamentari">Parlamentari</button>
-        <button type="button" role="menuitem" id="tab-domenii" data-pane="domenii">Cine face legea</button>
-        <button type="button" role="menuitem" id="tab-ue" data-pane="ue">Drept UE</button>
-        <button type="button" role="menuitem" id="tab-supraveghere" data-pane="supraveghere">Supraveghere</button>
+        <button type="button" role="menuitem" id="tab-consolidat" data-pane="consolidat" data-i18n="tab.consolidat">Consolidat</button>
+        <button type="button" role="menuitem" id="tab-graf" data-pane="graf" data-i18n="tab.graf">Conexiuni</button>
+        <button type="button" role="menuitem" id="tab-parlamentari" data-pane="parlamentari" data-i18n="tab.parlamentari">Parlamentari</button>
+        <button type="button" role="menuitem" id="tab-domenii" data-pane="domenii" data-i18n="tab.domenii">Cine face legea</button>
+        <button type="button" role="menuitem" id="tab-ue" data-pane="ue" data-i18n="tab.ue">Drept UE</button>
+        <button type="button" role="menuitem" id="tab-supraveghere" data-pane="supraveghere" data-i18n="tab.supraveghere">Supraveghere</button>
       </div>
     </div>
+    <button type="button" class="tab lang-toggle" id="lang-toggle" lang="en" title="Interfața în engleză / Interface in Romanian">English</button>
   </div>
-  <nav class="breadcrumb" id="legislative-workflow" aria-label="Pașii lucrului">
+  <nav class="breadcrumb" id="legislative-workflow" aria-label="Pașii lucrului" data-i18n-aria-label="breadcrumb">
     <ol>
-      <li data-workflow-step="source"><button type="button" data-workflow-open-search>Sursă</button></li>
-      <li data-workflow-step="evidence"><button type="button" data-workflow-open-matrix>Dovezi</button></li>
-      <li data-workflow-step="dossier"><button type="button" data-workflow-open-dossier>Dosar</button></li>
-      <li data-workflow-step="note"><button type="button" data-workflow-open-note>Notă</button></li>
-      <li data-workflow-step="draft"><button type="button" data-workflow-open-draft>Ciornă</button></li>
-      <li data-workflow-step="export"><button type="button" data-workflow-open-export>Export</button></li>
+      <li data-workflow-step="source"><button type="button" data-workflow-open-search data-i18n="step.source">Sursă</button></li>
+      <li data-workflow-step="evidence"><button type="button" data-workflow-open-matrix data-i18n="step.evidence">Dovezi</button></li>
+      <li data-workflow-step="dossier"><button type="button" data-workflow-open-dossier data-i18n="step.dossier">Dosar</button></li>
+      <li data-workflow-step="note"><button type="button" data-workflow-open-note data-i18n="step.note">Notă</button></li>
+      <li data-workflow-step="draft"><button type="button" data-workflow-open-draft data-i18n="step.draft">Ciornă</button></li>
+      <li data-workflow-step="export"><button type="button" data-workflow-open-export data-i18n="step.export">Export</button></li>
     </ol>
     <p class="breadcrumb-status"><span id="main-flow-context" role="status">Matrice · niciun dosar ales</span>
       <span id="legislative-workflow-status" role="status"></span></p>
   </nav>
 
   <div class="app">
-    <main class="main" id="main" tabindex="-1">
+    <main class="main" id="main" tabindex="-1" lang="ro">
 
       <div id="pane-start" role="tabpanel" aria-labelledby="tab-start" hidden>
         <section class="first-run" aria-labelledby="first-run-title">
@@ -1338,12 +1342,12 @@
 
       <div id="pane-setari" role="tabpanel" aria-labelledby="tab-setari" hidden>
         <section class="settings" aria-labelledby="settings-title">
-          <h2 id="settings-title" tabindex="-1">Setări</h2>
-          <div class="settings-row"><span>Temă</span>
+          <h2 id="settings-title" tabindex="-1" data-i18n="settings.title">Setări</h2>
+          <div class="settings-row"><span data-i18n="settings.theme">Temă</span>
             <button class="tema" id="tema-btn" type="button" title="Schimbă tema (auto / luminos / întunecat)">tema: auto</button></div>
-          <p class="hint">Setările se păstrează în acest browser. Datele legislative publice și dosarele private
+          <p class="hint" data-i18n="settings.hint">Setările se păstrează în acest browser. Datele legislative publice și dosarele private
             sunt separate; actualizarea datelor nu atinge dosarele.</p>
-          <p><a href="confidentialitate.html">Confidențialitate</a>: ce rămâne pe dispozitiv și ce conexiuni face pagina.</p>
+          <p><a href="confidentialitate.html" data-i18n="privacy">Confidențialitate</a><span data-i18n="settings.privacy">: ce rămâne pe dispozitiv și ce conexiuni face pagina.</span></p>
         </section>
       </div>
 
@@ -1899,9 +1903,9 @@
   </div>
 
   <footer>
-    Verificări deterministe, fiecare cu sursa ei — fără model de limbaj. Panoul din dreapta arată
-    aceleași legături ca graf (rotița mărește, tragi ca să miști, clic pe un nod ca să-i vezi vecinii).
-    <a href="confidentialitate.html">Confidențialitate</a>
+    <span data-i18n="footer">Verificări deterministe, fiecare cu sursa ei — fără model de limbaj. Panoul din dreapta arată
+    aceleași legături ca graf (rotița mărește, tragi ca să miști, clic pe un nod ca să-i vezi vecinii).</span>
+    <a href="confidentialitate.html" data-i18n="privacy">Confidențialitate</a>
   </footer>
 </div>
 <button id="totop" title="Sus" aria-label="Înapoi sus">↑</button>
@@ -2591,7 +2595,9 @@ bindAiProductFlow();
 
 // ---- theme: auto / light / dark, remembered per browser ----
 (function(){
-  const CICLU=["auto","light","dark"], ET={auto:"tema: auto",light:"tema: luminos",dark:"tema: întunecat"};
+  const CICLU=["auto","light","dark"];
+  const ETICHETE={ro:{auto:"tema: auto",light:"tema: luminos",dark:"tema: întunecat"},en:{auto:"theme: auto",light:"theme: light",dark:"theme: dark"}};
+  const ET=new Proxy({}, {get:(_,key)=>ETICHETE[document.documentElement.lang==="en"?"en":"ro"][key]});
   const btn=$("#tema-btn");
   function aplica(t){
     if(t==="light"||t==="dark") document.documentElement.dataset.theme=t;
@@ -2600,10 +2606,59 @@ bindAiProductFlow();
   }
   let tema; try{ tema=localStorage.getItem("tema")||"auto"; }catch(e){ tema="auto"; }
   aplica(tema);
+  window.addEventListener("legislativ-lang",()=>aplica(tema));
   btn.onclick=()=>{
     tema=CICLU[(CICLU.indexOf(tema)+1)%CICLU.length];
     try{ tema==="auto"?localStorage.removeItem("tema"):localStorage.setItem("tema",tema); }catch(e){}
     aplica(tema);
+  };
+})();
+
+// ---- interface language: the chrome in Romanian (default) or English ----
+// Only the navigation and page frame switch; legal text, findings and data stay in Romanian.
+// English strings need a human review (docs/specs/production-readiness.md, LL-10).
+const CHROME_EN = {
+  "skip":"Skip to content",
+  "eyebrow":"legislativ · checking and drafting legislation",
+  "title":"What the law says about your draft",
+  "tablist":"Workspaces",
+  "tab.start":"Start","tab.lint":"Check","tab.cauta":"Search","tab.matrice":"Matrix",
+  "tab.dosare":"Dossiers","tab.surse":"Sources","tab.redacteaza":"Drafting","tab.setari":"Settings",
+  "more":"More",
+  "tab.consolidat":"Consolidated text","tab.graf":"Connections","tab.parlamentari":"Members of Parliament",
+  "tab.domenii":"Who makes the law","tab.ue":"EU law","tab.supraveghere":"Watchlist",
+  "breadcrumb":"Workflow steps",
+  "step.source":"Source","step.evidence":"Evidence","step.dossier":"Dossier","step.note":"Note",
+  "step.draft":"Draft","step.export":"Export",
+  "settings.title":"Settings","settings.theme":"Theme",
+  "settings.hint":"Settings stay in this browser. Public legislative data and private dossiers are kept apart; updating the data does not touch dossiers.",
+  "settings.privacy":": what stays on the device and which connections the page makes.",
+  "privacy":"Privacy",
+  "footer":"Deterministic checks, each with its source — no language model. The panel on the right shows the same links as a graph (scroll to zoom, drag to move, click a node to see its neighbours)."
+};
+(function(){
+  const ro = new Map();
+  const nodes = () => document.querySelectorAll("[data-i18n],[data-i18n-aria-label]");
+  nodes().forEach(node => ro.set(node, {text: node.dataset.i18n ? node.textContent : null,
+    aria: node.getAttribute("aria-label")}));
+  const toggle = $("#lang-toggle");
+  function apply(lang){
+    const en = lang === "en";
+    document.documentElement.lang = en ? "en" : "ro";
+    nodes().forEach(node => {
+      const original = ro.get(node); if(!original) return;
+      if(node.dataset.i18n) node.textContent = en ? (CHROME_EN[node.dataset.i18n] ?? original.text) : original.text;
+      if(node.dataset.i18nAriaLabel) node.setAttribute("aria-label", en ? (CHROME_EN[node.dataset.i18nAriaLabel] ?? original.aria) : original.aria);
+    });
+    // The toggle names the other language in that language.
+    if(toggle){ toggle.textContent = en ? "Română" : "English"; toggle.lang = en ? "ro" : "en"; }
+    window.dispatchEvent(new CustomEvent("legislativ-lang", {detail:{lang: en ? "en" : "ro"}}));
+  }
+  apply(document.documentElement.lang === "en" ? "en" : "ro");
+  if(toggle) toggle.onclick = () => {
+    const next = document.documentElement.lang === "en" ? "ro" : "en";
+    try{ next === "en" ? localStorage.setItem("limba", "en") : localStorage.removeItem("limba"); }catch(e){}
+    apply(next);
   };
 })();
 

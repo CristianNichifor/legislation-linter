@@ -136,8 +136,9 @@ are marked *needs human review*.
 - Given `pages.yml` and `deploy-pages-cloudflare.yml`, then `--depozit` is derived from the newest
   `date-*` release, not a hardcoded `https://data.cristian-nichifor.com/YYYY-MM-DD`.
 
-Test: `tests/test_workflows_depozit.py` (xfail until the maintainer applies the diff in the PR
-body; the app has no `workflows` permission).
+Test: `tests/test_workflows_depozit.py` (strict xfail until the maintainer applies the diff in the
+PR body; agent pull requests do not change workflows). Without a release the build no longer
+points the fixtures demo at the data store.
 
 ### LL-2 Collect job on a self-hosted runner — needs human
 

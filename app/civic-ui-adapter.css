@@ -245,3 +245,29 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Windows high-contrast replaces every colour with system colours, so a selected tab marked
+   only by an accent underline and a focus ring in --accent can vanish. Name them in system
+   colours instead. */
+@media (forced-colors: active) {
+  .civic-legislativ :focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+  .civic-legislativ .tab[aria-selected="true"],
+  .civic-legislativ .civic-workspace-nav [aria-current="true"] {
+    border-color: Highlight;
+    forced-color-adjust: none;
+    color: CanvasText;
+    background: Canvas;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .civic-legislativ *,
+  .civic-legislativ *::before,
+  .civic-legislativ *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

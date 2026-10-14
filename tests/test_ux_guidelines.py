@@ -40,3 +40,12 @@ def test_the_guideline_links_the_bibles() -> None:
     for doc in ("UX_UI_BIBLE.md", "PROJECT_FINISH_BIBLE.md", "DESIGN.md", "UX_ACCEPTANCE.md"):
         assert f"({doc})" in text
     assert "(ux-guidelines.md)" in Path("docs/UX_UI_BIBLE.md").read_text(encoding="utf-8")
+
+
+def test_forced_colours_and_reduced_motion_are_handled() -> None:
+    css = Path("app/civic-ui-adapter.css").read_text(encoding="utf-8")
+    forced = css.split("@media (forced-colors: active)")[1].split("\n}\n")[0]
+    assert ":focus-visible" in forced and "Highlight" in forced
+    assert 'aria-selected="true"' in forced
+    motion = css.split("@media (prefers-reduced-motion: reduce)")[1].split("\n}\n")[0]
+    assert "transition: none" in motion and "animation: none" in motion

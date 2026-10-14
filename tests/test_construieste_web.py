@@ -312,6 +312,8 @@ def test_versiunea_se_schimba_cand_bazele_ies_din_build(tmp_path, monkeypatch):
 def test_limitarile_surselor_apar_o_singura_data():
     """The online data panel already lists the missing optional sources; the boot note is the
     fallback for a page without that panel, not a second copy of the same sentence."""
+    from scripts import construieste_web as cw
+
     boot = cw.BOOT
     nota = boot.index("browser-source-limitations")
     garda = boot.rfind("if (window.browserSourceLimitations.length", 0, nota)

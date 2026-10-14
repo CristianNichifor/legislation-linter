@@ -144,6 +144,13 @@ test('privacy page is linked and reachable', async ({ page }) => {
   await expect(page.locator('a[href="./"]')).toBeVisible();
 });
 
+test('footer links source code and contact', async ({ page }) => {
+  await page.goto('/');
+  const repo = 'https://github.com/CristianNichifor/legislation-linter';
+  await expect(page.locator(`footer a[href="${repo}"]`)).toBeVisible();
+  await expect(page.locator(`footer a[href="${repo}/issues"]`)).toBeVisible();
+});
+
 const AXE = fileURLToPath(new URL('../../node_modules/axe-core/axe.min.js', import.meta.url));
 
 async function seriousViolations(page) {

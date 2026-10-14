@@ -59,6 +59,19 @@ its diacritics back, and the default view's matrix copy no longer shows contract
 states, "law-as-code", "tracker" or "draft". Deeper panels (cockpit, tracker review, rule drafts)
 still use some machine terms; LL-NAV below finishes the navigation part.
 
+### LL-5b No machine terms in the deeper panels — done
+
+- Given every text node of `app/index.html` (not only the default view LL-5 covers), then none
+  reads „workbench”, „gate” (produs / gate-ului) or „law-as-code”: the source and project
+  workbenches are „Spațiu de lucru · …”, the product gate is „Criterii de lansare”, the rule
+  flow is „Flux regulă verificabilă”, „Reguli verificabile · candidați și ciorne”, „Promovează în
+  ciornă de regulă”, „extrage candidat de regulă”, the graph scaffold „schiță de reguli”.
+  Attributes, ids and data contracts keep their machine names (ux-guidelines § 9 D-8).
+
+Test: `tests/test_ux_guidelines.py::test_deeper_panels_use_no_machine_terms_in_visible_text`;
+the pinned labels in `test_ai_drafting.py`, `test_dossier_ui.py`, `test_inventory_ui.py` and
+`test_app_completeness.py` follow the new wording.
+
 ### LL-4 Matrix as the default workspace — done
 
 - Given a first load with no saved state, when the page settles, then the matrix pane is the

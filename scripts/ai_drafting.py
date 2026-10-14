@@ -63,7 +63,7 @@ TASKS = {
     "review_checklist": "listă de verificare",
     "summarize_source_change": "rezumat schimbare sursă",
     "compare_provisions": "compară două prevederi citate",
-    "extract_rule_candidate": "extrage candidat law-as-code",
+    "extract_rule_candidate": "extrage candidat de regulă",
 }
 TASK_ALIASES = {"amendment_rationale": "draft_amendment"}
 

@@ -49,7 +49,7 @@ for (const width of [390, 1440]) {
     await page.locator('[data-lifecycle-workbench]').first().click();
     expect((await workbenchResponse).ok()).toBe(true);
     await expect(page.locator('#project-workbench-status')).toContainText('Pachet încărcat');
-    await expect(page.locator('#project-workbench-body')).toContainText('Workbench · plx-999999-2026');
+    await expect(page.locator('#project-workbench-body')).toContainText('Spațiu de lucru · plx-999999-2026');
     await expect(page.locator('#project-workbench-body')).toContainText('Raport depus');
     await page.locator('#project-workbench-body [data-workbench-copy]').evaluate(button => button.click());
     await expect.poll(() => page.evaluate(() => window.__workbenchClipboard)).toContain('# Pachet dovezi proiect: plx-999999-2026');

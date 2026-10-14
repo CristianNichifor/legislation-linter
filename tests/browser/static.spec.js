@@ -208,6 +208,11 @@ test('matrix is the default workspace and opens drafts in place', async ({ page 
   const groups = page.locator('[data-matrix-workspace-group]');
   await expect(groups.first()).toBeVisible();
   await expect(groups.first().locator('h4').first()).toContainText('intrări');
+  // The matrix is what the first screen shows, not the sections below it.
+  const viewport = page.viewportSize();
+  for (const selector of ['#m-q', '[data-law-matrix-workspace-v1]']) {
+    expect((await page.locator(selector).boundingBox()).y).toBeLessThan(viewport.height);
+  }
   // Send the first cell to a dossier before one exists: the library opens in the matrix view.
   await groups.first().locator('[data-matrix-workspace-open-dossier]').first().click();
   await expect(page.locator('#tab-matrice')).toHaveAttribute('aria-selected', 'true');

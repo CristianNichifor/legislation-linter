@@ -291,7 +291,7 @@ def test_matrix_is_default_product_workspace():
     assert 'id="pane-start" role="tabpanel" aria-labelledby="tab-start" hidden' in source
     assert 'id="pane-matrice" role="tabpanel" aria-labelledby="tab-matrice">' in source
     assert '$(".app").dataset.pane = "matrice";' in source
-    assert 'selectTab("matrice");' in source
+    assert 'selectTab("matrice",{focus:false});' in source
 
 
 @pytest.mark.skipif(not shutil.which("node"), reason="Node unavailable")

@@ -164,6 +164,16 @@ Test: `tests/test_ux_guidelines.py`.
 Test: `tests/browser/static.spec.js` › "footer links source code and contact" and
 "dataset date and stale warning".
 
+### LL-UXG-3 Forced colours and reduced motion — done
+
+- Given Windows high-contrast (`forced-colors: active`), then focus rings and the selected tab
+  are drawn in system colours (`Highlight`), not in the accent token.
+- Given `prefers-reduced-motion: reduce`, then transitions and animations inside
+  `.civic-legislativ` are off.
+- Closes D-6 for the static rule; a visual high-contrast check is still to do.
+
+Test: `tests/test_ux_guidelines.py` › `test_forced_colours_and_reduced_motion_are_handled`.
+
 ## Workflow-only (maintainer applies the diff)
 
 ### LL-1 Data store prefix not hardcoded — needs human

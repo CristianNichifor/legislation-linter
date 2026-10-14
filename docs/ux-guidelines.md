@@ -83,8 +83,8 @@ in this area" (LL-4, LL-FORM).
 - Targets at least 24 × 24 px (WCAG 2.5.8), 44 px preferred for primary actions.
 - WCAG 2.1 AA; axe 0 serious or critical on every pane; every field has an accessible name.
 - Keyboard: skip link, tabs, hash routing and back button; visible focus.
-- `prefers-reduced-motion` stops the spinner and smooth scroll. Forced-colours mode keeps
-  borders, focus rings and graph state rings. *Not tested — D-6.*
+- `prefers-reduced-motion` stops the spinner, transitions and smooth scroll. Forced-colours
+  mode draws focus and the selected tab in system colours (`civic-ui-adapter.css`, LL-UXG-3).
 
 ## 7. Status vocabulary
 
@@ -126,7 +126,8 @@ and 390 px were not taken in this pass. Items in files other sessions were editi
 - **D-4** No status badge from §7; the fixtures demo is not marked as demo data.
 - **D-5** Mobile tab list (live review): eight tabs plus „Mai multe” at 390 px; check with
   a screenshot and make it one scrollable row with a visible scroll cue if it wraps.
-- **D-6** No forced-colours or reduced-motion test.
+- ~~**D-6** No forced-colours or reduced-motion test.~~ Static check added (LL-UXG-3); no
+  visual high-contrast check yet.
 - **D-7** Matrix workspace polish (UX-5): filters by domain, source family, lifecycle,
   quality and issue type; row density on a phone.
 - **D-8** Deeper panels (cockpit, tracker review, rule drafts) still show machine terms

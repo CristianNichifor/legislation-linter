@@ -53,3 +53,14 @@ def test_deeper_panels_use_no_machine_terms_in_visible_text():
     text_node = r">[^<>{}`;\n]*(?:workbench|gate produs|gate-ului|law-as-code)[^<>{}`;\n]*<"
     offenders = [m.group(0).strip() for m in re.finditer(text_node, html, re.IGNORECASE)]
     assert offenders == []
+
+
+def test_matrix_folds_columns_on_a_phone_and_design_suite_hands_off_landed_screens():
+    """D-7 closes in two halves: the phone rule in the app, and no fixme left for screens 03/04."""
+    html = Path("app/index.html").read_text(encoding="utf-8")
+    phone = re.search(r"@media\(max-width:650px\)\{\s*\.matrix-head,\.matrix-row\{[^}]*\}", html)
+    assert phone, "matrix phone rule missing"
+    assert ".matrix-row>:nth-child(n+5){display:none}" in html
+    spec = Path("tests/browser/design.spec.js").read_text(encoding="utf-8")
+    assert spec.count("test.fixme(") == 1, "only the D-1 family-bar test may stay fixme"
+    assert "matrix.spec.js" in spec and "dossier.spec.js" in spec

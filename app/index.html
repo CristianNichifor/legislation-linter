@@ -1283,7 +1283,7 @@
     <p class="stat" id="stat" lang="ro"><span class="spin"></span> se încarcă…</p>
   </header>
 
-  <section id="dataset-updates" hidden aria-label="Date legislative locale"></section>
+  <section id="dataset-updates" hidden aria-label="Date legislative locale" lang="ro"></section>
 
   <div class="tabs">
     <div class="tablist" role="tablist" aria-label="Spații de lucru" data-i18n-aria-label="tablist">
@@ -1307,7 +1307,7 @@
         <button type="button" role="menuitem" id="tab-supraveghere" data-pane="supraveghere" data-i18n="tab.supraveghere">Supraveghere</button>
       </div>
     </div>
-    <button type="button" class="tab lang-toggle" id="lang-toggle" lang="en" title="Interfața în engleză / Interface in Romanian">English</button>
+    <button type="button" class="tab lang-toggle" id="lang-toggle" lang="en" title="Interface in English">English</button>
   </div>
   <nav class="breadcrumb" id="legislative-workflow" aria-label="Pașii lucrului" data-i18n-aria-label="breadcrumb">
     <ol>
@@ -1319,7 +1319,7 @@
       <li data-workflow-step="export"><button type="button" data-workflow-open-export data-i18n="step.export">Export</button></li>
     </ol>
     <p class="breadcrumb-status"><span id="main-flow-context" role="status">Matrice · niciun dosar ales</span>
-      <span id="legislative-workflow-status" role="status"></span></p>
+      <span id="legislative-workflow-status" role="status" lang="ro"></span></p>
   </nav>
 
   <div class="app">
@@ -1472,6 +1472,9 @@
             <input id="ai-endpoint" class="ai-endpoint" type="text" placeholder="endpoint furnizor"
               title="Endpointul furnizorului tău. Pentru Worker propriu folosește /api/rewrite."
               aria-label="Endpointul furnizorului online" style="display:none">
+            <input id="ai-timeout" class="ai-model" type="number" min="5" max="120" step="1" placeholder="secunde"
+              title="Câte secunde aștepți răspunsul furnizorului online (5–120)."
+              aria-label="Așteptare răspuns furnizor, în secunde" style="display:none">
             <span class="hint" id="ai-sug" style="display:none"></span>
             <span class="hint" id="ai-nota"></span>
             <span class="hint" id="ai-contract"></span>
@@ -1624,7 +1627,7 @@
         <details class="dossier-library" id="dossier-library">
           <summary>Dosare salvate</summary>
           <p class="hint" id="dossier-status" role="status">Niciun dosar selectat.</p>
-          <button type="button" class="ghost mini" id="dossier-reload">Reîncarcă lista</button>
+          <button type="button" class="ghost mini" id="dossier-reload">Reîmprospătează lista</button>
           <div id="dossier-local" hidden>
             <label>Dosare afișate<select id="dossier-filter"><option value="active">Active</option><option value="arhivate">Arhivate</option><option value="toate">Toate</option></select></label>
             <details id="draft-library"><summary>Ciorne păstrate local</summary><button type="button" class="ghost mini" id="draft-library-reload">Reîncarcă ciornele</button><p class="hint" id="draft-library-status" role="status"></p><div id="draft-library-list"></div><div class="dossier-actions"><button type="button" class="ghost mini" id="draft-library-prev" disabled>Pagina anterioară</button><button type="button" class="ghost mini" id="draft-library-next" disabled>Pagina următoare</button></div></details>
@@ -1706,7 +1709,7 @@
         </section>
         <details class="dossier-library" id="source-coverage">
           <summary>Acoperire surse · Calitatea urmăririi</summary>
-          <div class="dossier-actions"><button type="button" id="source-workbench-refresh" class="ghost mini">Workbench surse</button><button type="button" id="source-coverage-refresh" class="ghost mini">Actualizează vederea</button><button type="button" id="acceptance-dashboard-refresh" class="ghost mini">Gate produs</button><button type="button" id="needs-attention-refresh" class="ghost mini">Ce necesită atenție</button><button type="button" id="monitor-reconciliation-refresh" class="ghost mini">Reconciliere MO</button><button type="button" id="monitor-replay-tracker" class="ghost mini">Trimite MO în tracker</button><button type="button" id="source-coverage-open-registry" class="ghost mini">Deschide registrul surselor</button><button type="button" id="source-coverage-open-lifecycle" class="ghost mini">Deschide stadiile proiectelor</button></div>
+          <div class="dossier-actions"><button type="button" id="source-workbench-refresh" class="ghost mini">Starea surselor</button><button type="button" id="source-coverage-refresh" class="ghost mini">Actualizează vederea</button><button type="button" id="acceptance-dashboard-refresh" class="ghost mini">Verificare de completitudine</button><button type="button" id="needs-attention-refresh" class="ghost mini">Ce necesită atenție</button><button type="button" id="monitor-reconciliation-refresh" class="ghost mini">Reconciliere MO</button><button type="button" id="monitor-replay-tracker" class="ghost mini">Trimite MO în urmărire</button><button type="button" id="source-coverage-open-registry" class="ghost mini">Deschide registrul surselor</button><button type="button" id="source-coverage-open-lifecycle" class="ghost mini">Deschide stadiile proiectelor</button></div>
           <p id="source-coverage-status" class="hint" role="status">Acoperire neîncărcată.</p>
           <div id="source-workbench-result"></div>
           <div id="source-coverage-result"></div>
@@ -1758,7 +1761,7 @@
               <label>Proiect<input name="project_id" id="cockpit-project-id" type="search" maxlength="200" placeholder="PL-x, id proiect sau sursă"></label>
               <label>Dosar<input name="dossier_id" id="cockpit-dossier-id" type="search" maxlength="200" placeholder="id dosar local opțional"></label>
               <button type="submit" class="ghost mini">Arată cockpit</button>
-              <button type="button" id="project-cockpit-refresh" class="ghost mini" title="Reîncarcă cockpit-ul" aria-label="Reîncarcă cockpit-ul">↻</button>
+              <button type="button" id="project-cockpit-refresh" class="ghost mini" title="Reîmprospătează fișa proiectului" aria-label="Reîmprospătează fișa proiectului">↻</button>
             </form>
             <p id="project-cockpit-status" class="hint" role="status">Alege un proiect pentru sumarul local.</p>
             <div id="project-cockpit-body"></div>
@@ -1893,12 +1896,12 @@
     </main>
 
     <aside class="canvas" id="canvas">
-      <div class="canvas-head"><span class="canvas-title">Conexiuni</span>
-        <button class="canvas-toggle" id="canvas-toggle" title="Restrânge / desfă" aria-expanded="true">⟩</button>
+      <div class="canvas-head"><span class="canvas-title" data-i18n="canvas.title">Conexiuni</span>
+        <button class="canvas-toggle" id="canvas-toggle" title="Restrânge / desfă" data-i18n-title="canvas.toggle" aria-expanded="true">⟩</button>
       </div>
       <div class="canvas-body">
-        <div id="graf-wrap"><p class="graf-empty">Verifică un proiect ca să vezi legăturile lui cu legislația.</p></div>
-        <div class="legend" id="legend" hidden>
+        <div id="graf-wrap"><p class="graf-empty" data-i18n="canvas.empty">Verifică un proiect ca să vezi legăturile lui cu legislația.</p></div>
+        <div class="legend" id="legend" lang="ro" hidden>
           <span><i style="background:var(--accent)"></i>proiect</span>
           <span><i style="background:#228455"></i>fiecare culoare = un act</span>
           <span><i style="background:transparent;border:2px solid var(--brand-red)"></i>inel: abrogat / mult amendat</span>
@@ -1917,7 +1920,7 @@
     <a href="https://github.com/CristianNichifor/legislation-linter/issues" data-i18n="footer.contact">Contact</a>
   </footer>
 </div>
-<button id="totop" title="Sus" aria-label="Înapoi sus">↑</button>
+<button id="totop" title="Sus" aria-label="Înapoi sus" data-i18n-title="totop.title" data-i18n-aria-label="totop">↑</button>
 
 <script>
 const $ = s => document.querySelector(s);
@@ -2281,6 +2284,15 @@ function openWorkflowTarget(target){
   }
 }
 const MAIN_FLOW_LABELS={matrix:'Matrice',evidence:'Dovezi',dossier:'Dosar',writing:'Redactare',proposal:'Propunere',export:'Export'};
+// English chrome for the flow summary (LL-10); needs human review.
+const MAIN_FLOW_EN={'flow.matrix':'Matrix','flow.evidence':'Evidence','flow.dossier':'Dossier','flow.writing':'Drafting',
+  'flow.proposal':'Proposal','flow.export':'Export','flow.noDossier':'no dossier selected','flow.dossierLabel':'dossier',
+  'flow.run':'saved analysis selected','flow.noRun':'no saved analysis','flow.finding':'finding selected',
+  'flow.noFinding':'no finding selected'};
+// The language toggle fires once at startup, before the dossier state exists; refresh only after
+// the summary has rendered once.
+let mainFlowActive='matrix', mainFlowRendered=false;
+globalThis.window?.addEventListener?.('legislativ-lang',()=>{if(mainFlowRendered)refreshMainFlowContext(mainFlowActive);});
 function mainFlowRoot(){
   return document.getElementById ? document.getElementById('main-flow-strip') : null;
 }
@@ -2290,7 +2302,7 @@ function mainFlowScroll(selector,message){
   if('open' in node)node.open=true;
   node.scrollIntoView({block:'start'});
   const status=$('#main-flow-context');
-  if(status&&message)status.textContent=message;
+  if(status&&message){status.textContent=message;status.lang='ro';}
   return true;
 }
 function mainFlowSelectedFinding(){
@@ -2309,10 +2321,16 @@ function refreshMainFlowContext(active='matrix'){
   const step={matrix:'evidence',evidence:'evidence',dossier:'dossier',writing:'draft',proposal:'draft',export:'export'}[active]||'evidence';
   document.querySelectorAll?.('#legislative-workflow [data-workflow-step]').forEach(li=>li.classList.toggle('current',li.dataset.workflowStep===step));
   if(!status)return;
-  const dossier=DOSARE_UI.selected?.titlu||DOSARE_UI.selected?.id||'niciun dosar ales';
-  const run=DOSARE_UI.runId?'analiză salvată aleasă':'fără analiză salvată';
-  const finding=mainFlowSelectedFinding()?'constatare aleasă':'fără constatare aleasă';
-  status.textContent=`${MAIN_FLOW_LABELS[active]||'Matrice'} · dosar: ${dossier} · ${run} · ${finding}`;
+  // The summary is interface chrome; dossier titles stay as the user wrote them.
+  mainFlowActive=active;
+  const en=globalThis.document?.documentElement?.lang==='en';
+  const t=(key,roText)=>en?MAIN_FLOW_EN[key]:roText;
+  const dossier=DOSARE_UI.selected?.titlu||DOSARE_UI.selected?.id||t('flow.noDossier','niciun dosar ales');
+  const run=DOSARE_UI.runId?t('flow.run','analiză salvată aleasă'):t('flow.noRun','fără analiză salvată');
+  const finding=mainFlowSelectedFinding()?t('flow.finding','constatare aleasă'):t('flow.noFinding','fără constatare aleasă');
+  status.lang=en?'en':'ro';
+  mainFlowRendered=true;
+  status.textContent=`${t('flow.'+(active in MAIN_FLOW_LABELS?active:'matrix'),MAIN_FLOW_LABELS[active]||'Matrice')} · ${t('flow.dossierLabel','dosar')}: ${dossier} · ${run} · ${finding}`;
 }
 function openMainFlowTarget(target){
   const status=$('#main-flow-context');
@@ -2648,13 +2666,16 @@ const CHROME_EN = {
   "settings.privacy":": what stays on the device and which connections the page makes.",
   "privacy":"Privacy",
   "footer.source":"Source code and method","footer.contact":"Contact",
+  "canvas.title":"Connections","canvas.toggle":"Collapse / expand",
+  "canvas.empty":"Check a draft to see its links to the legislation.",
+  "totop":"Back to top","totop.title":"Top",
   "footer":"Deterministic checks, each with its source — no language model. The panel on the right shows the same links as a graph (scroll to zoom, drag to move, click a node to see its neighbours)."
 };
 (function(){
   const ro = new Map();
-  const nodes = () => document.querySelectorAll("[data-i18n],[data-i18n-aria-label]");
+  const nodes = () => document.querySelectorAll("[data-i18n],[data-i18n-aria-label],[data-i18n-title]");
   nodes().forEach(node => ro.set(node, {text: node.dataset.i18n ? node.textContent : null,
-    aria: node.getAttribute("aria-label")}));
+    aria: node.getAttribute("aria-label"), title: node.getAttribute("title")}));
   const toggle = $("#lang-toggle");
   function apply(lang){
     const en = lang === "en";
@@ -2663,9 +2684,11 @@ const CHROME_EN = {
       const original = ro.get(node); if(!original) return;
       if(node.dataset.i18n) node.textContent = en ? (CHROME_EN[node.dataset.i18n] ?? original.text) : original.text;
       if(node.dataset.i18nAriaLabel) node.setAttribute("aria-label", en ? (CHROME_EN[node.dataset.i18nAriaLabel] ?? original.aria) : original.aria);
+      if(node.dataset.i18nTitle) node.setAttribute("title", en ? (CHROME_EN[node.dataset.i18nTitle] ?? original.title) : original.title);
     });
     // The toggle names the other language in that language.
-    if(toggle){ toggle.textContent = en ? "Română" : "English"; toggle.lang = en ? "ro" : "en"; }
+    if(toggle){ toggle.textContent = en ? "Română" : "English"; toggle.lang = en ? "ro" : "en";
+      toggle.title = en ? "Interfața în română" : "Interface in English"; }
     window.dispatchEvent(new CustomEvent("legislativ-lang", {detail:{lang: en ? "en" : "ro"}}));
   }
   apply(document.documentElement.lang === "en" ? "en" : "ro");
@@ -3921,6 +3944,12 @@ function aiUnifiedDraftPanelHtml(label='dovezi selectate'){
 }
 let _onlineOk=false;
 const AI_BYOK_TIMEOUT_MS=45000;
+// The user may shorten or lengthen the wait for an online provider; the bounds stay 5–120 s.
+function aiByokTimeoutMs(){
+  let s=NaN; try{ s=Number(localStorage.getItem("ai_timeout_s")); }catch(e){}
+  if(!Number.isFinite(s)||s<=0) return AI_BYOK_TIMEOUT_MS;
+  return Math.max(5000,Math.min(120000,Math.round(s*1000)));
+}
 // online sends text off the device; confirm once before doing that with the user's OWN text
 function okOnlinePrivat(){
   if(_onlineOk) return true;
@@ -3935,8 +3964,8 @@ function aiByokTimeoutError(ms){
   e.name="AbortError"; e.code="AI_BYOK_TIMEOUT"; e.timeout_ms=ms; return e;
 }
 function aiRequestTimeoutMs(opt){
-  const n=Number(opt&&opt.timeout_ms||AI_BYOK_TIMEOUT_MS);
-  return Math.max(5000,Math.min(120000,Number.isFinite(n)?n:AI_BYOK_TIMEOUT_MS));
+  const n=Number(opt&&opt.timeout_ms||aiByokTimeoutMs());
+  return Math.max(5000,Math.min(120000,Number.isFinite(n)?n:aiByokTimeoutMs()));
 }
 async function aiJson(ep, init, opt){
   opt=opt||{};
@@ -4058,8 +4087,12 @@ async function sugereazaModel(){
 }
 (function(){
   const mode=$("#ai-mode"), prov=$("#ai-provider"), sel=$("#ai-model"), selO=$("#ai-model-online"),
-        key=$("#ai-key"), ep=$("#ai-endpoint"), sug=$("#ai-sug"), nota=$("#ai-nota"), contract=$("#ai-contract");
+        key=$("#ai-key"), ep=$("#ai-endpoint"), sug=$("#ai-sug"), nota=$("#ai-nota"), contract=$("#ai-contract"),
+        wait=$("#ai-timeout");
   if(!mode) return;
+  if(wait){ wait.value=String(Math.round(aiByokTimeoutMs()/1000));
+    wait.oninput=()=>{ try{ const s=Number(wait.value);
+      if(Number.isFinite(s)&&s>0) localStorage.setItem("ai_timeout_s",String(s)); else localStorage.removeItem("ai_timeout_s"); }catch(e){} }; }
   if(sel){
     sel.innerHTML=MODELE.map(m=>`<option value="${m.id}">${m.et}</option>`).join("");
     let salvat; try{ salvat=localStorage.getItem("ai_model"); }catch(e){}
@@ -4091,6 +4124,7 @@ async function sugereazaModel(){
     if(prov){ prov.style.display=m==="online"?"":"none"; }
     if(selO){ selO.style.display=m==="online"?"":"none"; }
     if(ep){ ep.style.display=m==="online"?"":"none"; }
+    if(wait){ wait.style.display=m==="online"?"":"none"; }
     if(key){ key.style.display=(m==="online"&&aiProv().cheie)?"":"none"; }
     if(nota){ nota.textContent=m==="local"
       ?"rulează în browser · textul nu pleacă nicăieri"
@@ -5911,7 +5945,7 @@ function aiDraftExecutionRequest(plan,boundary){
     stores_api_key:false,
     key_storage:settings.key_storage,
     prompt_scope:'selected_evidence_only',
-    timeout_ms:AI_BYOK_TIMEOUT_MS,
+    timeout_ms:aiByokTimeoutMs(),
     retry_policy:aiByokRetryPolicy(),
     provider_failure_contract:'ai-byok-provider-failure-v1',
     requires_explicit_user_action:true,
@@ -5943,8 +5977,8 @@ function aiByokFailureCode(error,response){
   if(response?.failure_code&&AI_BYOK_FAILURES[response.failure_code])return response.failure_code;
   const raw=[error?.code,error?.name,error?.status,error?.statusCode,error?.message,response?.error,response?.status]
     .filter(v=>v!==undefined&&v!==null).join(' ').toLowerCase();
-  if(/\b(timeout|timed?out|abort|aborted)\b/.test(raw))return 'timeout';
-  if(/\b(401|403|unauthori[sz]ed|forbidden|auth|api.?key|bad.?key|invalid.?key)\b/.test(raw))return 'bad_key';
+  if(/timeout|timed.?out|abort/.test(raw))return 'timeout';   // codes like AI_BYOK_TIMEOUT have no word boundary
+  if(/\b(401|403|unauthori[sz]ed|forbidden|auth|api.?key|bad.?key|invalid.?key|no.?key|cheia api)\b/.test(raw))return 'bad_key';
   if(/\b(429|quota|rate.?limit|too many requests|insufficient_quota)\b/.test(raw))return 'quota';
   if(/\b(refusal|refused|safety|content_filter|policy)\b/.test(raw))return 'refusal';
   if(/\b(502|503|504|unavailable|network|fetch failed|failed to fetch|econnrefused|dns)\b/.test(raw))return 'provider_unavailable';
@@ -6008,6 +6042,14 @@ async function aiRunEvidenceDraft(plan,boundary,prog){
   const mode=aiMode();
   if(boundary==='mcp_handoff')throw new Error('Pentru MCP folosește previzualizarea și copierea payloadului MCP.');
   if(boundary==='online_byok'&&mode!=='online')throw new Error('Limită aleasă: online BYOK. Comută setările AI pe online și introdu cheia în sesiune.');
+  if(boundary==='online_byok'){
+    // No key in the session: fail before asking for consent, so nothing is approved for nothing.
+    const online=aiSettings().online_byok||{};
+    if(online.requires_api_key&&!online.api_key_present){
+      const missing=new Error('Introdu cheia API pentru furnizorul online ales.'); missing.code='AI_BYOK_NO_KEY';
+      return aiByokFailureResult(plan,boundary,aiDraftExecutionRequest(plan,boundary),missing,null);
+    }
+  }
   const approvalPacket=aiExternalApproval(plan,boundary);
   if(!confirmAiExternalApproval(approvalPacket))throw new Error('Anulat — promptul nu a fost trimis.');
   const request=aiDraftExecutionRequest(plan,boundary);
@@ -6027,7 +6069,7 @@ async function aiRunEvidenceDraft(plan,boundary,prog){
     };
   }
   let answer;
-  try{answer=await aiComplete(plan.prompt,plan.system,{privat:false,prog,timeout_ms:AI_BYOK_TIMEOUT_MS});}
+  try{answer=await aiComplete(plan.prompt,plan.system,{privat:false,prog,timeout_ms:aiByokTimeoutMs()});}
   catch(err){return aiByokFailureResult(plan,boundary,request,err,null);}
   if(answer?.failure_code||answer?.error||answer?.refusal||answer?.safety_refusal){
     return aiByokFailureResult(plan,boundary,request,null,answer);
@@ -8241,7 +8283,7 @@ $('#source-registry-add').onsubmit=async e=>{
 };
 $('#source-registry-guvern').onsubmit=async e=>{
   e.preventDefault();const form=e.currentTarget,status=$('#source-registry-status'),button=form.querySelector('button');
-  button.disabled=true;status.textContent='Adaug consultarea Guvern în tracker…';
+  button.disabled=true;status.textContent='Adaug consultarea Guvern în urmărire…';
   try{const data=await sourceRegistryApi({action:'discover_guvern',...Object.fromEntries(new FormData(form))});form.reset();await loadSourceRegistry(0,`${data.tracker_events||0} evenimente tracker pentru consultarea Guvern. ${data.next_action||''}`);}
   catch(err){status.textContent=err.message;}
   finally{button.disabled=false;}
@@ -8383,7 +8425,7 @@ function acceptanceDashboardHtml(data){
     const blocking=(data.blocking_capabilities||[]).map(item=>`<li><strong>${esc(item.key)}</strong> · ${esc(item.state)}<br><span class="hint">${esc((item.blockers||[]).join(' · ')||'fără dovadă suficientă')}${item.next_action?` ${esc(item.next_action)}`:''}</span></li>`).join('');
     const failed=(data.failed_checks||[]).map(item=>`<li>${esc(item.capability)}.${esc(item.check)}</li>`).join('');
     const sourceAction=acceptanceSourceActionHtml(data);
-    return `<section class="source-inventory"><h4>Gate produs final</h4><p><strong>${esc(data.status)}</strong> · ${data.completion_claim_allowed?'poate fi declarat complet':'nu poate fi declarat complet'} · ${data.summary?.ready||0} gata · ${data.summary?.partial||0} parțial · ${data.summary?.missing||0} lipsă.</p>${sourceAction}${completionActionCenterHtml(data)}<div class="coverage-grid">${cards}</div>${blocking?`<details open><summary>Blocaje care opresc acceptarea finală</summary><ul>${blocking}</ul></details>`:''}${failed?`<details open><summary>Verificări eșuate</summary><ul>${failed}</ul></details>`:''}<p class="hint">CLI: ${esc(data.visible_in?.cli||'python -m scripts.app_completeness --require-complete')}</p><p class="hint">${(data.limitari||[]).map(esc).join(' ')}</p></section>`;
+    return `<section class="source-inventory"><h4>Verificare de completitudine</h4><p><strong>${esc(data.status)}</strong> · ${data.completion_claim_allowed?'poate fi declarat complet':'nu poate fi declarat complet'} · ${data.summary?.ready||0} gata · ${data.summary?.partial||0} parțial · ${data.summary?.missing||0} lipsă.</p>${sourceAction}${completionActionCenterHtml(data)}<div class="coverage-grid">${cards}</div>${blocking?`<details open><summary>Blocaje care opresc acceptarea finală</summary><ul>${blocking}</ul></details>`:''}${failed?`<details open><summary>Verificări eșuate</summary><ul>${failed}</ul></details>`:''}<p class="hint">CLI: ${esc(data.visible_in?.cli||'python -m scripts.app_completeness --require-complete')}</p><p class="hint">${(data.limitari||[]).map(esc).join(' ')}</p></section>`;
   }
   const capabilityLabels={ready:'gata',partial:'parțial',missing:'lipsește'};
   const cards=(data.sections||[]).map(s=>{
@@ -8417,7 +8459,7 @@ function completionActionCenterHtml(data){
   for(const cap of blocked){
     if(cap.key==='public_source_data_availability'){
       add('registry','Registru surse','open-registry','Adaugă, sincronizează sau revizuiește familiile oficiale.');
-      add('workbench','Workbench surse','open-workbench','Inspectează surse, tracker și lifecycle în aceeași vedere.');
+      add('workbench','Starea surselor','open-workbench','Inspectează sursele, urmărirea și stadiile proiectelor în aceeași vedere.');
       add('attention','Ce necesită atenție','open-attention','Vezi schimbări, erori și rânduri nerevizuite.');
     }else if(cap.key==='lifecycle_tracking'){
       add('lifecycle','Stadii proiecte','open-lifecycle','Verifică proiectele vechi, necunoscute sau fără dovezi.');
@@ -8477,11 +8519,11 @@ async function loadAcceptanceDashboard(){
   status.textContent='Calculez gate-ul de produs…';out.innerHTML='';
   try{
     const response=await fetch('/api/app-completeness');
-    const data=await response.json().catch(()=>({error:'Gate produs indisponibil.'}));
-    if(!response.ok||data.error)throw Error(data.error||'Gate produs indisponibil.');
+    const data=await response.json().catch(()=>({error:'Verificarea de completitudine nu este disponibilă.'}));
+    if(!response.ok||data.error)throw Error(data.error||'Verificarea de completitudine nu este disponibilă.');
     out.innerHTML=acceptanceDashboardHtml(data);
     bindAcceptanceDashboardActions(out);
-    status.textContent=data.completion_claim_allowed?'Gate produs: complet conform dovezilor curente.':'Gate produs: blocat de capabilități parțiale sau lipsă.';
+    status.textContent=data.completion_claim_allowed?'Verificare de completitudine: complet conform dovezilor curente.':'Verificare de completitudine: blocată de capabilități parțiale sau lipsă.';
   }catch(err){status.textContent=err.message;}
 }
 async function runAcceptanceSourceSync(button){
@@ -8553,7 +8595,7 @@ async function loadMonitorReconciliation(){
 }
 async function replayMonitorToTracker(){
   const status=$('#source-coverage-status');
-  status.textContent='Trimit referințele Monitorul Oficial locale în tracker…';
+  status.textContent='Trimit referințele Monitorul Oficial locale în urmărire…';
   try{
     const response=await fetch('/api/monitor-reconciliere',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({limit:500})});
     const data=await response.json().catch(()=>({error:'Replay Monitorul Oficial indisponibil.'}));
@@ -8593,7 +8635,7 @@ function sourceWorkbenchHtml(data){
   const s=data.summary||{}, counts=Object.entries(data.counts||{}).map(([k,v])=>`${sourceWorkbenchKindLabel(k)}: ${v}`).join(' · ');
   const actions=(data.next_actions||[]).map(action=>`<li><strong>${esc(action.label||action.key)}</strong>${action.count?` · ${esc(action.count)}`:''}</li>`).join('');
   const rows=(data.rows||[]).map(sourceWorkbenchRowHtml).join('');
-  return `<section class="source-inventory"><h4>Workbench surse și lifecycle</h4><p><strong>${esc(s.attention_items||0)} elemente cu atenție</strong>${counts?` · ${esc(counts)}`:''}</p><div class="coverage-grid"><article class="coverage-card coverage-attention"><h4>Surse</h4><p>${esc(s.sources_attention||0)} cu atenție · ${esc(s.retryable_sources||0)} retry · ${esc(s.reviewable_sources||0)} revizuibile</p></article><article class="coverage-card coverage-attention"><h4>Tracker</h4><p>${esc(s.tracker_unreviewed||0)} evenimente nerevizuite</p></article><article class="coverage-card coverage-attention"><h4>Lifecycle</h4><p>${esc(s.projects_attention||0)} proiecte cu atenție · ${esc(s.evidence_links||0)} legături/hash dovezi</p></article></div>${actions?`<details open><summary>Ce trebuie făcut azi</summary><ul>${actions}</ul></details>`:''}${rows?`<div class="coverage-grid">${rows}</div>`:'<p class="hint">Nu există rânduri locale care cer acțiune în workbench.</p>'}${data.limitari?.length?`<p class="hint">${data.limitari.map(esc).join(' ')}</p>`:''}</section>`;
+  return `<section class="source-inventory"><h4>Starea surselor și stadiile proiectelor</h4><p><strong>${esc(s.attention_items||0)} elemente cu atenție</strong>${counts?` · ${esc(counts)}`:''}</p><div class="coverage-grid"><article class="coverage-card coverage-attention"><h4>Surse</h4><p>${esc(s.sources_attention||0)} cu atenție · ${esc(s.retryable_sources||0)} retry · ${esc(s.reviewable_sources||0)} revizuibile</p></article><article class="coverage-card coverage-attention"><h4>Tracker</h4><p>${esc(s.tracker_unreviewed||0)} evenimente nerevizuite</p></article><article class="coverage-card coverage-attention"><h4>Lifecycle</h4><p>${esc(s.projects_attention||0)} proiecte cu atenție · ${esc(s.evidence_links||0)} legături/hash dovezi</p></article></div>${actions?`<details open><summary>Ce trebuie făcut azi</summary><ul>${actions}</ul></details>`:''}${rows?`<div class="coverage-grid">${rows}</div>`:'<p class="hint">Nu există rânduri locale care cer acțiune în workbench.</p>'}${data.limitari?.length?`<p class="hint">${data.limitari.map(esc).join(' ')}</p>`:''}</section>`;
 }
 async function loadSourceWorkbench(){
   const status=$('#source-coverage-status'),out=$('#source-workbench-result');

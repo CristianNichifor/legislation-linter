@@ -890,7 +890,7 @@ def descopera_consultare_guvern(stare, data: dict | None = None) -> dict:
         "source": synced,
         "created": int(source["state"] == "discovered" and not source.get("last_hash")),
         "tracker_events": int((synced.get("tracker_sync") or {}).get("stored") or 0),
-        "next_action": "Revizuiește consultarea în tracker și leag-o la dosarul afectat.",
+        "next_action": "Revizuiește consultarea în urmărire și leag-o la dosarul afectat.",
     }
 
 
@@ -1111,7 +1111,7 @@ def _list_of_text(value, *, limit: int = 20, item_limit: int = 300) -> list[str]
     if value is None:
         return []
     if not isinstance(value, list):
-        raise ValueError("Listă metadata invalidă.")
+        raise ValueError("Listă de metadate invalidă.")
     out = []
     for item in value[:limit]:
         text = _text(item, limit=item_limit)
@@ -1141,7 +1141,7 @@ def _manual_documents(value) -> list[dict]:
 
 def _manual_metadata_snapshot(row: dict, metadata: dict) -> dict:
     if not isinstance(metadata, dict):
-        raise ValueError("Metadata sursă invalidă.")
+        raise ValueError("Metadatele sursei sunt invalide.")
     from scripts import achizitii_econsultare
 
     family = row["family"]
@@ -1255,7 +1255,7 @@ def _manual_metadata_snapshot(row: dict, metadata: dict) -> dict:
         "truncated": summary["truncated"],
         "metadata_only": True,
         "limitations": [
-            "Sursă sincronizată metadata-first; nu s-a făcut parsing live al paginii oficiale.",
+            "Sursă sincronizată doar din metadate; pagina oficială nu a fost citită acum.",
             "Documentele sunt păstrate ca linkuri/hash-uri declarate, nu ca bytes extrase.",
         ],
     }
@@ -1904,7 +1904,7 @@ def sincronizeaza_manual_metadata(stare, source_id: str, metadata: dict | None =
             "state": "fetched",
             "content_hash": content_hash,
             "parser_version": MANUAL_METADATA_PARSER_VERSION,
-            "note": "Metadata sursă reținută fără parsing live al paginii oficiale.",
+            "note": "Metadatele sursei sunt reținute; pagina oficială nu a fost citită acum.",
         },
     )
     needs_review = not snapshot.get("project_id") or (
@@ -1924,7 +1924,7 @@ def sincronizeaza_manual_metadata(stare, source_id: str, metadata: dict | None =
     )
     note = ""
     if needs_review:
-        note = "Metadata reținută, dar lipsesc câmpuri pentru eveniment tracker complet."
+        note = "Metadatele sunt reținute, dar lipsesc câmpuri pentru un eveniment complet."
     return _with_tracker_sync(
         inregistreaza(
             stare,

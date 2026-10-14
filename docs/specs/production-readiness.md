@@ -68,7 +68,7 @@ still use some machine terms; LL-NAV below finishes the navigation part.
 
 Test: `tests/browser/static.spec.js` › "matrix is the default workspace and opens drafts in place".
 
-### LL-NAV One navigation and a thin breadcrumb — todo
+### LL-NAV One navigation and a thin breadcrumb — done
 
 Coordinator review, 2026-10-14.
 
@@ -82,7 +82,7 @@ Coordinator review, 2026-10-14.
 
 Test: `tests/browser/static.spec.js` › "one navigation, breadcrumb and hash routing".
 
-### LL-ENGINE The check never hangs — todo
+### LL-ENGINE The check never hangs — done
 
 - Given the in-browser engine has not answered within 20 s, when the user runs a check, then
   the result area says "Motorul nu a pornit — reîncearcă" with a retry, instead of "se
@@ -93,18 +93,21 @@ Test: `tests/browser/static.spec.js` › "one navigation, breadcrumb and hash ro
 Test: `tests/browser/static.spec.js` › "engine timeout, progress and cancel" (the CDN runtime is
 blocked so the engine never starts).
 
-### LL-FORM Labels, targets and check-first layout — todo
+### LL-FORM Labels, targets and check-first layout — done
 
 - Every visible input, select and textarea has an accessible name (axe `label` rule passes).
 - Interactive targets on the default view are at least 24×24 px (WCAG 2.5.8).
 - On the Verifică tab the draft textarea and the Verifică button are the first content under the
   navigation, above the fold at 1440×900.
 
-Test: `tests/browser/static.spec.js` › "form labels, target size and check-first layout".
+Test: `tests/browser/static.spec.js` › "form labels, target size and check-first layout" (axe
+`label`, `select-name`, `button-name`, `link-name`, `target-size` over every pane, plus a check
+that no visible text field renders as a raw browser widget). The matrix now leads its pane, and
+the source coverage notice is shown once.
 
 ## Theme C: data freshness
 
-### LL-FRESH Dataset as-of date and corpus size — todo
+### LL-FRESH Dataset as-of date and corpus size — done
 
 - Given a built dataset, when the header loads, then it shows the dataset date ("date la zi pe
   YYYY-MM-DD") and the number of acts, both from `data/manifest.json` (`data_set`, `acte`).
@@ -114,20 +117,23 @@ Test: `tests/browser/static.spec.js` › "form labels, target size and check-fir
   `dataset-release.json`, else the fixture capture date for `--sursa fixturi`.
 
 Tests: `tests/test_construieste_web.py` › `test_manifest_poarta_data_setului` (stamping rules),
-`tests/browser/static.spec.js` › "dataset date and stale warning" (fixtures are older than 30
-days), `tests/browser/baseline.spec.js` › fresh dataset shows no warning.
+`tests/test_server.py` › `test_rezumat_carries_the_dataset_date_from_the_manifest`,
+`tests/test_dossier_ui.py` › `test_dataset_freshness_warns_after_thirty_days` (30 days: no
+warning, 31: warning), `tests/browser/static.spec.js` › "dataset date and stale warning"
+(fixtures are older than 30 days).
 
 ## Theme D: English locale
 
-### LL-10 English UI chrome — todo
+### LL-10 English UI chrome — done
 
 - Given the default load, then the page is Romanian and `<html lang="ro">`.
 - Given the language toggle, when the user picks English, then the header, tabs, navigation and
   footer switch to English, `<html lang="en">` follows, and the choice survives a reload.
   Legal text and findings stay in Romanian.
 
-Test: `tests/browser/static.spec.js` › "english chrome toggle syncs html lang". English strings
-are marked *needs human review*.
+Test: `tests/browser/static.spec.js` › "english chrome toggle syncs html lang". The toggle sits
+at the end of the navigation and names the other language in that language. The main region and
+the data panels keep `lang="ro"`. English strings are marked *needs human review*.
 
 ## Workflow-only (maintainer applies the diff)
 

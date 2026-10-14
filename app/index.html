@@ -1233,6 +1233,7 @@
   }
   .cons-bar{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;margin:.5rem 0 .2rem}
 
+  .lint-progress{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-family:var(--sans);font-size:.85rem;margin:.6rem 0}
   .spin{display:inline-block;width:.9rem;height:.9rem;border:2px solid var(--rule);
     border-top-color:var(--accent);border-radius:50%;animation:s .7s linear infinite;vertical-align:-1px}
   @keyframes s{to{transform:rotate(360deg)}}
@@ -2049,7 +2050,17 @@ function textLizibil(t){
   return s.replace(/^\n+/,"").replace(/\n{2,}/g,"\n");
 }
 
-fetch("/api/rezumat").then(r=>r.json()).then(d=>{
+// The engine answered 503 "motor indisponibil" when it did not start in time; say so and offer a
+// retry instead of a page that keeps loading or a header that reads as an empty corpus.
+const ENGINE_FAILED = "Motorul nu a pornit — reîncearcă.";
+const engineFailed = message => /motor indisponibil|nu a pornit/i.test(String(message||""));
+async function apiJson(response){
+  const data = await response.json().catch(()=>({}));
+  if(!response.ok) throw new Error(data.error||response.statusText||("HTTP "+response.status));
+  return data;
+}
+function loadRezumat(){
+fetch("/api/rezumat").then(apiJson).then(d=>{
   // How much of the corpus is actually structured, not just how much of it there is. An unenriched
   // act holds one flattened row, so a corpus of those reports as many "prevederi" as it has acte —
   // a number that looks healthy and means the opposite. Stated as a share so the gap is legible.
@@ -2071,7 +2082,15 @@ fetch("/api/rezumat").then(r=>r.json()).then(d=>{
       + `<b>${nf(structurate)}</b> cu articole `
       + `(${proc > 0 && proc < 1 ? "&lt;1" : Math.round(proc)}%)</span>` : ``)
     + ue;
-}).catch(()=>{ $("#stat").textContent="corpus indisponibil"; });
+}).catch(err=>{
+  const stat=$("#stat");
+  stat.textContent=engineFailed(err.message)?ENGINE_FAILED+" ":"Date indisponibile: "+(err.message||"eroare")+" ";
+  const retry=document.createElement("button");retry.type="button";retry.className="ghost mini";retry.textContent="Reîncearcă";
+  retry.onclick=()=>{stat.innerHTML='<span class="spin"></span> se încarcă…';loadRezumat();};
+  stat.append(retry);
+});
+}
+loadRezumat();
 
 // ---- tabs ----
 // One navigation: eight primary tabs, the remaining tools under "Mai multe". Dosare and Surse are
@@ -2889,16 +2908,39 @@ function renderOpinie(r){
   return h;
 }
 
+// Staged progress and a way out: the first check may wait for the in-browser engine to start.
+function lintProgress(cancel){
+  const box=document.createElement("div");box.className="lint-progress";box.setAttribute("role","status");
+  const stage=()=>window.legislativEngine&&window.legislativEngine.state==="starting"
+    ?"Pornesc motorul de verificare în browser…":"Verific textul…";
+  box.innerHTML=`<span class="spin"></span> <span data-lint-stage>${stage()}</span> `
+    +`<button type="button" class="ghost mini" data-lint-cancel>Anulează</button>`;
+  const update=()=>{const node=box.querySelector("[data-lint-stage]");if(node)node.textContent=stage();};
+  window.addEventListener("legislativ-engine",update);
+  box.querySelector("[data-lint-cancel]").onclick=cancel;
+  return {box,done:()=>window.removeEventListener("legislativ-engine",update)};
+}
+function lintRetryState(message){
+  const box=document.createElement("div");
+  box.innerHTML=empty(esc(message));
+  const retry=document.createElement("button");retry.type="button";retry.className="ghost mini";retry.textContent="Reîncearcă";
+  retry.onclick=()=>$("#go").click();
+  box.append(retry);
+  return box;
+}
 $("#go").onclick = async ()=>{
   const draft = $("#draft").value.trim();
   if(!draft){ $("#lint-out").innerHTML = empty("Lipește un text mai întâi."); return; }
+  let cancelled=false, cancelWait;
+  const cancelPromise=new Promise((_,reject)=>{cancelWait=()=>{cancelled=true;reject(new Error("cancelled"));};});
+  const progress=lintProgress(()=>cancelWait());
   $("#go").disabled=true; $("#go").innerHTML=`<span class="spin"></span> se verifică…`;
+  $("#lint-out").replaceChildren(progress.box);
   const t0=performance.now();
   try{
     const opt={method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({draft})};
-    const r = await fetch("/api/lint",opt);
-    if(!r.ok) throw new Error((await r.json()).error||r.statusText);
-    renderLint(await r.json());
+    const result = await Promise.race([fetch("/api/lint",opt).then(apiJson),cancelPromise]);
+    renderLint(result);
     // impact (reach) loads on its own, so a slow corpus count never delays the lint results
     fetch("/api/impact",opt).then(ri=>ri.ok?ri.json():null).then(im=>{
       const html=im?renderImpact(im):""; if(html) insertLintSection("sec-impact", html);
@@ -2911,8 +2953,13 @@ $("#go").onclick = async ()=>{
     const s=document.createElement("p"); s.className="hint"; s.style.margin=".4rem 0 0";
     s.textContent="verificat în "+(ms<1000?Math.round(ms)+" ms":(ms/1000).toFixed(1)+" s");
     $("#lint-out").appendChild(s);
-  }catch(e){ $("#lint-out").innerHTML = empty("Eroare: "+esc(e.message||e)); }
-  finally{ $("#go").disabled=false; $("#go").textContent="Verifică"; }
+  }catch(e){
+    const message=String(e&&e.message||e);
+    if(cancelled) $("#lint-out").replaceChildren(lintRetryState("Verificare anulată. Textul a rămas în editor."));
+    else if(engineFailed(message)) $("#lint-out").replaceChildren(lintRetryState(ENGINE_FAILED+" ("+message+")"));
+    else $("#lint-out").innerHTML = empty("Eroare: "+esc(message));
+  }
+  finally{ progress.done(); $("#go").disabled=false; $("#go").textContent="Verifică"; }
 };
 
 // ---- draft assistant: structured act picker (tip/număr/an) → citation + corpus lookup ----

@@ -724,6 +724,19 @@ BOOT = """
 
   let resolveReady, rejectReady;
   const ready = new Promise((res, rej)=>{ resolveReady=res; rejectReady=rej; });
+  // The page reads this to say whether a check is waiting for the engine or running.
+  const engine = window.legislativEngine = {state: "starting"};
+  const engineState = (state, error) => {
+    engine.state = state; engine.error = error || "";
+    window.dispatchEvent(new CustomEvent("legislativ-engine", {detail: {state}}));
+  };
+  ready.then(() => engineState("ready"), e => engineState("failed", String(e && e.message || e)));
+  // A worker that never answers must not leave a request waiting forever: each call waits at most
+  // ENGINE_TIMEOUT_MS, then answers 503 so the page can offer a retry. A slow start may still finish
+  // and serve the next attempt.
+  const ENGINE_TIMEOUT_MS = 20000;
+  const readyWithin = () => Promise.race([ready, new Promise((_, rej) => setTimeout(
+    () => rej(new Error("Motorul nu a pornit în " + ENGINE_TIMEOUT_MS / 1000 + " s")), ENGINE_TIMEOUT_MS))]);
   const worker = new Worker("worker.js");
   let selectedGeneration = null;
   const pending = new Map(); let seq = 0;
@@ -776,7 +789,7 @@ BOOT = """
     }
     if (u && u.indexOf("/api/cauta") === 0) {
       try {
-        await ready;
+        await readyWithin();
         if (!selectedGeneration) {
         const parsed = new URL(u, location.origin);
         const out = await cauta(parsed.searchParams);
@@ -788,7 +801,7 @@ BOOT = """
       }
     }
     if (u && u.indexOf("/api/") === 0) {
-      try { if (!u.startsWith('/api/browser-generation')) await ready; }
+      try { if (!u.startsWith('/api/browser-generation')) await readyWithin(); }
       catch(e){ return new Response(JSON.stringify({error:"motor indisponibil: "+e}), {status:503}); }
       try {
         const parsed = new URL(u, location.origin);

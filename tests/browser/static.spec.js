@@ -144,6 +144,13 @@ test('privacy page is linked and reachable', async ({ page }) => {
   await expect(page.locator('a[href="./"]')).toBeVisible();
 });
 
+test('footer links source code and contact', async ({ page }) => {
+  await page.goto('/');
+  const repo = 'https://github.com/CristianNichifor/legislation-linter';
+  await expect(page.locator(`footer a[href="${repo}"]`)).toBeVisible();
+  await expect(page.locator(`footer a[href="${repo}/issues"]`)).toBeVisible();
+});
+
 const AXE = fileURLToPath(new URL('../../node_modules/axe-core/axe.min.js', import.meta.url));
 
 async function seriousViolations(page) {
@@ -327,7 +334,8 @@ test('dataset date and stale warning', async ({ page }) => {
   const stat = page.locator('#stat');
   await expect(stat).toContainText('4 acte');
   // The committed fixtures were captured on this date, more than 30 days ago.
-  await expect(stat).toContainText('date la zi pe 2026-09-05');
+  // Romanian order, as DESIGN.md › Dates asks; ISO stays on the wire.
+  await expect(stat).toContainText('date la zi pe 05.09.2026');
   await expect(page.locator('#stat [data-dataset-stale]')).toBeVisible();
   await expect(page.locator('#stat [data-dataset-stale]')).toContainText('peste 30 de zile');
 });

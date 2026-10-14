@@ -135,7 +135,35 @@ Test: `tests/browser/static.spec.js` › "english chrome toggle syncs html lang"
 at the end of the navigation and names the other language in that language. The main region and
 the data panels keep `lang="ro"`. English strings are marked *needs human review*.
 
-## Theme E: AI drafting
+## Theme E: UX guidelines
+
+### LL-UXG UX guidelines with a conformance checklist — done
+
+- Given `docs/ux-guidelines.md`, then it refines `UX_UI_BIBLE.md`, `PROJECT_FINISH_BIBLE.md`,
+  `DESIGN.md` and `UX_ACCEPTANCE.md` without contradicting them (the bible wins on conflict),
+  links all four, and states users and top tasks, page anatomy, content, data-viz, state,
+  mobile and accessibility rules, the status vocabulary, a conformance checklist mapped to
+  tests and a deviations backlog (D-1…D-8).
+- Given the bible and the README docs index, then both link the guideline.
+- Given the checklist, when a test file or a quoted browser test title it names is renamed or
+  removed, then `tests/test_ux_guidelines.py` fails.
+- Agent-written Romanian in the guideline (status vocabulary, no-verdict phrasing): needs
+  human review.
+
+Test: `tests/test_ux_guidelines.py`.
+
+### LL-UXG-2 Footer links and a Romanian dataset date — done
+
+- Given the default view, then the footer links the privacy page, the repository (source code
+  and method) and its GitHub issues (contact).
+- Given a built dataset, then the header reads „date la zi pe zz.ll.aaaa” (DESIGN.md › Dates);
+  the manifest keeps ISO.
+- Closes deviations D-2 and D-3 in `docs/ux-guidelines.md`. „Cod sursă și metodă” and its
+  English label are agent-written: needs human review.
+
+Test: `tests/browser/static.spec.js` › "footer links source code and contact" and
+"dataset date and stale warning".
+## Theme F: AI drafting
 
 ### LL-9 BYOK draft from evidence, end to end — done
 

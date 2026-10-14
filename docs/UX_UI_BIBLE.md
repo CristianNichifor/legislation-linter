@@ -5,7 +5,8 @@ Status date: 2026-09-14.
 This is the product UX contract for v1. It does not replace
 [`PROJECT_FINISH_BIBLE.md`](PROJECT_FINISH_BIBLE.md); it defines how the finished
 app must feel, what each UX phase must close, and what the interface must never
-claim.
+claim. The concrete rules, conformance checklist and deviations backlog live in
+[`ux-guidelines.md`](ux-guidelines.md), which refines this file.
 
 ## Target UX
 

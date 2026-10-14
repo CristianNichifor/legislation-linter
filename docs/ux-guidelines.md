@@ -109,6 +109,7 @@ Exactly one of: **Date reale** (Live data) · **Date demonstrative** (Demo data)
 | English chrome syncs `lang` | `tests/browser/static.spec.js` › "english chrome toggle syncs html lang" |
 | Phone and desktop baseline | `tests/browser/baseline.spec.js` |
 | Reduced motion stops the spinner; forced colours keep the tab rail, focus and borders | `tests/browser/baseline.spec.js` › "reduced motion and forced colours keep state visible" |
+| Phone tab list is one scrollable row with „Mai multe” in view | `tests/browser/baseline.spec.js` › "phone tab list is one scrollable row" |
 
 `tests/test_ux_guidelines.py` fails when a test file or a test title named here no longer
 exists.
@@ -125,8 +126,9 @@ and 390 px were not taken in this pass. Items in files other sessions were editi
 - ~~**D-2** The footer links only the privacy page.~~ Fixed by LL-UXG-2.
 - ~~**D-3** The header dataset date is ISO.~~ Fixed by LL-UXG-2.
 - **D-4** No status badge from §7; the fixtures demo is not marked as demo data.
-- **D-5** Mobile tab list (live review): eight tabs plus „Mai multe” at 390 px; check with
-  a screenshot and make it one scrollable row with a visible scroll cue if it wraps.
+- ~~**D-5** Mobile tab list (live review): eight tabs plus „Mai multe” at 390 px; check with
+  a screenshot and make it one scrollable row with a visible scroll cue if it wraps.~~ Fixed in
+  `app/civic-ui-adapter.css` (one row, fade cue, overflow menu pinned) with a baseline test.
 - ~~**D-6** No forced-colours or reduced-motion test.~~ Fixed: forced-colours rules in
   `app/civic-ui-adapter.css` and a baseline test (spec item deferred to the readiness spec once
   the open pull requests that edit it merge).

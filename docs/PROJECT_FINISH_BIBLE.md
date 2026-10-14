@@ -25,7 +25,7 @@ The app is complete when a Romanian legislative worker can:
 9. Run deterministic checks against drafts/proposals and get candidate issues,
    never automatic legal verdicts.
 10. Export/backup/restore dossiers with traceable evidence and limitations.
-11. Open the public GitHub Pages app or run the downloadable local app without
+11. Open the public static app or run the downloadable local app without
    losing private work.
 12. Pass the final release gate with CI, browser tests, code scanning, public
    smoke, local smoke, real-data acceptance, AI eval and MCP dry run.
@@ -533,7 +533,7 @@ Implement:
 
 Acceptance:
 
-- Fresh user can open GitHub Pages and create a private dossier.
+- Fresh user can open the public static app and create a private dossier.
 - Fresh user can download/run locally.
 - Source update does not overwrite private work.
 - Rollback preserves private dossiers.

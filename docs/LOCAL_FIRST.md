@@ -1,6 +1,6 @@
 # Local-first delivery
 
-The application has two delivery modes: the static GitHub Pages application and
+The application has two delivery modes: the static application on Cloudflare Pages and
 a downloaded Python runtime serving localhost. Public legislation and private
 research have separate lifecycles. Neither requires an account or a hosted
 private-workspace database.

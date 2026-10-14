@@ -142,7 +142,7 @@ Unavailable response:
 ## Boundaries
 
 - The endpoint is available only in the local app because it performs live network acquisition.
-- GitHub Pages/static mode returns a local-only error for this route.
+- The public static mode returns a local-only error for this route.
 - The importer stores official source metadata and extracted text; it does not produce a legal
   compatibility verdict.
 - The import response exposes enough provenance for the UI to show the CELEX reference URL, selected

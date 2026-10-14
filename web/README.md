@@ -84,9 +84,15 @@ wires the `fetch` shim).
 
 ## Deploy
 
-`.github/workflows/pages.yml` builds `--sursa fixturi` and publishes `web/` to GitHub Pages on push
-to `main`. To turn it on: **Settings → Pages → Source: GitHub Actions** (and make the repo public,
-or use Pages on a plan that allows private). No secrets are needed.
+`.github/workflows/deploy-pages-cloudflare.yml` builds the bundle (from the newest dataset release,
+else `--sursa fixturi`) and publishes `web/` to Cloudflare Pages under `/legislation-linter/`. A push
+to `main` is production, served at <https://projects.cristian-nichifor.com/legislation-linter/>; a
+push to `dev` is the gated preview behind projects-dev.cristian-nichifor.com. No repository secrets:
+a short-lived Cloudflare token comes from the CN Webify token broker.
+
+GitHub Pages no longer hosts the app. `.github/workflows/pages.yml` publishes only `redirect/`,
+which sends every `cristiannichifor.github.io/legislation-linter/…` link to the same path, query and
+hash on the hub.
 
 ## Search covers the corpus without shipping it
 

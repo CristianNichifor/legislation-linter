@@ -34,8 +34,8 @@ The first contract is `mcp-boundary-v1`:
 The v1 executor does not connect to Claude, ChatGPT, GitHub, calendar or document tools. It supports
 only `local-mock/ai.draft` and `local-mock/document.export`, deterministic local adapters used to
 prove configure, test, approve, run and audit behavior without network access or credential storage.
-GitHub Pages can show the capability list, but rejects MCP previews/execution because the public
-static worker has no approved local executor.
+The public static app can show the capability list, but rejects MCP previews/execution because
+the public static worker has no approved local executor.
 
 The first user workflow is an explicit AI-draft handoff from a manual note. The
 browser prepares the source-backed prompt, shows cost/privacy/approval metadata,

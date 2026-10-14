@@ -25,7 +25,7 @@ def _connect_src_hosts() -> list[str]:
 def test_names_every_endpoint_the_csp_allows():
     text = _text()
     hosts = _connect_src_hosts()
-    assert "api.openai.com" in hosts and "api.anthropic.com" in hosts
+    assert {"api.openai.com", "api.anthropic.com"} <= set(hosts)
     missing = [host for host in hosts if host not in text]
     assert missing == []
     # The channel and data store origin is added to connect-src at build time.

@@ -264,3 +264,34 @@
     border: 1px solid CanvasText;
   }
 }
+
+/* Phone: eight tabs plus „Mai multe” must not wrap into a three-row block (ux-guidelines §6,
+   D-5). One scrollable row, the overflow menu pinned at the right, a fade as the scroll cue. */
+@media (max-width: 640px) {
+  .civic-legislativ .tabs {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .civic-legislativ .tablist {
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    mask-image: linear-gradient(90deg, #000 calc(100% - 1.5rem), transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 1.5rem), transparent);
+  }
+  .civic-legislativ .tablist::-webkit-scrollbar {
+    display: none;
+  }
+  .civic-legislativ .tablist .tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    min-height: 44px;
+  }
+  .civic-legislativ .more-tools {
+    flex: 0 0 auto;
+  }
+}

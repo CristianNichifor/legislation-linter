@@ -180,3 +180,30 @@ test('reduced motion and forced colours keep state visible', async ({ page, brow
   expect(border.width).toBe('3px');
   expect(border.color).not.toBe('rgba(0, 0, 0, 0)');
 });
+
+test('phone tab list is one scrollable row', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('#tab-matrice')).toBeVisible();
+  const layout = await page.evaluate(() => {
+    const tabs = [...document.querySelectorAll('.tablist .tab')];
+    const list = document.querySelector('.tablist');
+    const tops = new Set(tabs.map(tab => Math.round(tab.getBoundingClientRect().top)));
+    const more = document.getElementById('more-toggle').getBoundingClientRect();
+    return {
+      rows: tops.size,
+      scrolls: list.scrollWidth > list.clientWidth,
+      pageScroll: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      moreInView: more.right <= window.innerWidth && more.width > 0,
+      minHeight: Math.min(...tabs.map(tab => tab.getBoundingClientRect().height)),
+    };
+  });
+  expect(layout.rows).toBe(1);
+  expect(layout.scrolls).toBe(true);
+  expect(layout.pageScroll).toBeLessThanOrEqual(0);
+  expect(layout.moreInView).toBe(true);
+  expect(layout.minHeight).toBeGreaterThanOrEqual(44);
+  await page.locator('#tab-setari').scrollIntoViewIfNeeded();
+  await page.locator('#tab-setari').click();
+  await expect(page.locator('#tab-setari')).toHaveAttribute('aria-selected', 'true');
+});

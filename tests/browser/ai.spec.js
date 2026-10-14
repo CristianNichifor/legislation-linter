@@ -5,9 +5,11 @@ import { test, expect } from '@playwright/test';
 const PROVIDER = 'https://api.openai.com/v1/chat/completions';
 const KEY = 'sk-test-fleet-never-sent-anywhere';
 const QUOTE = 'Prezenta lege reglementează modul de realizare a achizițiilor publice.';
+// WebKit follows the Fetch spec to the letter: `Authorization` is never covered by the `*`
+// wildcard, so the mocked preflight names every header the app sends.
 const CORS = {
   'access-control-allow-origin': '*',
-  'access-control-allow-headers': '*',
+  'access-control-allow-headers': 'authorization, content-type, x-api-key, anthropic-version, anthropic-dangerous-direct-browser-access',
   'access-control-allow-methods': 'POST, OPTIONS',
 };
 

@@ -131,3 +131,14 @@ test('metadata, canonical and skip link', async ({ page, browserName }) => {
   await skip.press('Enter');
   await expect(page.locator('#main')).toBeFocused();
 });
+
+test('privacy page is linked and reachable', async ({ page }) => {
+  await page.goto('/');
+  const link = page.locator('footer a[href="confidentialitate.html"]');
+  await expect(link).toBeVisible();
+  await link.click();
+  await expect(page).toHaveURL(/confidentialitate\.html$/);
+  await expect(page.locator('h1')).toContainText('Confidențialitate');
+  await expect(page.locator('main')).toContainText('api.anthropic.com');
+  await expect(page.locator('a[href="./"]')).toBeVisible();
+});

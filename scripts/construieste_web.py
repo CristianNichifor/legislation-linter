@@ -745,7 +745,8 @@ BOOT = """
     if (m.type === "ready"){
       selectedGeneration = m.generation;
       window.browserSourceLimitations = m.limitations || [];
-      if (window.browserSourceLimitations.length) {
+      // The online data panel lists the same sources; this note is for pages without it.
+      if (window.browserSourceLimitations.length && !document.getElementById('browser-generation')) {
         const note = document.createElement('p'); note.id = 'browser-source-limitations';
         note.className = 'hint'; note.setAttribute('role', 'status');
         note.style.overflowWrap = 'anywhere';

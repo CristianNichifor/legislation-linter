@@ -441,30 +441,11 @@
   .manual-note-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.4rem;margin:.55rem 0}
   .manual-note-summary button{text-align:left;white-space:normal;overflow-wrap:anywhere}
   .daily-workflow{border-block:1px solid var(--rule);padding:.7rem 0;margin:.2rem 0 .9rem}
-  .daily-workflow summary{cursor:pointer}
-  .daily-workflow summary h3{display:inline}
   .daily-workflow h3{font-size:1rem;margin:.1rem 0 .25rem}
   .daily-workflow-status{border-left:3px solid var(--material);padding:.35rem .55rem;background:var(--surface);
     font-size:.78rem;margin:.45rem 0}
-  .daily-flow-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(10.5rem,1fr));gap:.45rem;margin:.65rem 0;padding:0;list-style:none}
-  .daily-flow-steps li{border-top:2px solid var(--rule-soft);padding:.45rem 0;min-width:0}
-  .daily-flow-steps li[data-workflow-step="source"]{border-color:var(--accent)}
-  .daily-flow-steps li[data-workflow-step="note"],.daily-flow-steps li[data-workflow-step="evidence"]{border-color:var(--material)}
-  .daily-flow-steps li.current{background:color-mix(in srgb,var(--accent) 8%,transparent);padding-inline:.35rem}
-  .daily-flow-steps b{display:block;font-size:.82rem}
-  .daily-flow-steps span{display:block;font-family:var(--sans);font-size:.74rem;color:var(--ink-mute);margin-top:.2rem}
-  .daily-flow-steps code{font-family:var(--mono);font-size:.7rem;color:var(--ink-mid)}
-  .daily-flow-output{display:block;margin-top:.25rem}
-  .main-flow-strip{border-block:1px solid var(--rule);padding:.65rem 0;margin:.25rem 0 .95rem}
-  .main-flow-strip ol{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.4rem;margin:.45rem 0 0;padding:0;list-style:none}
-  .main-flow-strip button{width:100%;height:100%;border:0;border-top:2px solid var(--rule-soft);background:transparent;color:var(--ink);padding:.45rem 0;text-align:left;font:inherit;cursor:pointer;white-space:normal;overflow-wrap:anywhere}
-  .main-flow-strip button:hover,.main-flow-strip button:focus-visible{border-color:var(--accent);background:var(--surface)}
-  .main-flow-strip button[aria-current=true]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
-  .main-flow-strip button[data-state=ready]{border-color:var(--material)}
-  .main-flow-strip b{display:block;font-size:.82rem}
-  .main-flow-strip small{display:block;font-family:var(--sans);font-size:.72rem;color:var(--ink-mute);margin-top:.18rem}
-  .main-flow-strip button[aria-current=true] small,.daily-flow-steps li.current span{color:var(--ink-mid)}
-  .main-flow-context{border-left:3px solid var(--material);padding:.35rem .55rem;background:var(--surface);font-size:.78rem;margin:.25rem 0 0}
+  .source-start{border-block:1px solid var(--rule);padding:.7rem 0;margin:.2rem 0 .9rem}
+  .source-start h3{font-size:1rem;margin:.1rem 0 .25rem}
   .gap-workflow{border:1px solid var(--rule-soft);border-left:3px solid var(--accent);padding:.55rem .65rem;margin:.35rem 0 .7rem;background:var(--surface);overflow-wrap:anywhere}
   .gap-workflow h4{font-size:.9rem;margin:.05rem 0 .25rem}
   .gap-workflow p{margin:.25rem 0}
@@ -704,24 +685,30 @@
     aside.canvas.collapsed .canvas-toggle{margin-left:auto}
   }
 
-  .tabs{margin-bottom:1rem;position:relative;padding-right:13rem}
+  .tabs{margin-bottom:.4rem;display:flex;gap:.35rem;flex-wrap:wrap;align-items:flex-start}
   .tablist{display:flex;gap:.35rem;flex-wrap:wrap}
-  .chrome-tools{position:absolute;top:0;right:0;display:flex;gap:.35rem}
+  .more-tools{position:relative}
+  .more-toggle::after{content:" ▾"}
+  .more-menu{position:absolute;z-index:30;top:100%;left:0;min-width:12rem;display:flex;flex-direction:column;
+    padding:.3rem;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r1);box-shadow:var(--e1)}
+  .more-menu[hidden]{display:none}
+  .more-menu button{text-align:left;background:transparent;border:0;padding:.5rem .7rem;font:600 .82rem var(--sans);
+    color:var(--ink-mid);cursor:pointer;min-height:2rem}
+  .more-menu button:hover,.more-menu button:focus-visible{background:var(--accent-wash);color:var(--ink)}
+  .more-menu button[aria-current="page"],.more-toggle[data-current="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+  .breadcrumb{display:flex;flex-wrap:wrap;align-items:center;gap:.2rem .8rem;margin:0 0 .9rem;padding:.25rem 0;
+    border-bottom:1px solid var(--rule-soft);font-family:var(--sans);font-size:.76rem;color:var(--ink-mid)}
+  .breadcrumb ol{display:flex;flex-wrap:wrap;margin:0;padding:0;list-style:none}
+  .breadcrumb li+li::before{content:"›";padding:0 .15rem;color:var(--ink-mute)}
+  .breadcrumb button{background:transparent;border:0;padding:.2rem .3rem;min-height:1.6rem;font:inherit;color:var(--accent);cursor:pointer}
+  .breadcrumb li.current button{color:var(--ink);font-weight:700}
+  .breadcrumb-status{margin:0}
+  .settings{max-width:40rem}
+  .settings-row{display:flex;gap:.8rem;align-items:center;margin:.6rem 0}
   .tab{font-family:var(--sans);font-size:.82rem;font-weight:600;padding:.5rem 1rem;cursor:pointer;
     background:transparent;border:0;border-bottom:2px solid transparent;color:var(--ink-mute)}
   .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
   .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .workflow-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,8.5rem),1fr));
-    gap:.45rem;margin:-.35rem 0 .75rem;font-family:var(--sans)}
-  .workflow-nav button{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
-    gap:.08rem;font-size:.78rem;font-weight:700;min-height:3.25rem;padding:.48rem .65rem;
-    border:1px solid var(--rule);border-left:3px solid var(--rule);border-radius:var(--r1);
-    background:var(--surface);color:var(--ink-mid);cursor:pointer;white-space:normal;text-align:left;
-    box-shadow:var(--e1)}
-  .workflow-nav button small{font-size:.64rem;font-weight:400;color:var(--ink-mute);line-height:1.25}
-  .workflow-nav button:hover{border-color:var(--accent);background:var(--accent-wash);color:var(--ink)}
-  .workflow-nav button[aria-current="true"]{border-left-color:var(--accent);color:var(--ink)}
-  .workflow-nav button[aria-current="true"] small{color:var(--ink-mid)}
   /* pinned to the top-right of the tab strip, so it never orphans onto its own line when the tabs
      wrap on a narrow viewport */
   .tema{background:transparent;border:1px solid var(--rule);
@@ -1288,45 +1275,38 @@
   <div class="tabs">
     <div class="tablist" role="tablist" aria-label="Spații de lucru">
     <button class="tab" id="tab-start" role="tab" aria-selected="false" aria-controls="pane-start">Start</button>
-    <button class="tab" id="tab-lint" role="tab" aria-selected="false" aria-controls="pane-lint">Verifică proiect</button>
-    <button class="tab" id="tab-redacteaza" role="tab" aria-selected="false" aria-controls="pane-redacteaza">Redactează</button>
-    <button class="tab" id="tab-consolidat" role="tab" aria-selected="false" aria-controls="pane-consolidat">Consolidat</button>
-    <button class="tab" id="tab-cauta" role="tab" aria-selected="false" aria-controls="pane-cauta">Caută în legislație</button>
-    <button class="tab" id="tab-graf" role="tab" aria-selected="false" aria-controls="pane-graf">Conexiuni</button>
-    <button class="tab" id="tab-parlamentari" role="tab" aria-selected="false" aria-controls="pane-parlamentari">Parlamentari</button>
-    <button class="tab" id="tab-domenii" role="tab" aria-selected="false" aria-controls="pane-domenii">Cine face legea</button>
+    <button class="tab" id="tab-lint" role="tab" aria-selected="false" aria-controls="pane-lint">Verifică</button>
+    <button class="tab" id="tab-cauta" role="tab" aria-selected="false" aria-controls="pane-cauta">Caută</button>
     <button class="tab" id="tab-matrice" role="tab" aria-selected="true" aria-controls="pane-matrice">Matrice</button>
-    <button class="tab" id="tab-ue" role="tab" aria-selected="false" aria-controls="pane-ue">Drept UE</button>
-    <button class="tab" id="tab-supraveghere" role="tab" aria-selected="false" aria-controls="pane-supraveghere">Supraveghere</button>
+    <button class="tab" id="tab-dosare" role="tab" aria-selected="false" aria-controls="pane-matrice">Dosare</button>
+    <button class="tab" id="tab-surse" role="tab" aria-selected="false" aria-controls="pane-matrice">Surse</button>
+    <button class="tab" id="tab-redacteaza" role="tab" aria-selected="false" aria-controls="pane-redacteaza">Redactare</button>
+    <button class="tab" id="tab-setari" role="tab" aria-selected="false" aria-controls="pane-setari">Setări</button>
     </div>
-    <div class="chrome-tools">
-      <button class="tema" id="tema-btn" type="button" title="Schimbă tema (auto / luminos / întunecat)">tema: auto</button>
+    <div class="more-tools">
+      <button type="button" class="tab more-toggle" id="more-toggle" aria-haspopup="menu" aria-expanded="false" aria-controls="more-menu">Mai multe</button>
+      <div class="more-menu" id="more-menu" role="menu" aria-labelledby="more-toggle" hidden>
+        <button type="button" role="menuitem" id="tab-consolidat" data-pane="consolidat">Consolidat</button>
+        <button type="button" role="menuitem" id="tab-graf" data-pane="graf">Conexiuni</button>
+        <button type="button" role="menuitem" id="tab-parlamentari" data-pane="parlamentari">Parlamentari</button>
+        <button type="button" role="menuitem" id="tab-domenii" data-pane="domenii">Cine face legea</button>
+        <button type="button" role="menuitem" id="tab-ue" data-pane="ue">Drept UE</button>
+        <button type="button" role="menuitem" id="tab-supraveghere" data-pane="supraveghere">Supraveghere</button>
+      </div>
     </div>
   </div>
-  <nav class="workflow-nav" aria-label="Navigare spații de lucru">
-    <button type="button" data-main-nav="start" aria-current="false">Start<small>alege fluxul</small></button>
-    <button type="button" data-main-nav="search">Surse<small>lege, proiect, consultare, CELEX</small></button>
-    <button type="button" data-main-nav="track">Urmărire<small>stadii, comisii, avize, voturi</small></button>
-    <button type="button" data-main-nav="matrix" aria-current="true">Matrice<small>lacune și contradicții</small></button>
-    <button type="button" data-main-nav="dossiers">Dosare<small>lucru privat local</small></button>
-    <button type="button" data-main-nav="ai">Redactare<small>ciorne din dovezi, AI opțional</small></button>
-    <button type="button" data-main-nav="rules">Reguli<small>reguli verificabile, revizuite</small></button>
-    <button type="button" data-main-nav="status">Stadiu<small>acoperire și limitări</small></button>
-  </nav>
-  <section class="main-flow-strip" id="main-flow-strip" aria-labelledby="main-flow-title">
-    <h2 id="main-flow-title">Flux principal</h2>
-    <p class="main-flow-context" id="main-flow-context" role="status">
-      Matrice -> dovezi -> dosar -> redactare -> propunere -> export. Alege un pas ca să ajungi direct la panoul existent.
-    </p>
+  <nav class="breadcrumb" id="legislative-workflow" aria-label="Pașii lucrului">
     <ol>
-      <li><button type="button" data-flow-target="matrix" aria-current="true"><b>1. Matrice</b><small>Lacune, contradicții, riscuri UE</small></button></li>
-      <li><button type="button" data-flow-target="evidence"><b>2. Dovezi</b><small>Citat, locator, URL, hash</small></button></li>
-      <li><button type="button" data-flow-target="dossier"><b>3. Dosar</b><small>Lucru privat local</small></button></li>
-      <li><button type="button" data-flow-target="writing"><b>4. Redactare</b><small>Ciornă din dovezi selectate</small></button></li>
-      <li><button type="button" data-flow-target="proposal"><b>5. Propunere</b><small>Editor verificabil</small></button></li>
-      <li><button type="button" data-flow-target="export"><b>6. Export</b><small>Raport cu limitări păstrate</small></button></li>
+      <li data-workflow-step="source"><button type="button" data-workflow-open-search>Sursă</button></li>
+      <li data-workflow-step="evidence"><button type="button" data-workflow-open-matrix>Dovezi</button></li>
+      <li data-workflow-step="dossier"><button type="button" data-workflow-open-dossier>Dosar</button></li>
+      <li data-workflow-step="note"><button type="button" data-workflow-open-note>Notă</button></li>
+      <li data-workflow-step="draft"><button type="button" data-workflow-open-draft>Ciornă</button></li>
+      <li data-workflow-step="export"><button type="button" data-workflow-open-export>Export</button></li>
     </ol>
-  </section>
+    <p class="breadcrumb-status"><span id="main-flow-context" role="status">Matrice · niciun dosar ales</span>
+      <span id="legislative-workflow-status" role="status"></span></p>
+  </nav>
 
   <div class="app">
     <main class="main" id="main" tabindex="-1">
@@ -1349,6 +1329,17 @@
             <button type="button" class="ghost" data-start-action="draft">Verific text proiect</button>
           </div>
           <p class="state-note" role="status" id="first-run-status">Datele publice și dosarele private sunt separate. Actualizarea surselor nu suprascrie dosarele locale.</p>
+        </section>
+      </div>
+
+      <div id="pane-setari" role="tabpanel" aria-labelledby="tab-setari" hidden>
+        <section class="settings" aria-labelledby="settings-title">
+          <h2 id="settings-title" tabindex="-1">Setări</h2>
+          <div class="settings-row"><span>Temă</span>
+            <button class="tema" id="tema-btn" type="button" title="Schimbă tema (auto / luminos / întunecat)">tema: auto</button></div>
+          <p class="hint">Setările se păstrează în acest browser. Datele legislative publice și dosarele private
+            sunt separate; actualizarea datelor nu atinge dosarele.</p>
+          <p><a href="confidentialitate.html">Confidențialitate</a>: ce rămâne pe dispozitiv și ce conexiuni face pagina.</p>
         </section>
       </div>
 
@@ -1515,27 +1506,8 @@
       </div>
 
       <div id="pane-matrice" role="tabpanel" aria-labelledby="tab-matrice">
-        <details class="daily-workflow" id="legislative-workflow">
-          <summary><h3 id="legislative-workflow-title">Flux zilnic pentru lacune și contradicții</h3></summary>
-          <p class="daily-workflow-status" id="legislative-workflow-status" role="status">
-            Următorul pas: caută și deschide sursa oficială, apoi păstrează constatarea în dosarul local.
-          </p>
-          <ol class="daily-flow-steps">
-            <li data-workflow-step="source"><b>1. Sursă</b><span>Caută actul, proiectul, consultarea sau CELEX și deschide fișa oficială.</span><code class="daily-flow-output">ieșire: URL + identificator</code></li>
-            <li data-workflow-step="note"><b>2. Notă</b><span>Adaugă lacună, contradicție, CCR sau risc UE în dosarul ales.</span><code class="daily-flow-output">ieșire: constatare locală</code></li>
-            <li data-workflow-step="evidence"><b>3. Dovezi</b><span>Completează citatul, locatorul, sursa și SHA-256 când există.</span><code class="daily-flow-output">ieșire: pachet verificabil</code></li>
-            <li data-workflow-step="draft"><b>4. Ciornă</b><span>Pornește propunerea sau regula numai din nota cu dovezi.</span><code class="daily-flow-output">ieșire: amendament salvat</code></li>
-            <li data-workflow-step="export"><b>5. Export</b><span>Descarcă raportul, propunerea sau analiza cu limitările păstrate.</span><code class="daily-flow-output">ieșire: Markdown/JSON</code></li>
-          </ol>
-          <div class="dossier-actions">
-            <button type="button" class="ghost mini" data-workflow-open-search>Caută sursă</button>
-            <button type="button" class="ghost mini" data-workflow-open-matrix>Filtrează matricea</button>
-            <button type="button" class="ghost mini" data-workflow-open-dossier>Dosar local</button>
-            <button type="button" class="ghost mini" data-workflow-open-note>Notă lacună/UE</button>
-            <button type="button" class="ghost mini" data-workflow-open-draft>Ciornă amendament</button>
-            <button type="button" class="ghost mini" id="start-real-project">Start proiect real</button>
-            <button type="button" class="ghost mini" data-workflow-open-export>Export</button>
-          </div>
+        <section class="source-start" id="source-start" aria-labelledby="source-start-title">
+          <h3 id="source-start-title">Pornește dintr-o sursă publică</h3>
           <form id="real-workflow-start" class="dossier-actions">
             <label>Sursă publică reală<input name="identifier" maxlength="1000" required placeholder="PL-x 33/2025, CELEX:32014L0024, URL CDEP/Senat/e-consultare/EUR-Lex"></label>
             <label>Tip<select name="family"><option value="auto">detectează automat</option><option value="camera">Camera Deputaților</option><option value="senat">Senat</option><option value="consultare_econsultare">e-consultare</option><option value="ue_cellar">Drept UE · CELEX</option><option value="consultare_minister">consultare minister</option></select></label>
@@ -1544,7 +1516,7 @@
             <p class="hint" id="real-workflow-status" role="status"></p>
           </form>
           <div id="real-workflow-handoff"></div>
-        </details>
+        </section>
         <section class="source-inventory" aria-labelledby="source-title">
           <div class="source-heading"><h3 id="source-title">Acoperirea surselor</h3><div class="source-actions">
             <button type="button" class="ghost mini" id="source-refresh">Reîmprospătează inventarul</button>
@@ -2102,37 +2074,96 @@ fetch("/api/rezumat").then(r=>r.json()).then(d=>{
 }).catch(()=>{ $("#stat").textContent="corpus indisponibil"; });
 
 // ---- tabs ----
-const PANES = ["start","lint","redacteaza","consolidat","cauta","graf","parlamentari","domenii","matrice","ue","supraveghere"];
-function selectTab(which,{focus=true}={}){
+// One navigation: eight primary tabs, the remaining tools under "Mai multe". Dosare and Surse are
+// places in the matrix workspace, so they show its pane and open their section there.
+const PANES = ["start","lint","cauta","matrice","dosare","surse","redacteaza","setari","consolidat","graf","parlamentari","domenii","ue","supraveghere"];
+const PANE_OF = {dosare:"matrice",surse:"matrice"};
+const HASH_OF = {lint:"verifica",redacteaza:"redactare",graf:"conexiuni"};
+const paneOf = which => PANE_OF[which]||which;
+const hashOf = which => HASH_OF[which]||which;
+function paneFromHash(){
+  let wanted=""; try{ wanted=decodeURIComponent(location.hash.slice(1)); }catch(e){}
+  return PANES.find(p=>hashOf(p)===wanted)||null;
+}
+function selectTab(which,{focus=true,route=true}={}){
+  if(!PANES.includes(which)) which="matrice";
+  const pane=paneOf(which);
   PANES.forEach(p=>{
-    $("#tab-"+p).setAttribute("aria-selected", p===which);
-    $("#tab-"+p).tabIndex = p===which ? 0 : -1;
-    $("#pane-"+p).hidden = p!==which;
+    const control=$("#tab-"+p);
+    if(control?.getAttribute("role")==="tab"){
+      control.setAttribute("aria-selected", p===which);
+      control.tabIndex = p===which ? 0 : -1;
+    }else if(control){
+      control.setAttribute("aria-current", p===which ? "page" : "false");
+    }
+    const panel=$("#pane-"+p);
+    if(panel) panel.hidden = p!==pane;
   });
-  $(".app").dataset.pane = which;   // Conexiuni panel shows only where it means something (Verifică)
+  const more=$("#more-toggle");
+  if(more) more.dataset.current=String($("#tab-"+which)?.getAttribute("role")==="menuitem");
+  $(".app").dataset.pane = pane;   // Conexiuni panel shows only where it means something (Verifică)
+  if(route && location.hash!=="#"+hashOf(which)){
+    try{ history.pushState(null,"","#"+hashOf(which)); }catch(e){}
+  }
   // #r-nr, not #r-act: the only #r-act in the page is #r-act-info, a hint div. Redactează's first
   // typed field is the number, the same as graf and supraveghere.
-  const focusEl = {start:"#first-run-title",lint:"#draft",redacteaza:"#r-nr",consolidat:"#c-act",cauta:"#q",graf:"#g-nr",parlamentari:"#p-q",matrice:"#m-q",ue:"#ue-text",supraveghere:"#s-nr"}[which];
+  const focusEl = {start:"#first-run-title",lint:"#draft",redacteaza:"#r-nr",consolidat:"#c-act",cauta:"#q",graf:"#g-nr",parlamentari:"#p-q",matrice:"#m-q",ue:"#ue-text",supraveghere:"#s-nr",setari:"#settings-title"}[which];
   // Look the element up rather than assuming it exists: when this pointed at a missing id it threw
   // mid-function, and the two loaders below never ran.
   const focusTarget = focusEl && $(focusEl);
   if(focus && focusTarget) focusTarget.focus();
-  if(which==="ue") pregatesteUEDinDraft(false);
-  if(which==="consolidat") loadConsAsezari();
-  if(which==="parlamentari"){ loadGrupuri(); loadToti(); }
-  if(which==="domenii") loadDomenii();
-  if(which==="matrice") loadMatrice();
-  if(which==="supraveghere") renderSupraveghere();
-  updateMainNav(which);
-  refreshMainFlowContext(which==='matrice'?'matrix':which==='lint'?'writing':'matrix');
+  if(pane==="ue") pregatesteUEDinDraft(false);
+  if(pane==="consolidat") loadConsAsezari();
+  if(pane==="parlamentari"){ loadGrupuri(); loadToti(); }
+  if(pane==="domenii") loadDomenii();
+  if(pane==="matrice") loadMatrice();
+  if(pane==="supraveghere") renderSupraveghere();
+  const section=which==="dosare"?$("#dossier-library"):which==="surse"?$("#source-registry"):null;
+  if(section){
+    section.open=true;
+    if(which==="surse"){ const coverage=$("#source-coverage"); if(coverage) coverage.open=true; }
+    (which==="surse"?$("#source-start"):section)?.scrollIntoView?.({block:"start"});
+  }
+  updateMainNav(pane);
+  refreshMainFlowContext(which==='dosare'?'dossier':pane==='lint'?'writing':'matrix');
 }
-PANES.forEach(p=>{ $("#tab-"+p).onclick=()=>selectTab(p); });
-PANES.forEach((p,index)=>{
+const PRIMARY_TABS=[...document.querySelectorAll('.tablist [role="tab"]')].map(tab=>tab.id.slice(4));
+PANES.forEach(p=>{ const control=$("#tab-"+p); if(control) control.onclick=()=>{ closeMoreMenu(); selectTab(p); }; });
+PRIMARY_TABS.forEach((p,index)=>{
   const tab=$('#tab-'+p);tab.tabIndex=tab.getAttribute('aria-selected')==='true'?0:-1;
   tab.onkeydown=e=>{
-    const next=e.key==='Home'?0:e.key==='End'?PANES.length-1:e.key==='ArrowRight'?(index+1)%PANES.length:e.key==='ArrowLeft'?(index+PANES.length-1)%PANES.length:null;
-    if(next===null)return;e.preventDefault();selectTab(PANES[next]);$('#tab-'+PANES[next]).focus();
+    const n=PRIMARY_TABS.length;
+    const next=e.key==='Home'?0:e.key==='End'?n-1:e.key==='ArrowRight'?(index+1)%n:e.key==='ArrowLeft'?(index+n-1)%n:null;
+    if(next===null)return;e.preventDefault();selectTab(PRIMARY_TABS[next]);$('#tab-'+PRIMARY_TABS[next]).focus();
   };
+});
+function closeMoreMenu(){
+  const menu=$("#more-menu"), toggle=$("#more-toggle");
+  if(!menu||menu.hidden) return;
+  menu.hidden=true; toggle.setAttribute("aria-expanded","false");
+}
+(function(){
+  const menu=$("#more-menu"), toggle=$("#more-toggle");
+  if(!menu||!toggle) return;
+  const items=()=>[...menu.querySelectorAll('[role="menuitem"]')];
+  toggle.onclick=()=>{
+    const open=menu.hidden;
+    menu.hidden=!open; toggle.setAttribute("aria-expanded",String(open));
+    if(open) items()[0]?.focus();
+  };
+  menu.addEventListener("keydown",e=>{
+    const list=items(), i=list.indexOf(document.activeElement);
+    if(e.key==="Escape"){ e.preventDefault(); closeMoreMenu(); toggle.focus(); }
+    else if(e.key==="ArrowDown"){ e.preventDefault(); list[(i+1)%list.length].focus(); }
+    else if(e.key==="ArrowUp"){ e.preventDefault(); list[(i-1+list.length)%list.length].focus(); }
+  });
+  document.addEventListener("click",e=>{ if(!e.target.closest?.(".more-tools")) closeMoreMenu(); });
+})();
+// The active tab lives in the URL hash, so a link opens it and Back returns to the previous one.
+window.addEventListener("popstate",()=>{
+  const p=paneFromHash();
+  if(p) selectTab(p,{focus:false,route:false});
+  else if(!location.hash) selectTab("matrice",{focus:false,route:false});
 });
 $(".app").dataset.pane = "matrice";   // initial tab
 function setFirstRunStatus(message){
@@ -2164,7 +2195,7 @@ function openWorkflowTarget(target){
   }
   if(target==='matrix'){selectTab('matrice');setMainNavCurrent(target);$("#m-q")?.focus();setFirstRunStatus('Matricea este spațiul principal pentru lacune, contradicții și riscuri urmărite.');return;}
   if(target==='dossiers'){
-    selectTab('matrice');const panel=$("#dossier-library");if(panel)panel.open=true;
+    selectTab('dosare');const panel=$("#dossier-library");if(panel)panel.open=true;
     panel?.scrollIntoView({block:'start'});
     setMainNavCurrent(target);
     setFirstRunStatus('Dosare deschide lucrul privat local: note, dovezi, ciorne și export.');
@@ -2174,15 +2205,15 @@ function openWorkflowTarget(target){
     selectTab('matrice');const panel=$("#dossier-library");if(panel)panel.open=true;
     panel?.scrollIntoView({block:'start'});
     setMainNavCurrent(target);
-    setFirstRunStatus('Reguli deschide candidații law-as-code din dosar: revizuibili, sursați și niciodată verdict juridic.');
+    setFirstRunStatus('Reguli deschide regulile candidate din dosar: revizuibile, cu sursă și niciodată verdict juridic.');
     return;
   }
   if(target==='status'){
-    selectTab('matrice');const panel=$("#source-registry");if(panel)panel.open=true;
+    selectTab('surse');const panel=$("#source-registry");if(panel)panel.open=true;
     const coverage=$("#source-coverage");if(coverage)coverage.open=true;
     $("#source-title")?.scrollIntoView({block:'start'});
     setMainNavCurrent(target);
-    setFirstRunStatus('Stadiu arată acoperirea surselor, gate-ul produsului și limitările care blochează finalizarea.');
+    setFirstRunStatus('Surse arată acoperirea surselor și limitările care blochează finalizarea.');
     return;
   }
   if(target==='ai'){
@@ -2221,11 +2252,13 @@ function refreshMainFlowContext(active='matrix'){
       button.setAttribute('aria-current',String(target===active));
     });
   }
+  const step={matrix:'evidence',evidence:'evidence',dossier:'dossier',writing:'draft',proposal:'draft',export:'export'}[active]||'evidence';
+  document.querySelectorAll?.('#legislative-workflow [data-workflow-step]').forEach(li=>li.classList.toggle('current',li.dataset.workflowStep===step));
   if(!status)return;
   const dossier=DOSARE_UI.selected?.titlu||DOSARE_UI.selected?.id||'niciun dosar ales';
   const run=DOSARE_UI.runId?'analiză salvată aleasă':'fără analiză salvată';
   const finding=mainFlowSelectedFinding()?'constatare aleasă':'fără constatare aleasă';
-  status.textContent=`Pas curent: ${MAIN_FLOW_LABELS[active]||'Matrice'} · dosar: ${dossier} · ${run} · ${finding}.`;
+  status.textContent=`${MAIN_FLOW_LABELS[active]||'Matrice'} · dosar: ${dossier} · ${run} · ${finding}`;
 }
 function openMainFlowTarget(target){
   const status=$('#main-flow-context');
@@ -2452,7 +2485,7 @@ function bindDailyWorkflow(){
     return node;
   };
   root.querySelector('[data-workflow-open-search]').onclick=()=>{mark('source');selectTab('cauta');status.textContent='Caută sursa oficială, apoi deschide fișa actului/proiectului pentru URL, locator și context.';$('#q')?.focus();};
-  root.querySelector('[data-workflow-open-matrix]').onclick=()=>{mark('source');selectTab('matrice');status.textContent='Filtrează matricea și deschide un rând cu sursă verificabilă înainte de notă.';$('#m-q')?.focus();};
+  root.querySelector('[data-workflow-open-matrix]').onclick=()=>{mark('evidence');selectTab('matrice');status.textContent='Filtrează matricea și deschide un rând cu sursă verificabilă înainte de notă.';$('#m-q')?.focus();};
   const startRealProject=root.querySelector('#start-real-project');
   if(startRealProject)startRealProject.onclick=()=>{
     mark('source');
@@ -2462,9 +2495,9 @@ function bindDailyWorkflow(){
     form?.elements.identifier.focus();
     status.textContent='Lipește un PL-x, CELEX sau URL oficial. Fluxul îl trimite spre surse, tracker, cockpit și dosar.';
   };
-  const realForm=root.querySelector('#real-workflow-start');
+  const realForm=$('#real-workflow-start');
   if(realForm)realForm.onsubmit=e=>{e.preventDefault();mark('source');startRealWorkflow(e.currentTarget);};
-  root.querySelector('[data-workflow-open-dossier]').onclick=()=>{mark('note');reveal('#dossier-library','Alege sau creează dosarul local care va ține nota, dovezile, ciorna și exportul.');};
+  root.querySelector('[data-workflow-open-dossier]').onclick=()=>{mark('dossier');reveal('#dossier-library','Alege sau creează dosarul local care va ține nota, dovezile, ciorna și exportul.');};
   root.querySelector('[data-workflow-open-note]').onclick=()=>{
     mark('note');
     const panel=reveal('#dossier-library','Scrie nota manuală: tipul problemei, locatorul, citatul, sursa și raționamentul.');
@@ -11533,8 +11566,9 @@ $("#ue-limba").onchange=()=>{ if(($("#ue-text").value||"").trim()) cautaUE(); };
 
 $("#s-add").onclick=sAdd;
 ["s-nr","s-an"].forEach(id=>$("#"+id).addEventListener("keydown",e=>{ if(e.key==="Enter") sAdd(); }));
-// The first load opens the matrix without moving focus: the skip link must stay the first stop.
-selectTab("matrice",{focus:false});
+// The first load opens the hash's tab, else the matrix, without moving focus: the skip link must
+// stay the first stop.
+selectTab(paneFromHash()||"matrice",{focus:false,route:false});
 </script>
 <script src="dataset-updates.js" defer></script>
 </body>

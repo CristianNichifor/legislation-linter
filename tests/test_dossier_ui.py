@@ -204,13 +204,12 @@ def test_library_is_in_matrix_tab():
 
 def test_matrix_tab_exposes_daily_legislative_workflow():
     source = APP.read_text()
-    assert 'id="legislative-workflow"' in source
-    assert "Flux zilnic pentru lacune și contradicții" in source
-    assert 'class="daily-workflow-status"' in source
+    # The daily flow is the breadcrumb under the navigation now (LL-NAV).
+    assert '<nav class="breadcrumb" id="legislative-workflow"' in source
+    assert "Flux zilnic" not in source
+    assert 'id="legislative-workflow-status"' in source
     assert 'data-workflow-step="source"' in source
     assert 'data-workflow-step="evidence"' in source
-    assert "ieșire: URL + identificator" in source
-    assert "ieșire: Markdown/JSON" in source
     assert "data-workflow-open-search" in source
     assert "data-workflow-open-note" in source
     assert "data-workflow-open-draft" in source
@@ -286,12 +285,10 @@ def test_matrix_is_default_product_workspace():
     source = APP.read_text()
     assert 'id="tab-start" role="tab" aria-selected="false"' in source
     assert 'id="tab-matrice" role="tab" aria-selected="true"' in source
-    assert 'data-main-nav="start" aria-current="false"' in source
-    assert 'data-main-nav="matrix" aria-current="true"' in source
     assert 'id="pane-start" role="tabpanel" aria-labelledby="tab-start" hidden' in source
     assert 'id="pane-matrice" role="tabpanel" aria-labelledby="tab-matrice">' in source
     assert '$(".app").dataset.pane = "matrice";' in source
-    assert 'selectTab("matrice",{focus:false});' in source
+    assert 'selectTab(paneFromHash()||"matrice",{focus:false,route:false});' in source
 
 
 @pytest.mark.skipif(not shutil.which("node"), reason="Node unavailable")
@@ -352,14 +349,11 @@ def test_first_run_navigation_is_top_level_and_stateful():
     source = APP.read_text()
     assert 'id="tab-start"' in source
     assert 'id="pane-start"' in source
-    assert 'data-main-nav="track"' in source
-    assert 'data-main-nav="dossiers"' in source
-    assert 'data-main-nav="ai"' in source
-    assert 'data-main-nav="rules"' in source
-    assert 'data-main-nav="status"' in source
-    assert "Navigare spații de lucru" in source
-    assert "Surse<small>lege, proiect, consultare, CELEX</small>" in source
-    assert "Urmărire<small>stadii, comisii, avize, voturi</small>" in source
+    # One navigation (LL-NAV): the second workflow navigation is gone.
+    assert "data-main-nav=" not in source
+    for tab in ("lint", "cauta", "matrice", "dosare", "surse", "redacteaza", "setari"):
+        assert f'id="tab-{tab}" role="tab"' in source
+    assert 'id="more-menu" role="menu"' in source
     # The principles panel restated the navigation and the AI panel; it is gone (LL-5).
     assert "Principii de lucru" not in source
     assert "Pornește o analiză legislativă" in source
@@ -376,15 +370,10 @@ def test_first_run_navigation_is_top_level_and_stateful():
     assert "data-ai-open-mcp-runtime" in source
     assert "function bindAiProductFlow" in source
     assert "function explainDisabledControls" in source
-    assert 'id="main-flow-strip"' in source
-    assert "Flux principal" in source
-    assert 'data-flow-target="matrix"' in source
-    assert 'data-flow-target="evidence"' in source
-    assert 'data-flow-target="dossier"' in source
-    assert 'data-flow-target="writing"' in source
-    assert 'data-flow-target="proposal"' in source
-    assert 'data-flow-target="export"' in source
-    assert "Matrice -> dovezi -> dosar -> redactare -> propunere -> export" in source
+    # The main flow strip became the breadcrumb's status line.
+    assert 'id="main-flow-strip"' not in source
+    assert "Flux principal" not in source
+    assert 'id="main-flow-context" role="status"' in source
 
 
 @pytest.mark.skipif(not shutil.which("node"), reason="Node unavailable")
@@ -469,7 +458,7 @@ def test_first_run_shortcuts_reuse_existing_panels_without_duplicate_forms():
         "assert.equal(navs.find(n=>n.dataset.mainNav==='track').current,'true');"
         "openWorkflowTarget('dossiers');assert.equal(panels['#dossier-library'].open,true);"
         "openWorkflowTarget('rules');assert.equal(panels['#dossier-library'].open,true);"
-        "assert.ok(panels['#first-run-status'].textContent.includes('law-as-code'));"
+        "assert.ok(panels['#first-run-status'].textContent.includes('reguli'));"
         "openWorkflowTarget('status');assert.equal(panels['#source-registry'].open,true);"
         "assert.equal(panels['#source-coverage'].open,true);"
         "openWorkflowTarget('ai');assert.deepEqual(calls.slice(-3),[['tab','matrice'],['scroll','ai-product-flow','start'],['focus','m-q']]);"

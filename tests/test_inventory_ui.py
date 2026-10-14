@@ -10,8 +10,8 @@ import pytest
 def test_daily_workflow_exposes_start_real_project_action():
     html = (Path(__file__).parents[1] / "app/index.html").read_text()
 
-    assert 'id="start-real-project"' in html
-    assert "Start proiect real" in html
+    assert 'id="source-start"' in html
+    assert "Pornește dintr-o sursă publică" in html
     assert 'id="real-workflow-start"' in html
     assert 'id="real-workflow-handoff"' in html
     assert "Sursă publică reală" in html

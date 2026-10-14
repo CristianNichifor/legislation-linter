@@ -736,7 +736,7 @@ BOOT = """
         const note = document.createElement('p'); note.id = 'browser-source-limitations';
         note.className = 'hint'; note.setAttribute('role', 'status');
         note.style.overflowWrap = 'anywhere';
-        note.textContent = 'Acoperire indisponibila pentru sursele optionale: ' + window.browserSourceLabels(window.browserSourceLimitations);
+        note.textContent = 'Acoperire indisponibilă pentru sursele opționale: ' + window.browserSourceLabels(window.browserSourceLimitations);
         document.querySelector('header')?.after(note);
       }
       resolveReady(); return;

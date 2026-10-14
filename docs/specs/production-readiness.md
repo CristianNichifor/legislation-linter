@@ -187,3 +187,28 @@ points the fixtures demo at the data store.
 - API worker route for the rewrite endpoint (LL-8).
 - Civic UI upgrade waits for the civic-ui 0.8 release.
 - Review of the English strings (LL-10) and of the privacy page wording (LL-7).
+- Review of the Romanian copy in the design mockups and the mockup screenshots (LL-DS); hub URL and product name (D-1).
+
+## Theme F: design screens
+
+### LL-DS Target-state screen designs — done (docs)
+
+- Given `docs/design/README.md`, then it indexes five mockups in `docs/design/screens/`
+  (Start, Verifică, Matrice, Dosar, Redactare asistată) and maps each to the user task, the
+  guideline sections, what changes against the live site and implementation notes.
+- Given a mockup, then it is self-contained (inline CSS with the DESIGN.md token values, no
+  scripts, no external requests), shows a desktop and a 390 px layout, uses Romanian with
+  comma-below ș ț, and shows loading staged, empty, error with retry and the status badge.
+- Given data in a mockup, then it comes from `data/real_reviewable_finding.json` or
+  `data/exemplu.json`, or is shown as „—”.
+- Before screenshots of the live Start screen at 1440 and 390 px are committed; mockup
+  screenshots are deferred (no local browser during the fleet run): needs human or a later
+  session.
+- Agent-written Romanian copy in the mockups (consent card, states, filter labels, family bar
+  „Toate proiectele”, „Despre și metodă”): needs human review. The hub URL and the product
+  name (D-1) are a human decision.
+
+Test: `tests/test_design_screens.py` (to add with the implementation): every file named in the
+README exists, has no `ş`/`ţ`, no `<script>` and no `http` request in `src=`/`href` of
+stylesheets or scripts. Acceptance criteria 1–7 in the README become browser tests when the
+screens are implemented.

@@ -334,7 +334,8 @@ test('dataset date and stale warning', async ({ page }) => {
   const stat = page.locator('#stat');
   await expect(stat).toContainText('4 acte');
   // The committed fixtures were captured on this date, more than 30 days ago.
-  await expect(stat).toContainText('date la zi pe 2026-09-05');
+  // Romanian order, as DESIGN.md › Dates asks; ISO stays on the wire.
+  await expect(stat).toContainText('date la zi pe 05.09.2026');
   await expect(page.locator('#stat [data-dataset-stale]')).toBeVisible();
   await expect(page.locator('#stat [data-dataset-stale]')).toContainText('peste 30 de zile');
 });

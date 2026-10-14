@@ -2080,7 +2080,7 @@ function datasetFreshness(dataSet, now=Date.now()){
 function datasetFreshnessHtml(dataSet){
   const f=datasetFreshness(dataSet);
   if(!f) return "";
-  return ` · <span data-dataset-date>date la zi pe <b>${esc(f.date)}</b></span>`
+  return ` · <span data-dataset-date>date la zi pe <b>${esc(isoLaDataRo(f.date)||f.date)}</b></span>`
     +(f.stale?` <span class="stat-vechi" data-dataset-stale role="status">⚠ datele au peste 30 de zile (${nf(f.days)} zile); verifică sursa oficială înainte de concluzii</span>`:"");
 }
 function loadRezumat(){

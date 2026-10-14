@@ -181,6 +181,7 @@ const INTERNAL_TERMS = [
   /law-as-code/i, /\bgate\b/i, /\bruntime/i, /\bpayload/i, /\bhandoff/i, /\btracker\b/i,
   /\bpipeline/i, /\brebuild/i, /\breindex/i, /\bshard/i, /\bSQLite\b/, /\bworkbench\b/i,
   /\bpack\b/i, /AI\/BYOK\/MCP/, /\bgap\b/i, /Reîncarcă/,
+  /law-matrix/, /\b[a-z]+_[a-z_]+\b/, /\bdraft\b/i,
   /\bCauta\b/, /\bFara\b/, /\bversiune noua\b/,
 ];
 
@@ -188,10 +189,14 @@ test('primary copy uses no internal terms', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#stat')).toContainText('acte');
   await expect(page.locator('#tab-matrice')).toHaveAttribute('aria-selected', 'true');
+  // The matrix workspace renders after the engine answers; its copy is part of the default view.
+  await expect(page.locator('[data-law-matrix-workspace-v1]')).toBeVisible();
   const text = await page.locator('body').innerText();
   expect(INTERNAL_TERMS.filter(term => term.test(text)).map(String)).toEqual([]);
   // One navigation, one flow: the panels that restated them are gone from the normal path.
   await expect(page.getByText('Principii de lucru')).toHaveCount(0);
   await expect(page.locator('.civic-workspace-status')).toHaveCount(0);
-  await expect(page.getByText('Flux zilnic pentru lacune și contradicții')).toBeHidden();
+  // The daily flow restates the main flow strip: it stays one click away, collapsed.
+  await expect(page.locator('#legislative-workflow')).not.toHaveAttribute('open', '');
+  await expect(page.locator('#legislative-workflow .daily-flow-steps')).toBeHidden();
 });

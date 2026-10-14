@@ -1123,7 +1123,7 @@ def _matrix_workspace_summary(
         },
         {
             "kind": "filter_tracker",
-            "label": "Vezi trackerul nerevizuit",
+            "label": "Vezi urmărirea nerevizuită",
             "enabled": bool(tracker.get("unreviewed")),
         },
     ]
@@ -1184,7 +1184,7 @@ def _matrix_workspace_summary(
         "actions": actions,
         "next_actions": [
             "Alege un domeniu sau o problemă, apoi deschide rândul cu cele mai multe semnale.",
-            "Pentru fiecare rând, pornește din dovezi și salvează o notă înainte de draft.",
+            "Pentru fiecare rând, pornește din dovezi și salvează o notă înainte de ciornă.",
             "Dacă sursele sunt lipsă sau schimbate, tratează rândul ca incomplet.",
         ],
         "not_legal_verdict": True,

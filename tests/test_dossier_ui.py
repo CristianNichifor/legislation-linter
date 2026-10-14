@@ -360,8 +360,8 @@ def test_first_run_navigation_is_top_level_and_stateful():
     assert "Navigare spații de lucru" in source
     assert "Surse<small>lege, proiect, consultare, CELEX</small>" in source
     assert "Urmărire<small>stadii, comisii, avize, voturi</small>" in source
-    assert "Dovezi exacte" in source
-    assert "Revizie umană" in source
+    # The principles panel restated the navigation and the AI panel; it is gone (LL-5).
+    assert "Principii de lucru" not in source
     assert "Pornește o analiză legislativă" in source
     assert "Aplicația nu dă verdict juridic" in source
     assert "Datele publice și dosarele private sunt separate" in source

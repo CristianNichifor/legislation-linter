@@ -48,8 +48,8 @@ def minimal_html(extra: str = "") -> str:
   <p>Ultima verificare salvată pentru fiecare rulare.</p>
 </section>
 <section>
-  <p>AI/MCP este explicit: BYOK sau handoff aprobat.</p>
-  <p>Cheile API rămân doar în sesiunea browserului. confirmare explicită necesară</p>
+  <p>BYOK: cheia rămâne în sesiunea browserului. MCP: aprobi explicit.</p>
+  <p>Rezultatul este ciornă nerevizuită.</p>
 </section>
 <section>
   <p>candidați, nu verdict juridic. Aplicabilitatea cere revizie umană și necesită jurist.</p>
@@ -173,7 +173,7 @@ def test_technical_provenance_terms_are_allowed_in_machine_detail_areas(tmp_path
 
 
 def test_missing_source_and_ai_copy_block(tmp_path):
-    html = minimal_html().replace("Acoperirea surselor", "Surse").replace("handoff aprobat", "")
+    html = minimal_html().replace("Acoperirea surselor", "Surse").replace("aprobi explicit", "")
     write_fixture(tmp_path, html, ADAPTER)
 
     out = ux_acceptance.report(tmp_path)

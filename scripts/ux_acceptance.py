@@ -334,11 +334,10 @@ def report(root: Path | None = None) -> dict:
         )
 
     ai_needles = (
-        "AI/MCP este explicit",
-        "handoff aprobat",
         "BYOK",
-        "Cheile API rămân doar în sesiunea browserului",
-        "confirmare explicită necesară",
+        "cheia rămâne în sesiunea browserului",
+        "aprobi explicit",
+        "ciornă nerevizuită",
     )
     missing_ai = _missing_needles(html_text, ai_needles)
     if missing_ai:

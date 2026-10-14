@@ -441,6 +441,8 @@
   .manual-note-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.4rem;margin:.55rem 0}
   .manual-note-summary button{text-align:left;white-space:normal;overflow-wrap:anywhere}
   .daily-workflow{border-block:1px solid var(--rule);padding:.7rem 0;margin:.2rem 0 .9rem}
+  .daily-workflow summary{cursor:pointer}
+  .daily-workflow summary h3{display:inline}
   .daily-workflow h3{font-size:1rem;margin:.1rem 0 .25rem}
   .daily-workflow-status{border-left:3px solid var(--material);padding:.35rem .55rem;background:var(--surface);
     font-size:.78rem;margin:.45rem 0}
@@ -720,12 +722,6 @@
   .workflow-nav button:hover{border-color:var(--accent);background:var(--accent-wash);color:var(--ink)}
   .workflow-nav button[aria-current="true"]{border-left-color:var(--accent);color:var(--ink)}
   .workflow-nav button[aria-current="true"] small{color:var(--ink-mid)}
-  .civic-workspace-status{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr));
-    gap:.5rem;margin:0 0 1rem;font-family:var(--sans)}
-  .civic-workspace-status span{border:1px solid var(--rule-soft);border-radius:var(--r1);
-    background:var(--surface);padding:.55rem .65rem;min-height:3.2rem;font-size:.76rem;color:var(--ink-mid)}
-  .civic-workspace-status b{display:block;font-size:.64rem;text-transform:uppercase;
-    letter-spacing:.08em;color:var(--ink-mute);margin-bottom:.12rem}
   /* pinned to the top-right of the tab strip, so it never orphans onto its own line when the tabs
      wrap on a narrow viewport */
   .tema{background:transparent;border:1px solid var(--rule);
@@ -1313,17 +1309,10 @@
     <button type="button" data-main-nav="track">Urmărire<small>stadii, comisii, avize, voturi</small></button>
     <button type="button" data-main-nav="matrix" aria-current="true">Matrice<small>lacune și contradicții</small></button>
     <button type="button" data-main-nav="dossiers">Dosare<small>lucru privat local</small></button>
-    <button type="button" data-main-nav="ai">Redactare<small>ciorne, AI/BYOK/MCP</small></button>
-    <button type="button" data-main-nav="rules">Reguli<small>law-as-code revizuibil</small></button>
-    <button type="button" data-main-nav="status">Stadiu<small>gate produs și limitări</small></button>
+    <button type="button" data-main-nav="ai">Redactare<small>ciorne din dovezi, AI opțional</small></button>
+    <button type="button" data-main-nav="rules">Reguli<small>reguli verificabile, revizuite</small></button>
+    <button type="button" data-main-nav="status">Stadiu<small>acoperire și limitări</small></button>
   </nav>
-  <section class="civic-workspace-status" aria-label="Principii de lucru">
-    <span><b>Surse publice</b>Actualitate, lipsuri și limitări vizibile înainte de concluzii.</span>
-    <span><b>Dosare private</b>Notele, ciornele și backupurile rămân în spațiul local.</span>
-    <span><b>Dovezi exacte</b>Fiecare constatare păstrează URL, citat, locator și hash când există.</span>
-    <span><b>Revizie umană</b>AI/MCP este explicit: BYOK sau handoff aprobat; confirmare explicită necesară.</span>
-    <span><b>Chei private</b>Cheile API rămân doar în sesiunea browserului; ciornele rămân nerevizuite.</span>
-  </section>
   <section class="main-flow-strip" id="main-flow-strip" aria-labelledby="main-flow-title">
     <h2 id="main-flow-title">Flux principal</h2>
     <p class="main-flow-context" id="main-flow-context" role="status">
@@ -1526,8 +1515,8 @@
       </div>
 
       <div id="pane-matrice" role="tabpanel" aria-labelledby="tab-matrice">
-        <section class="daily-workflow" id="legislative-workflow" aria-labelledby="legislative-workflow-title">
-          <h3 id="legislative-workflow-title">Flux zilnic pentru lacune și contradicții</h3>
+        <details class="daily-workflow" id="legislative-workflow">
+          <summary><h3 id="legislative-workflow-title">Flux zilnic pentru lacune și contradicții</h3></summary>
           <p class="daily-workflow-status" id="legislative-workflow-status" role="status">
             Următorul pas: caută și deschide sursa oficială, apoi păstrează constatarea în dosarul local.
           </p>
@@ -1542,7 +1531,7 @@
             <button type="button" class="ghost mini" data-workflow-open-search>Caută sursă</button>
             <button type="button" class="ghost mini" data-workflow-open-matrix>Filtrează matricea</button>
             <button type="button" class="ghost mini" data-workflow-open-dossier>Dosar local</button>
-            <button type="button" class="ghost mini" data-workflow-open-note>Notă gap/UE</button>
+            <button type="button" class="ghost mini" data-workflow-open-note>Notă lacună/UE</button>
             <button type="button" class="ghost mini" data-workflow-open-draft>Ciornă amendament</button>
             <button type="button" class="ghost mini" id="start-real-project">Start proiect real</button>
             <button type="button" class="ghost mini" data-workflow-open-export>Export</button>
@@ -1555,10 +1544,10 @@
             <p class="hint" id="real-workflow-status" role="status"></p>
           </form>
           <div id="real-workflow-handoff"></div>
-        </section>
+        </details>
         <section class="source-inventory" aria-labelledby="source-title">
           <div class="source-heading"><h3 id="source-title">Acoperirea surselor</h3><div class="source-actions">
-            <button type="button" class="ghost mini" id="source-refresh">Reîncarcă inventarul</button>
+            <button type="button" class="ghost mini" id="source-refresh">Reîmprospătează inventarul</button>
             <button type="button" class="ghost mini" id="source-export" disabled data-disabled-reason="Exportul devine disponibil după încărcarea inventarului de surse.">Exportă JSON</button>
           </div></div>
           <p id="source-status" class="hint" role="status">Inventar neîncărcat.</p>
@@ -1668,9 +1657,9 @@
             Alege o dovadă din matrice sau din dosar. AI poate pregăti promptul local, BYOK sau MCP numai ca ciornă nerevizuită.
           </p>
           <div class="matrix-stats">
-            <div class="matrix-stat"><b>local</b><span>rulează fără cost extern când runtime-ul local este disponibil</span></div>
+            <div class="matrix-stat"><b>local</b><span>rulează pe dispozitiv, fără cost extern, când modelul local este disponibil</span></div>
             <div class="matrix-stat"><b>BYOK</b><span>cheia rămâne în sesiunea browserului, fără salvare sau export</span></div>
-            <div class="matrix-stat"><b>MCP</b><span>payload previzualizat, aprobare explicită, audit înainte de rezultat</span></div>
+            <div class="matrix-stat"><b>MCP</b><span>vezi ce se trimite, aprobi explicit, apelul rămâne în jurnal</span></div>
           </div>
           <p class="hint">Cost server zero. Fără chei salvate/exportate. Ieșirea este ciornă nerevizuită, nu verdict juridic, și trebuie să citeze dovezile selectate.</p>
           <div class="dossier-actions">
@@ -1800,7 +1789,7 @@
           </select>
           <select id="m-lifecycle-state" title="Filtrează sumarul după etapa procedurală" aria-label="Filtrează sumarul după etapa procedurală">
             <option value="">toate etapele</option>
-            <option value="tracker_unreviewed">tracker nerevizuit</option>
+            <option value="tracker_unreviewed">urmărire nerevizuită</option>
             <option value="published_monitor">publicare Monitor</option>
             <option value="consultation">consultări</option>
             <option value="parliament">procedură parlamentară</option>
@@ -6455,7 +6444,7 @@ function gapWorkflowHtml(data){
     +step('source',!!s.total,'1. Sursă deschisă',s.total?'Constatarea are dosar':'Caută act/proiect/CELEX')
     +step('note',!!s.total,'2. Notă manuală',s.total?`${s.total} note salvate`:'Lacună, contradicție sau risc UE')
     +step('evidence',s.evidence>0,'3. Dovezi atașate',s.evidence?`${s.evidence} note au citate/surse`:'Adaugă citat, locator, sursă')
-    +step('draft',s.ready>0||s.reviewed>0,'4. Ciornă propunere',s.reviewed?`${s.reviewed} revizuite/rezolvate`:(s.ready?`${s.ready} pregătite`:'Revizie umană înainte de draft'))
+    +step('draft',s.ready>0||s.reviewed>0,'4. Ciornă propunere',s.reviewed?`${s.reviewed} revizuite/rezolvate`:(s.ready?`${s.ready} pregătite`:'Revizie umană înainte de ciornă'))
     +step('export',s.reviewed>0,'5. Export',s.reviewed?'Exportă revizia salvată':'Alege propunerea sau analiza')
     +'</ol><div class="dossier-actions">'
     +'<button type="button" class="ghost mini" data-gap-flow-new-note>Notă nouă</button>'
@@ -6623,7 +6612,7 @@ async function loadManualNotes(dossierId,offset=0){
     host.querySelectorAll('[data-edit-note]').forEach(button=>button.onclick=()=>{MANUAL_NOTES_UI.editing=data.note[Number(button.closest('[data-note-index]').dataset.noteIndex)];loadManualNotes(dossierId,offset);});
     host.querySelectorAll('[data-note-draft-selected]').forEach(button=>button.onclick=()=>{
       const note=data.note[Number(button.closest('[data-note-index]').dataset.noteIndex)];
-      if(!manualNoteDraftReady(note)){host.querySelector('[data-note-list-status]').textContent='Nota are nevoie de citat și URL sau SHA-256 înainte de draft.';return;}
+      if(!manualNoteDraftReady(note)){host.querySelector('[data-note-list-status]').textContent='Nota are nevoie de citat și URL sau SHA-256 înainte de ciornă.';return;}
       MANUAL_NOTES_UI.editing=note;MANUAL_NOTES_UI.draft={task:'issue_note'};loadManualNotes(dossierId,offset);
     });
     host.querySelectorAll('[data-copy-note-export]').forEach(button=>button.onclick=async()=>{
@@ -7648,7 +7637,7 @@ function sourceInventoryHtml(d){
   return h;
 }
 function sourceFreshnessWarningItems(d){
-  if(!d) return [{key:'unknown',label:'Inventar surse',message:'Inventarul surselor locale nu este încărcat.',detail:'Inventar neîncărcat',action:'Reîncarcă inventarul surselor înainte de concluzia juridică.'}];
+  if(!d) return [{key:'unknown',label:'Inventar surse',message:'Inventarul surselor locale nu este încărcat.',detail:'Inventar neîncărcat',action:'Reîmprospătează inventarul surselor înainte de concluzia juridică.'}];
   if(d.mod==='static') return [{key:'static',label:'Inventar surse',message:'Inventarul bazei locale nu este disponibil în versiunea statică.',detail:'Rulează aplicația locală pentru inventar complet al surselor.',action:'Folosește aplicația locală pentru analiză cu inventar complet.'}];
   const states={disponibil:'bază accesibilă',partial:'date parțiale',lipsa:'bază lipsă',inaccesibil:'bază inaccesibilă'};
   const items=[];
@@ -9972,7 +9961,7 @@ function mWorkspaceDailyBuckets(workspace){
     ["source","surse schimbate",s.source_attention||0,"verifică impactul înainte de redactare"],
     ["eu","risc UE",s.eu_risks||0,"compară cu CELEX/Cellar importat"],
     ["draft","gata de redactare",s.manual_notes||0,"pornește notă sau propunere din dovezi"],
-    ["rules","reguli candidate",s.rule_candidates||0,"structurează law-as-code pentru revizie"]
+    ["rules","reguli candidate",s.rule_candidates||0,"structurează reguli verificabile pentru revizie"]
   ];
 }
 function mWorkspaceDailyBucketsHtml(workspace){
@@ -10112,12 +10101,13 @@ function mWorkspacePanelHtml(workspace){
   ).join("");
   return `<div class="matrix-workspace" data-law-matrix-workspace-v1>`
     +`<div class="matrix-workspace-head"><div><div class="parc-h">Matrice zilnică de lucru</div>`
-    +`<p class="hint">${esc(workspace.contract||"law-matrix-workspace-v1")} · ${esc(payload.contract||"law-matrix-workspace-v2")} · ${esc(workspace.status||"needs_sources")} · ${esc(filterBits)}</p></div>`
+    // The contract ids and status are provenance for whoever inspects the page, not reading copy.
+    +`<p class="hint" data-matrix-contract="${esc(workspace.contract||"law-matrix-workspace-v1")} · ${esc(payload.contract||"law-matrix-workspace-v2")} · ${esc(workspace.status||"needs_sources")}">${esc(filterBits)}</p></div>`
     +`<span class="matrix-workspace-badge">candidați, nu verdict juridic</span></div>`
     +`<p class="hint">Pornește de aici: alege un candidat, verifică dovezile, salvează în dosar, apoi redactează sau creează o regulă candidată.</p>`
     +`<div class="matrix-workspace-section" data-matrix-workspace-path><h5>Lucru pe un rând</h5><p class="hint">Dovezi → notă în dosar → redactare/propunere → regulă candidată. Lipsa dovezii rămâne blocaj, nu rezultat gol.</p></div>`
     +mWorkspaceDailyBucketsHtml(workspace)
-    +`<div class="matrix-stats">${stat("rânduri de lucru",s.ready_rows||s.rows)}${stat("surse lipsă",s.missing_source_rows)}${stat("note manuale",s.manual_notes)}${stat("candidați reguli",s.rule_candidates)}${stat("tracker nerevizuit",s.tracker_unreviewed)}${stat("surse cu atenție",s.source_attention)}</div>`
+    +`<div class="matrix-stats">${stat("rânduri de lucru",s.ready_rows||s.rows)}${stat("surse lipsă",s.missing_source_rows)}${stat("note manuale",s.manual_notes)}${stat("candidați reguli",s.rule_candidates)}${stat("urmărire nerevizuită",s.tracker_unreviewed)}${stat("surse cu atenție",s.source_attention)}</div>`
     +`<div class="matrix-stats">${stat("coadă totală",counts.total)}${stat("cu dovezi",byState["evidence-backed"])}${stat("de completat",byState["missing-source"])}${stat("de revizuit",byState["needs-review"])}</div>`
     +`<div class="matrix-drilldown-actions">${actions}</div>`
     +`<div class="parc-h">Coadă zilnică de lucru</div>`

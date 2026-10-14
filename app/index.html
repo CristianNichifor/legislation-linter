@@ -1466,6 +1466,9 @@
             <input id="ai-endpoint" class="ai-endpoint" type="text" placeholder="endpoint furnizor"
               title="Endpointul furnizorului tău. Pentru Worker propriu folosește /api/rewrite."
               aria-label="Endpointul furnizorului online" style="display:none">
+            <input id="ai-timeout" class="ai-model" type="number" min="5" max="120" step="1" placeholder="secunde"
+              title="Câte secunde aștepți răspunsul furnizorului online (5–120)."
+              aria-label="Așteptare răspuns furnizor, în secunde" style="display:none">
             <span class="hint" id="ai-sug" style="display:none"></span>
             <span class="hint" id="ai-nota"></span>
             <span class="hint" id="ai-contract"></span>
@@ -3914,6 +3917,12 @@ function aiUnifiedDraftPanelHtml(label='dovezi selectate'){
 }
 let _onlineOk=false;
 const AI_BYOK_TIMEOUT_MS=45000;
+// The user may shorten or lengthen the wait for an online provider; the bounds stay 5–120 s.
+function aiByokTimeoutMs(){
+  let s=NaN; try{ s=Number(localStorage.getItem("ai_timeout_s")); }catch(e){}
+  if(!Number.isFinite(s)||s<=0) return AI_BYOK_TIMEOUT_MS;
+  return Math.max(5000,Math.min(120000,Math.round(s*1000)));
+}
 // online sends text off the device; confirm once before doing that with the user's OWN text
 function okOnlinePrivat(){
   if(_onlineOk) return true;
@@ -3928,8 +3937,8 @@ function aiByokTimeoutError(ms){
   e.name="AbortError"; e.code="AI_BYOK_TIMEOUT"; e.timeout_ms=ms; return e;
 }
 function aiRequestTimeoutMs(opt){
-  const n=Number(opt&&opt.timeout_ms||AI_BYOK_TIMEOUT_MS);
-  return Math.max(5000,Math.min(120000,Number.isFinite(n)?n:AI_BYOK_TIMEOUT_MS));
+  const n=Number(opt&&opt.timeout_ms||aiByokTimeoutMs());
+  return Math.max(5000,Math.min(120000,Number.isFinite(n)?n:aiByokTimeoutMs()));
 }
 async function aiJson(ep, init, opt){
   opt=opt||{};
@@ -4051,8 +4060,12 @@ async function sugereazaModel(){
 }
 (function(){
   const mode=$("#ai-mode"), prov=$("#ai-provider"), sel=$("#ai-model"), selO=$("#ai-model-online"),
-        key=$("#ai-key"), ep=$("#ai-endpoint"), sug=$("#ai-sug"), nota=$("#ai-nota"), contract=$("#ai-contract");
+        key=$("#ai-key"), ep=$("#ai-endpoint"), sug=$("#ai-sug"), nota=$("#ai-nota"), contract=$("#ai-contract"),
+        wait=$("#ai-timeout");
   if(!mode) return;
+  if(wait){ wait.value=String(Math.round(aiByokTimeoutMs()/1000));
+    wait.oninput=()=>{ try{ const s=Number(wait.value);
+      if(Number.isFinite(s)&&s>0) localStorage.setItem("ai_timeout_s",String(s)); else localStorage.removeItem("ai_timeout_s"); }catch(e){} }; }
   if(sel){
     sel.innerHTML=MODELE.map(m=>`<option value="${m.id}">${m.et}</option>`).join("");
     let salvat; try{ salvat=localStorage.getItem("ai_model"); }catch(e){}
@@ -4084,6 +4097,7 @@ async function sugereazaModel(){
     if(prov){ prov.style.display=m==="online"?"":"none"; }
     if(selO){ selO.style.display=m==="online"?"":"none"; }
     if(ep){ ep.style.display=m==="online"?"":"none"; }
+    if(wait){ wait.style.display=m==="online"?"":"none"; }
     if(key){ key.style.display=(m==="online"&&aiProv().cheie)?"":"none"; }
     if(nota){ nota.textContent=m==="local"
       ?"rulează în browser · textul nu pleacă nicăieri"
@@ -5904,7 +5918,7 @@ function aiDraftExecutionRequest(plan,boundary){
     stores_api_key:false,
     key_storage:settings.key_storage,
     prompt_scope:'selected_evidence_only',
-    timeout_ms:AI_BYOK_TIMEOUT_MS,
+    timeout_ms:aiByokTimeoutMs(),
     retry_policy:aiByokRetryPolicy(),
     provider_failure_contract:'ai-byok-provider-failure-v1',
     requires_explicit_user_action:true,
@@ -5936,8 +5950,8 @@ function aiByokFailureCode(error,response){
   if(response?.failure_code&&AI_BYOK_FAILURES[response.failure_code])return response.failure_code;
   const raw=[error?.code,error?.name,error?.status,error?.statusCode,error?.message,response?.error,response?.status]
     .filter(v=>v!==undefined&&v!==null).join(' ').toLowerCase();
-  if(/\b(timeout|timed?out|abort|aborted)\b/.test(raw))return 'timeout';
-  if(/\b(401|403|unauthori[sz]ed|forbidden|auth|api.?key|bad.?key|invalid.?key)\b/.test(raw))return 'bad_key';
+  if(/timeout|timed.?out|abort/.test(raw))return 'timeout';   // codes like AI_BYOK_TIMEOUT have no word boundary
+  if(/\b(401|403|unauthori[sz]ed|forbidden|auth|api.?key|bad.?key|invalid.?key|no.?key|cheia api)\b/.test(raw))return 'bad_key';
   if(/\b(429|quota|rate.?limit|too many requests|insufficient_quota)\b/.test(raw))return 'quota';
   if(/\b(refusal|refused|safety|content_filter|policy)\b/.test(raw))return 'refusal';
   if(/\b(502|503|504|unavailable|network|fetch failed|failed to fetch|econnrefused|dns)\b/.test(raw))return 'provider_unavailable';
@@ -6001,6 +6015,14 @@ async function aiRunEvidenceDraft(plan,boundary,prog){
   const mode=aiMode();
   if(boundary==='mcp_handoff')throw new Error('Pentru MCP folosește previzualizarea și copierea payloadului MCP.');
   if(boundary==='online_byok'&&mode!=='online')throw new Error('Limită aleasă: online BYOK. Comută setările AI pe online și introdu cheia în sesiune.');
+  if(boundary==='online_byok'){
+    // No key in the session: fail before asking for consent, so nothing is approved for nothing.
+    const online=aiSettings().online_byok||{};
+    if(online.requires_api_key&&!online.api_key_present){
+      const missing=new Error('Introdu cheia API pentru furnizorul online ales.'); missing.code='AI_BYOK_NO_KEY';
+      return aiByokFailureResult(plan,boundary,aiDraftExecutionRequest(plan,boundary),missing,null);
+    }
+  }
   const approvalPacket=aiExternalApproval(plan,boundary);
   if(!confirmAiExternalApproval(approvalPacket))throw new Error('Anulat — promptul nu a fost trimis.');
   const request=aiDraftExecutionRequest(plan,boundary);
@@ -6020,7 +6042,7 @@ async function aiRunEvidenceDraft(plan,boundary,prog){
     };
   }
   let answer;
-  try{answer=await aiComplete(plan.prompt,plan.system,{privat:false,prog,timeout_ms:AI_BYOK_TIMEOUT_MS});}
+  try{answer=await aiComplete(plan.prompt,plan.system,{privat:false,prog,timeout_ms:aiByokTimeoutMs()});}
   catch(err){return aiByokFailureResult(plan,boundary,request,err,null);}
   if(answer?.failure_code||answer?.error||answer?.refusal||answer?.safety_refusal){
     return aiByokFailureResult(plan,boundary,request,null,answer);

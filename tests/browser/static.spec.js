@@ -282,6 +282,13 @@ test('engine timeout, progress and cancel', async ({ page, context, browserName 
   await page.locator('#draft').fill('In termen de 30 de zile, Guvernul aproba normele metodologice.');
   await page.locator('#go').click();
   await expect(page.locator('#lint-out')).toContainText('Pornesc motorul');
+  // Design screen 02: three named steps on a progress bar in a live region, the first one current.
+  const progress = page.locator('#lint-out [role="progressbar"]');
+  await expect(progress).toHaveAttribute('aria-valuemax', '3');
+  await expect(progress).toHaveAttribute('aria-valuenow', '0');
+  await expect(page.locator('#lint-out .lint-steps li')).toHaveText(['Pornesc motorul', 'Verific textul', 'Caut actele atinse']);
+  await expect(page.locator('#lint-out .lint-steps li.now')).toHaveText('Pornesc motorul');
+  await expect(page.locator('#lint-out [aria-live="polite"]')).toContainText('Dacă durează peste 20 s');
   await page.locator('#lint-out [data-lint-cancel]').click();
   await expect(page.locator('#lint-out')).toContainText('Verificare anulată');
   await expect(page.locator('#go')).toBeEnabled();

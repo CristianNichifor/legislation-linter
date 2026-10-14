@@ -141,3 +141,42 @@ for (const width of [390, 1440]) {
     await page.screenshot({ path: info.outputPath(`local-${width}.png`), fullPage: true });
   });
 }
+
+test('reduced motion and forced colours keep state visible', async ({ page, browserName }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await expect(page.locator('#tab-matrice')).toBeVisible();
+  const motion = await page.evaluate(() => {
+    const spin = document.createElement('span');
+    spin.className = 'spin';
+    document.body.append(spin);
+    const result = {
+      animation: getComputedStyle(spin).animationName,
+      scroll: getComputedStyle(document.documentElement).scrollBehavior,
+    };
+    spin.remove();
+    return result;
+  });
+  expect(motion.animation).toBe('none');
+  expect(motion.scroll).toBe('auto');
+
+  const declaresForcedColours = await page.evaluate(() =>
+    [...document.styleSheets].some(sheet => {
+      try {
+        return [...sheet.cssRules].some(rule => rule.conditionText?.includes('forced-colors'));
+      } catch { return false; }
+    })
+  );
+  expect(declaresForcedColours).toBe(true);
+
+  if (browserName === 'webkit') return; // WebKit does not implement forced-colors emulation.
+  await page.emulateMedia({ forcedColors: 'active' });
+  const active = page.locator('.tab[aria-selected="true"]');
+  await expect(active).toBeVisible();
+  const border = await active.evaluate(el => {
+    const style = getComputedStyle(el);
+    return { width: style.borderBottomWidth, color: style.borderBottomColor };
+  });
+  expect(border.width).toBe('3px');
+  expect(border.color).not.toBe('rgba(0, 0, 0, 0)');
+});

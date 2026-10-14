@@ -245,3 +245,22 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Forced-colours mode (Windows high contrast): the system palette drops our colours, so
+   state must survive as borders. The active tab keeps a visible rail, focus keeps a ring,
+   and cards, badges and details keep an edge (ux-guidelines §6, D-6). */
+@media (forced-colors: active) {
+  .civic-legislativ .tab[aria-selected="true"] {
+    border-bottom: 3px solid Highlight;
+  }
+  .civic-legislativ :focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+  .civic-legislativ .card,
+  .civic-legislativ .badge,
+  .civic-legislativ details,
+  .civic-legislativ [role="tablist"] {
+    border: 1px solid CanvasText;
+  }
+}

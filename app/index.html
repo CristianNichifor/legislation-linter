@@ -6855,8 +6855,11 @@ async function loadManualNotes(dossierId,offset=0){
       e.preventDefault();if(!form.reportValidity())return;
       const missing=manualNoteSelfReviewMissing(form);
       if(missing.length){saveStatus.textContent='Nu marca nota auto-revizuită fără: '+missing.join(', ')+'.';return;}
+      // Read the form before locking it: a disabled control is left out of FormData, and the
+      // payload built after the lock reached the store with every field missing („Cerere invalidă”).
+      const payload=manualNotePayload(form,dossierId,MANUAL_NOTES_UI.editing);
       const controls=[...form.elements];controls.forEach(c=>c.disabled=true);saveStatus.textContent='Salvez nota…';
-      try{const saved=await dossierApi('/api/dosare/note',manualNotePayload(form,dossierId,MANUAL_NOTES_UI.editing));MANUAL_NOTES_UI.editing=saved;await loadManualNotes(dossierId,0);}
+      try{const saved=await dossierApi('/api/dosare/note',payload);MANUAL_NOTES_UI.editing=saved;await loadManualNotes(dossierId,0);}
       catch(err){saveStatus.textContent=err.message+' Reîncarcă nota dacă a fost modificată în altă fereastră.';controls.forEach(c=>c.disabled=false);}
     };
   }catch(err){if(valid()){host.innerHTML='<details class="manual-notes" open><summary>Note manuale</summary><p role="status">'+esc(err.message)+'</p><button type="button" class="ghost mini" data-notes-retry>Reîncearcă notele</button></details>';host.querySelector('[data-notes-retry]').onclick=()=>loadManualNotes(dossierId,offset);}}

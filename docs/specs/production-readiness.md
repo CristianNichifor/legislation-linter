@@ -223,6 +223,9 @@ screens are implemented.
   list re-renders; „Auto-revizuită” and „Rezolvată” are refused, with the missing items named,
   when the note lacks quote, source or reasoning (same rule as the form).
 - Given the finding, then it prints no verdict word (legal, ilegal, conform, constituțional).
+- Given the note form, when „Salvează nota” is pressed, then the note is stored: the payload is
+  read before the controls are locked (a disabled control is left out of FormData, so the old
+  order sent every field empty and the store answered „Cerere invalidă”).
 
-Tests: `tests/browser/dossier.spec.js` (static suite); `tests/test_dossier_ui.py` (renderer
-escaping, node harness).
+Tests: `tests/browser/dossier.spec.js` (static suite; the first test is also the regression test
+for the save); `tests/test_dossier_ui.py` (renderer escaping, node harness).

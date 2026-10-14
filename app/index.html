@@ -1233,6 +1233,7 @@
   }
   .cons-bar{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;margin:.5rem 0 .2rem}
 
+  .stat-vechi{display:inline-block;margin-top:.2rem;color:var(--blocking);font-weight:600}
   .lint-progress{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-family:var(--sans);font-size:.85rem;margin:.6rem 0}
   .spin{display:inline-block;width:.9rem;height:.9rem;border:2px solid var(--rule);
     border-top-color:var(--accent);border-radius:50%;animation:s .7s linear infinite;vertical-align:-1px}
@@ -2061,6 +2062,21 @@ async function apiJson(response){
   if(!response.ok) throw new Error(data.error||response.statusText||("HTTP "+response.status));
   return data;
 }
+// How old the dataset is, from the date the build stamped into manifest.json. Past 30 days the
+// header says so: absence of a finding in old data is not absence of a problem.
+function datasetFreshness(dataSet, now=Date.now()){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(dataSet||""))) return null;
+  const at=Date.parse(dataSet+"T00:00:00Z");
+  if(Number.isNaN(at)) return null;
+  const days=Math.floor((now-at)/86400000);
+  return {date:dataSet, days, stale:days>30};
+}
+function datasetFreshnessHtml(dataSet){
+  const f=datasetFreshness(dataSet);
+  if(!f) return "";
+  return ` · <span data-dataset-date>date la zi pe <b>${esc(f.date)}</b></span>`
+    +(f.stale?` <span class="stat-vechi" data-dataset-stale role="status">⚠ datele au peste 30 de zile (${nf(f.days)} zile); verifică sursa oficială înainte de concluzii</span>`:"");
+}
 function loadRezumat(){
 fetch("/api/rezumat").then(apiJson).then(d=>{
   // How much of the corpus is actually structured, not just how much of it there is. An unenriched
@@ -2083,7 +2099,7 @@ fetch("/api/rezumat").then(apiJson).then(d=>{
       + ` intră în socoteală — nu au articole de parsat.">`
       + `<b>${nf(structurate)}</b> cu articole `
       + `(${proc > 0 && proc < 1 ? "&lt;1" : Math.round(proc)}%)</span>` : ``)
-    + ue;
+    + ue + datasetFreshnessHtml(d.data_set);
 }).catch(err=>{
   const stat=$("#stat");
   stat.textContent=engineFailed(err.message)?ENGINE_FAILED+" ":"Date indisponibile: "+(err.message||"eroare")+" ";

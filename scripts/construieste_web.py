@@ -65,6 +65,9 @@ CURATE = ["lege-98-2016", "lege-99-2016", "lege-100-2016", "lege-24-2000", "oug-
 # 150 KB an act once structured, so this is the size dial for the published build.
 N_ACTE = 400
 N_INITIATIVE = 300
+# When the committed `sources/` fixtures were captured (their last change). The demo shows this as
+# its dataset date, so it reads as old data rather than as fresh data built today.
+FIXTURI_DATA_SET = "2026-09-05"
 
 # The privacy boundary, made a rule the page obeys rather than a claim it makes. `connect-src` is the
 # load-bearing line: deterministic checks can reach only this origin and the Pyodide/WebLLM assets.
@@ -1279,6 +1282,34 @@ def _fara_bazele_din_depozit() -> list[str]:
     return scoase
 
 
+def _stampileaza_data_setului(*, sursa: str, depozit: str) -> None:
+    """Record in `manifest.json` which date the dataset describes, for the header's freshness line.
+
+    The data store prefix is the dataset's date; a downloaded release names its own; the fixtures
+    carry their capture date. Anything else gets no date rather than an invented one.
+    """
+    manifest = DATA / "manifest.json"
+    if not manifest.is_file():
+        return
+    date = json.loads(manifest.read_text(encoding="utf-8"))
+    date.pop("data_set", None)
+    zi = None
+    potrivire = (
+        re.search(r"/(\d{4}-\d{2}-\d{2})(?:[-/]|$)", urlparse(depozit).path) if depozit else None
+    )
+    release = DATA / "dataset-release.json"
+    if potrivire:
+        zi = potrivire.group(1)
+    elif release.is_file():
+        eticheta = str(json.loads(release.read_text(encoding="utf-8")).get("release", ""))
+        zi = eticheta[:10] if re.fullmatch(r"\d{4}-\d{2}-\d{2}", eticheta[:10]) else None
+    elif sursa == "fixturi":
+        zi = FIXTURI_DATA_SET
+    if zi:
+        date["data_set"] = zi
+    manifest.write_text(json.dumps(date, ensure_ascii=False), encoding="utf-8")
+
+
 def _versiune_si_sw() -> str:
     """Version the runtime and public catalogs without scanning the monolithic corpus."""
     manifest = DATA / "manifest.json"
@@ -1580,6 +1611,7 @@ def main(
     _pagina(depozit, felii_cautare, channel=channel, allow_loopback=allow_loopback)
     if depozit:
         _fara_bazele_din_depozit()
+    _stampileaza_data_setului(sursa=sursa, depozit=depozit)
     _versiune_si_sw()
     print("gata. servește cu:  uv run python -m http.server -d web 8080")
 

@@ -326,6 +326,11 @@ def rezumat(stare: Stare) -> dict:
             r = depozit.rezumat(con)
     with depozit.deschide(stare.initiative, readonly=True) as con:
         r["initiative"] = depozit.rezumat(con)["initiative"]
+    # The dataset's own date, stamped at build time; the header warns when it is old.
+    if cale is not None and cale.is_file():
+        data_set = json.loads(cale.read_text(encoding="utf-8")).get("data_set")
+        if data_set:
+            r["data_set"] = data_set
     r |= _rezumat_ue(stare)
     return r
 

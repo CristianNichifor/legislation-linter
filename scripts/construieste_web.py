@@ -79,7 +79,7 @@ CSP = (
     #  · `api.openai.com` / `api.anthropic.com` — explicit BYOK rewrite providers;
     #  · `*.workers.dev` — a user-owned Worker rewrite endpoint;
     #  · `projects.cristian-nichifor.com` — the project's own rewrite Worker, the "Worker propriu"
-    #    default; the app is also served from GitHub Pages, where it is not 'self';
+    #    default; listed so a build served from another origin (pages.dev) still reaches it;
     #  · huggingface.co / hf.co — WebLLM's on-device model weights, for the opt-in local AI. The
     #    provision text stays on the device; only the model is downloaded.
     "connect-src 'self' https://cdn.jsdelivr.net https://esm.run https://api.openai.com "

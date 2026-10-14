@@ -279,3 +279,40 @@ test('engine timeout, progress and cancel', async ({ page, context, browserName 
   await expect(page.locator('#stat')).not.toContainText('se încarcă');
   await expect(page.locator('#stat')).toContainText('Motorul nu a pornit');
 });
+
+test.describe('form', () => {
+test.use({ viewport: { width: 1440, height: 900 } });
+test('form labels, target size and check-first layout', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'One engine is enough for the rule set.');
+  test.setTimeout(240_000);
+  await page.goto('/');
+  await expect(page.locator('#stat')).toContainText('acte');
+  await page.addScriptTag({ path: AXE });
+  const hashes = ['matrice', 'start', 'verifica', 'cauta', 'dosare', 'surse', 'redactare', 'setari',
+    'consolidat', 'conexiuni', 'parlamentari', 'domenii', 'ue', 'supraveghere'];
+  const problems = [];
+  for (const hash of hashes) {
+    await page.evaluate(value => { location.hash = value; }, hash);
+    await page.waitForTimeout(800);
+    const result = await page.evaluate(() => globalThis.axe.run(document, {
+      runOnly: ['label', 'select-name', 'button-name', 'link-name', 'target-size'],
+      resultTypes: ['violations'],
+    }));
+    for (const violation of result.violations) {
+      problems.push(`${hash}: ${violation.id} ${violation.nodes.map(node => node.target.join(' ')).join(', ')}`);
+    }
+    // A text field without the app's field style renders as a raw browser widget.
+    const raw = await page.evaluate(() => [...document.querySelectorAll(
+      'input:not([type]),input[type=text],input[type=search],input[type=url],input[type=number],input[type=date],textarea')]
+      .filter(field => field.offsetParent !== null && parseFloat(getComputedStyle(field).paddingLeft) < 4)
+      .map(field => field.name || field.id || field.className));
+    if (raw.length) problems.push(`${hash}: unstyled ${raw.join(', ')}`);
+  }
+  expect(problems).toEqual([]);
+  await page.evaluate(() => { location.hash = 'verifica'; });
+  for (const selector of ['#draft', '#go']) {
+    const box = await page.locator(selector).boundingBox();
+    expect(box.y + box.height).toBeLessThan(900);
+  }
+});
+});

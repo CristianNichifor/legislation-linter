@@ -1905,7 +1905,9 @@
   <footer>
     <span data-i18n="footer">Verificări deterministe, fiecare cu sursa ei — fără model de limbaj. Panoul din dreapta arată
     aceleași legături ca graf (rotița mărește, tragi ca să miști, clic pe un nod ca să-i vezi vecinii).</span>
-    <a href="confidentialitate.html" data-i18n="privacy">Confidențialitate</a>
+    <a href="confidentialitate.html" data-i18n="privacy">Confidențialitate</a> ·
+    <a href="https://github.com/CristianNichifor/legislation-linter" data-i18n="footer.source">Cod sursă și metodă</a> ·
+    <a href="https://github.com/CristianNichifor/legislation-linter/issues" data-i18n="footer.contact">Contact</a>
   </footer>
 </div>
 <button id="totop" title="Sus" aria-label="Înapoi sus">↑</button>
@@ -2078,7 +2080,7 @@ function datasetFreshness(dataSet, now=Date.now()){
 function datasetFreshnessHtml(dataSet){
   const f=datasetFreshness(dataSet);
   if(!f) return "";
-  return ` · <span data-dataset-date>date la zi pe <b>${esc(f.date)}</b></span>`
+  return ` · <span data-dataset-date>date la zi pe <b>${esc(isoLaDataRo(f.date)||f.date)}</b></span>`
     +(f.stale?` <span class="stat-vechi" data-dataset-stale role="status">⚠ datele au peste 30 de zile (${nf(f.days)} zile); verifică sursa oficială înainte de concluzii</span>`:"");
 }
 function loadRezumat(){
@@ -2638,6 +2640,7 @@ const CHROME_EN = {
   "settings.hint":"Settings stay in this browser. Public legislative data and private dossiers are kept apart; updating the data does not touch dossiers.",
   "settings.privacy":": what stays on the device and which connections the page makes.",
   "privacy":"Privacy",
+  "footer.source":"Source code and method","footer.contact":"Contact",
   "footer":"Deterministic checks, each with its source — no language model. The panel on the right shows the same links as a graph (scroll to zoom, drag to move, click a node to see its neighbours)."
 };
 (function(){

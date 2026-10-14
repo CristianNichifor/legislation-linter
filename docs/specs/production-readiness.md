@@ -152,6 +152,18 @@ the data panels keep `lang="ro"`. English strings are marked *needs human review
 
 Test: `tests/test_ux_guidelines.py`.
 
+### LL-UXG-2 Footer links and a Romanian dataset date — done
+
+- Given the default view, then the footer links the privacy page, the repository (source code
+  and method) and its GitHub issues (contact).
+- Given a built dataset, then the header reads „date la zi pe zz.ll.aaaa” (DESIGN.md › Dates);
+  the manifest keeps ISO.
+- Closes deviations D-2 and D-3 in `docs/ux-guidelines.md`. „Cod sursă și metodă” and its
+  English label are agent-written: needs human review.
+
+Test: `tests/browser/static.spec.js` › "footer links source code and contact" and
+"dataset date and stale warning".
+
 ## Workflow-only (maintainer applies the diff)
 
 ### LL-1 Data store prefix not hardcoded — needs human

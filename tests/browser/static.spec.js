@@ -227,3 +227,36 @@ test('matrix is the default workspace and opens drafts in place', async ({ page 
   await expect(page.locator('#tab-matrice')).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('#pane-matrice')).toBeVisible();
 });
+
+test('one navigation, breadcrumb and hash routing', async ({ page }) => {
+  await page.goto('/');
+  const tabs = page.getByRole('tablist').getByRole('tab');
+  await expect(tabs).toHaveText(['Start', 'Verifică', 'Caută', 'Matrice', 'Dosare', 'Surse', 'Redactare', 'Setări']);
+  await expect(page.locator('.workflow-nav, [data-main-nav], [data-flow-target]')).toHaveCount(0);
+  await expect(page.getByText(/Flux (principal|zilnic)/)).toHaveCount(0);
+  const crumb = page.locator('nav.breadcrumb');
+  await expect(crumb).toBeVisible();
+  expect((await crumb.boundingBox()).height).toBeLessThan(72);
+  // Secondary tools sit one click away.
+  await page.getByRole('button', { name: 'Mai multe' }).click();
+  await page.getByRole('menuitem', { name: 'Drept UE' }).click();
+  await expect(page.locator('#pane-ue')).toBeVisible();
+  await expect(page).toHaveURL(/#ue$/);
+  await expect(page.getByRole('menuitem', { name: 'Drept UE' })).toBeHidden();
+  await page.getByRole('tab', { name: 'Verifică' }).click();
+  await expect(page).toHaveURL(/#verifica$/);
+  await expect(page.locator('#pane-lint')).toBeVisible();
+  await page.goBack();
+  await expect(page.locator('#pane-ue')).toBeVisible();
+  await page.getByRole('tab', { name: 'Dosare' }).click();
+  await expect(page).toHaveURL(/#dosare$/);
+  await expect(page.locator('#pane-matrice')).toBeVisible();
+  await expect(page.locator('#dossier-library')).toHaveAttribute('open', '');
+  await page.getByRole('tab', { name: 'Setări' }).click();
+  await expect(page.locator('#pane-setari')).toBeVisible();
+  await expect(page.locator('#pane-setari #tema-btn')).toBeVisible();
+  await expect(page.locator('#pane-setari a[href="confidentialitate.html"]')).toBeVisible();
+  await page.goto('/#cauta');
+  await expect(page.locator('#pane-cauta')).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Caută' })).toHaveAttribute('aria-selected', 'true');
+});

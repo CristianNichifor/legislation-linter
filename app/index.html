@@ -438,6 +438,15 @@
   .manual-note h5{font-size:.88rem;margin:0 0 .25rem}
   .manual-note pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:14rem;overflow:auto}
   .manual-note-meta{font-family:var(--sans);font-size:.74rem;color:var(--ink-mute);display:flex;flex-wrap:wrap;gap:.25rem .7rem;margin:.25rem 0}
+  /* One finding reads source, quote, reasoning, review state, then the hash (design screen 04). */
+  .manual-note h6{font-family:var(--sans);font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-mute);margin:.6rem 0 .2rem}
+  .manual-note .finding-target{font-family:var(--mono,ui-monospace,monospace);font-size:.8rem;margin:0 0 .25rem}
+  .manual-note blockquote.finding-quote{margin:0 0 .3rem;padding:.35rem .7rem;border-left:3px solid var(--rule);white-space:pre-wrap;overflow-wrap:anywhere;max-height:14rem;overflow:auto}
+  .manual-note .finding-reasoning{white-space:pre-wrap;margin:0}
+  .manual-note .finding-review{border:1px solid var(--rule-soft);border-radius:6px;padding:.4rem .7rem .5rem;margin:.6rem 0 .3rem;font-family:var(--sans);font-size:.8rem}
+  .manual-note .finding-review legend{font-weight:600;padding:0 .3rem}
+  .manual-note .finding-review label{display:inline-flex;align-items:center;gap:.35rem;min-height:1.6rem;margin:0 .9rem .15rem 0}
+  .manual-note .finding-review input{margin:0}
   .manual-note-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.4rem;margin:.55rem 0}
   .manual-note-summary button{text-align:left;white-space:normal;overflow-wrap:anywhere}
   .daily-workflow{border-block:1px solid var(--rule);padding:.7rem 0;margin:.2rem 0 .9rem}
@@ -5693,16 +5702,34 @@ function manualNoteFilename(note){
     .replace(/^-+|-+$/g,'').slice(0,80)||'nota-dosar';
   return stem+'.md';
 }
+function manualNoteReviewMissing(note){
+  if(note.status!=='reviewed'&&note.status!=='resolved')return [];
+  const missing=[];
+  if(!String(note.evidence_quote||'').trim())missing.push('citat dovadă');
+  if(!String(note.source_url||note.source_hash||'').trim())missing.push('sursă sau SHA-256');
+  if(!String(note.reasoning||'').trim())missing.push('raționament');
+  return missing;
+}
+// Design screen 04 / UX-6: a finding reads source, quote, reasoning and review state in that
+// order, the hash last behind <details>; the state is a radio group saved on change. No
+// verdict words: the note is a reviewable working note, not a legal conclusion.
 function manualNoteHtml(note,index){
-  const source=note.source_url?` · <a href="${esc(note.source_url)}" target="_blank" rel="noopener">sursa</a>`:'';
+  const dateRo=value=>{const d=new Date(value);return Number.isNaN(d.getTime())?'—':new Intl.DateTimeFormat('ro-RO',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'UTC'}).format(d);};
+  const sourceText=url=>{try{const u=new URL(url);return u.host+u.pathname.replace(/\/$/,'');}catch{return url;}};
   const canOpen=note.act_id&&note.locator;
   const exportLabel=note.export_markdown?'Exportă nota UE':'Exportă nota';
-  return `<article class="manual-note" data-note-index="${index}"><h5>${esc(note.title)}</h5>`
-    +`<div class="manual-note-meta"><span>${esc(MANUAL_NOTE_TYPES[note.type]||note.type)}</span><span>${esc(MANUAL_NOTE_STATUS[note.status]||note.status)}</span><span>Revizia ${esc(note.revizie)}</span><span>Modificat: ${esc(dossierTime(note.modificat_la))}</span></div>`
-    +`<p>${esc([note.act_id,note.locator].filter(Boolean).join(' · ')||'Fără act sau locator atașat')}${source}</p>`
-    +(note.source_hash?`<p class="hint">SHA-256 sursă: ${esc(note.source_hash)}</p>`:'')
-    +(note.evidence_quote?`<details open><summary>Citat dovadă</summary><pre>${esc(note.evidence_quote)}</pre></details>`:'')
-    +(note.reasoning?`<details open><summary>Raționament</summary><pre>${esc(note.reasoning)}</pre></details>`:'')
+  const source=note.source_url
+    ?`<a href="${esc(note.source_url)}" target="_blank" rel="noopener">${esc(sourceText(note.source_url))}</a>`
+    :(note.source_hash?'doar SHA-256 (vezi detaliile tehnice)':'nespecificată');
+  const review=Object.entries(MANUAL_NOTE_STATUS).map(([key,label])=>`<label><input type="radio" name="note_status_${index}" value="${key}" ${key===note.status?'checked':''}> ${esc(label)}</label>`).join('');
+  return `<article class="manual-note" data-note-index="${index}" data-finding="${esc(note.id||'')}"><h5>${esc(note.title)}</h5>`
+    +`<div class="manual-note-meta"><span>${esc(MANUAL_NOTE_TYPES[note.type]||note.type)}</span><span data-note-status="${esc(note.status||'')}">${esc(MANUAL_NOTE_STATUS[note.status]||note.status)}</span><span>Revizia ${esc(note.revizie)}</span><span data-reviewed-at>Ultima revizie: ${esc(dateRo(note.modificat_la))}</span></div>`
+    +`<h6>Dovada</h6><p class="finding-target">${esc([note.act_id,note.locator].filter(Boolean).join(' · ')||'Fără act sau locator atașat')}</p>`
+    +(note.evidence_quote?`<blockquote class="finding-quote" aria-label="Citat dovadă">${esc(note.evidence_quote)}</blockquote>`:'<p class="hint">Citat dovadă: lipsește.</p>')
+    +`<p class="hint finding-source">Sursa: ${source}</p>`
+    +(note.reasoning?`<h6>Raționament</h6><p class="finding-reasoning">${esc(note.reasoning)}</p>`:'')
+    +`<fieldset class="finding-review" role="radiogroup" aria-labelledby="note-review-${index}" data-note-review><legend id="note-review-${index}">Stare de verificare</legend>${review}</fieldset>`
+    +(note.source_hash?`<details class="finding-tech"><summary>Detalii tehnice</summary><p class="hint">SHA-256 sursă: ${esc(note.source_hash)}</p></details>`:'')
     +`<div class="dossier-actions"><button type="button" class="ghost mini" data-edit-note>Editează nota</button><button type="button" class="ghost mini" data-note-draft-selected>Draft din dovadă</button><button type="button" class="ghost mini" data-copy-note-export>Copiază Markdown</button><button type="button" class="ghost mini" data-download-note-export>${esc(exportLabel)}</button>${canOpen?'<button type="button" class="ghost mini" data-open-note-source>Deschide prevederea</button>':''}</div><div data-note-source></div></article>`;
 }
 function manualNoteFormHtml(editing=null){
@@ -6832,6 +6859,25 @@ async function loadManualNotes(dossierId,offset=0){
     host.querySelector('[data-notes-prev]').onclick=()=>loadManualNotes(dossierId,Math.max(0,offset-50));
     host.querySelector('[data-notes-next]').onclick=()=>loadManualNotes(dossierId,offset+50);
     host.querySelectorAll('[data-edit-note]').forEach(button=>button.onclick=()=>{MANUAL_NOTES_UI.editing=data.note[Number(button.closest('[data-note-index]').dataset.noteIndex)];loadManualNotes(dossierId,offset);});
+    host.querySelectorAll('[data-note-review] input[type="radio"]').forEach(radio=>radio.onchange=async()=>{
+      const note=data.note[Number(radio.closest('[data-note-index]').dataset.noteIndex)];
+      const next={...note,status:radio.value};
+      const missing=manualNoteReviewMissing(next);
+      const status=host.querySelector('[data-note-list-status]');
+      if(missing.length){
+        const previous=radio.closest('[data-note-review]').querySelector(`input[value="${note.status}"]`);
+        if(previous)previous.checked=true;else radio.checked=false;
+        status.textContent='Nu marca nota „'+(MANUAL_NOTE_STATUS[radio.value]||radio.value)+'” fără: '+missing.join(', ')+'.';return;
+      }
+      const group=radio.closest('[data-note-review]');group.querySelectorAll('input').forEach(i=>i.disabled=true);
+      try{
+        await dossierApi('/api/dosare/note',{id:note.id,dosar_id:dossierId,revizie:note.revizie,title:note.title,type:note.type,act_id:note.act_id,locator:note.locator,evidence_quote:note.evidence_quote,source_url:note.source_url,source_hash:note.source_hash,reasoning:note.reasoning,status:radio.value});
+        await loadManualNotes(dossierId,offset);
+        // The reload rewrote the list and its status line; say what just happened on the new one.
+        const after=host.querySelector('[data-note-list-status]');if(after)after.textContent='Starea notei a fost salvată.';
+      }
+      catch(err){group.querySelectorAll('input').forEach(i=>i.disabled=false);status.textContent=err.message+' Reîncarcă nota dacă a fost modificată în altă fereastră.';}
+    });
     host.querySelectorAll('[data-note-draft-selected]').forEach(button=>button.onclick=()=>{
       const note=data.note[Number(button.closest('[data-note-index]').dataset.noteIndex)];
       if(!manualNoteDraftReady(note)){host.querySelector('[data-note-list-status]').textContent='Nota are nevoie de citat și URL sau SHA-256 înainte de ciornă.';return;}
@@ -6867,8 +6913,11 @@ async function loadManualNotes(dossierId,offset=0){
       e.preventDefault();if(!form.reportValidity())return;
       const missing=manualNoteSelfReviewMissing(form);
       if(missing.length){saveStatus.textContent='Nu marca nota auto-revizuită fără: '+missing.join(', ')+'.';return;}
+      // Read the form before locking it: a disabled control is left out of FormData, and the
+      // payload built after the lock reached the store with every field missing („Cerere invalidă”).
+      const payload=manualNotePayload(form,dossierId,MANUAL_NOTES_UI.editing);
       const controls=[...form.elements];controls.forEach(c=>c.disabled=true);saveStatus.textContent='Salvez nota…';
-      try{const saved=await dossierApi('/api/dosare/note',manualNotePayload(form,dossierId,MANUAL_NOTES_UI.editing));MANUAL_NOTES_UI.editing=saved;await loadManualNotes(dossierId,0);}
+      try{const saved=await dossierApi('/api/dosare/note',payload);MANUAL_NOTES_UI.editing=saved;await loadManualNotes(dossierId,0);}
       catch(err){saveStatus.textContent=err.message+' Reîncarcă nota dacă a fost modificată în altă fereastră.';controls.forEach(c=>c.disabled=false);}
     };
   }catch(err){if(valid()){host.innerHTML='<details class="manual-notes" open><summary>Note manuale</summary><p role="status">'+esc(err.message)+'</p><button type="button" class="ghost mini" data-notes-retry>Reîncearcă notele</button></details>';host.querySelector('[data-notes-retry]').onclick=()=>loadManualNotes(dossierId,offset);}}

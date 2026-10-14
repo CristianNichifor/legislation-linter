@@ -1,16 +1,15 @@
 import { test, expect } from '@playwright/test';
 
 // LL-9: the evidence-to-draft flow with the user's own provider (BYOK), end to end in the real
-// static app. The provider is mocked with page.route, so no key and no text leave the test.
-// The mock lives on the app's own origin, set through the endpoint field the settings pane
-// offers for exactly this (a proxy or a self-hosted provider): a cross-origin endpoint needs a
-// CORS preflight, and Playwright's WebKit does not route preflights, so the OPTIONS went to the
-// real api.openai.com, came back 401 without allow-origin headers, and the browser dropped the
-// POST before any route saw it. Same origin, no preflight, every engine routes the request.
+// static app. The provider is the test server itself (tests/browser/serve_static.py, the
+// /byok-mock/ routes), reached through the endpoint field the settings pane offers for a proxy or
+// a self-hosted provider, so no key and no text leave the test. A page.route mock was tried
+// first: WebKit never handed these requests to it, neither cross-origin (the preflight went to
+// the real api.openai.com) nor same-origin (the POST reached the static server), so the stand-in
+// lives in the server and every engine runs the same HTTP.
 const PROVIDER_PATH = '/byok-mock/v1/chat/completions';
 const KEY = 'sk-test-fleet-never-sent-anywhere';
 const QUOTE = 'Prezenta lege reglementează modul de realizare a achizițiilor publice.';
-const JSON_HEADERS = { 'content-type': 'application/json' };
 
 // Settings live on another pane, and leaving the dossier pane re-renders the note form (WebKit
 // does it late enough to race a click), so the provider is configured before the dossier exists.
@@ -57,13 +56,17 @@ async function preparePrompt(panel) {
   await expect(panel.locator('[data-ai-send-note]')).toBeEnabled();
 }
 
-function mockProvider(page, handler) {
-  const calls = [];
-  return page.route(`**${PROVIDER_PATH}`, async route => {
-    const request = route.request();
-    calls.push({ headers: request.headers(), body: request.postDataJSON() });
-    return handler(route, calls);
-  }).then(() => calls);
+// Picks the provider's answer for the calls that follow and clears the recorded ones.
+async function providerMode(page, mode) {
+  const response = await page.request.get(`/byok-mock/mode/${mode}`);
+  expect(response.ok()).toBe(true);
+}
+
+// What the app sent since the last providerMode: [{ headers, body }], oldest first.
+async function providerCalls(page) {
+  const response = await page.request.get('/byok-mock/calls');
+  expect(response.ok()).toBe(true);
+  return response.json();
 }
 
 async function run(panel, page, { accept = true } = {}) {
@@ -80,22 +83,19 @@ async function run(panel, page, { accept = true } = {}) {
 
 test('byok draft from evidence: consent, provider call, audit and citations', async ({ page }) => {
   test.setTimeout(240_000);
-  const calls = await mockProvider(page, route => route.fulfill({
-    status: 200, headers: JSON_HEADERS,
-    body: JSON.stringify({ choices: [{ message: { content:
-      'Conform [1], legea reglementează realizarea achizițiilor publice. Termenul rămâne de verificat în textul sursă [1].' } }] }),
-  }));
   await setOnlineProvider(page);
+  await providerMode(page, 'ok');
   const { panel } = await openDossierWithEvidence(page);
   await preparePrompt(panel);
   // Declining the consent sends nothing.
   await run(panel, page, { accept: false });
   await expect(panel.locator('[data-ai-draft-status]')).toContainText('Anulat — promptul nu a fost trimis.');
-  expect(calls).toEqual([]);
+  expect(await providerCalls(page)).toEqual([]);
   // Accepting it sends the prompt once, with the key as a header, to the chosen endpoint only.
   await run(panel, page);
   const result = panel.locator('[data-ai-draft-result]');
   await expect(result).toContainText('[Ciornă AI · online_byok · OpenAI / gpt-5-mini ·');
+  const calls = await providerCalls(page);
   expect(calls).toHaveLength(1);
   expect(calls[0].headers.authorization).toBe(`Bearer ${KEY}`);
   expect(calls[0].body.model).toBe('gpt-5-mini');
@@ -116,13 +116,8 @@ test('byok draft from evidence: consent, provider call, audit and citations', as
 
 test('byok failure states: missing key, rejected key, quota and timeout create no draft', async ({ page }) => {
   test.setTimeout(240_000);
-  let mode = 'bad_key';
-  const calls = await mockProvider(page, route => {
-    if (mode === 'bad_key') return route.fulfill({ status: 401, headers: JSON_HEADERS, body: JSON.stringify({ error: { message: 'Incorrect API key provided' } }) });
-    if (mode === 'quota') return route.fulfill({ status: 429, headers: JSON_HEADERS, body: JSON.stringify({ error: { message: 'Rate limit reached' } }) });
-    return new Promise(() => {}); // timeout: the provider never answers
-  });
   await setOnlineProvider(page, { key: '' });
+  await providerMode(page, 'bad_key');
   const { panel } = await openDossierWithEvidence(page);
   const guardrail = panel.locator('[data-ai-guardrail-summary]');
   const status = panel.locator('[data-ai-draft-status]');
@@ -145,26 +140,26 @@ test('byok failure states: missing key, rejected key, quota and timeout create n
   await expect(guardrail).toContainText('Retry: nu');
   expect(unexpected).toEqual([]);
   page.off('dialog', noConsent);
-  expect(calls).toEqual([]);
+  expect(await providerCalls(page)).toEqual([]);
   // The provider rejects the key. The settings field keeps the key in sessionStorage only; it is
   // set there directly so the filled note is not re-rendered by a trip to the settings pane.
   await page.evaluate(key => sessionStorage.setItem('ai_key_openai', key), KEY);
   await run(panel, page);
   await expectFailure('cheie invalidă');
-  expect(calls).toHaveLength(1);
+  expect(await providerCalls(page)).toHaveLength(1);
   // The provider reports quota or rate limit; the user may retry.
-  mode = 'quota';
+  await providerMode(page, 'quota');
   await run(panel, page);
   await expectFailure('cotă/rate limit');
   await expect(guardrail).toContainText('Retry: da');
-  expect(calls).toHaveLength(2);
+  expect(await providerCalls(page)).toHaveLength(1);
   // The provider never answers within the configured wait.
-  mode = 'timeout';
+  await providerMode(page, 'timeout');
   await run(panel, page);
   await expect(status).toContainText('se trimite la furnizorul online BYOK');
   await expectFailure('timeout');
   await expect(guardrail).toContainText('Furnizorul nu a răspuns la timp.');
-  expect(calls).toHaveLength(3);
+  expect(await providerCalls(page)).toHaveLength(1);
   // The raw provider messages are never shown or stored.
   await expect(panel).not.toContainText('Incorrect API key');
   await expect(panel).not.toContainText('Rate limit reached');

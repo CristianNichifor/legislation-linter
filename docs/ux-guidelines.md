@@ -108,6 +108,7 @@ Exactly one of: **Date reale** (Live data) · **Date demonstrative** (Demo data)
 | Footer links source code and contact | `tests/browser/static.spec.js` › "footer links source code and contact" |
 | English chrome syncs `lang` | `tests/browser/static.spec.js` › "english chrome toggle syncs html lang" |
 | Phone and desktop baseline | `tests/browser/baseline.spec.js` |
+| Reduced motion stops the spinner; forced colours keep the tab rail, focus and borders | `tests/browser/baseline.spec.js` › "reduced motion and forced colours keep state visible" |
 
 `tests/test_ux_guidelines.py` fails when a test file or a test title named here no longer
 exists.
@@ -126,7 +127,9 @@ and 390 px were not taken in this pass. Items in files other sessions were editi
 - **D-4** No status badge from §7; the fixtures demo is not marked as demo data.
 - **D-5** Mobile tab list (live review): eight tabs plus „Mai multe” at 390 px; check with
   a screenshot and make it one scrollable row with a visible scroll cue if it wraps.
-- **D-6** No forced-colours or reduced-motion test.
+- ~~**D-6** No forced-colours or reduced-motion test.~~ Fixed: forced-colours rules in
+  `app/civic-ui-adapter.css` and a baseline test (spec item deferred to the readiness spec once
+  the open pull requests that edit it merge).
 - **D-7** Matrix workspace polish (UX-5): filters by domain, source family, lifecycle,
   quality and issue type; row density on a phone.
 - **D-8** Deeper panels (cockpit, tracker review, rule drafts) still show machine terms

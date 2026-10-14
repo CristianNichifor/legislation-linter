@@ -38,7 +38,7 @@ in this area" (LL-4, LL-FORM).
 4. One navigation: Start · Verifică · Caută · Matrice · Dosare · Surse · Redactare · Setări,
    the rest under „Mai multe”; a one-line breadcrumb; the tab in the URL hash (LL-NAV).
 5. The pane's primary task first, then evidence, then details behind `<details>`.
-6. Footer: method, privacy, source, contact. *Only privacy is linked today — D-2.*
+6. Footer: privacy, source code and method (the repository README), contact (GitHub issues).
 
 ## 3. Content rules
 
@@ -54,7 +54,6 @@ in this area" (LL-4, LL-FORM).
   „necesită verificare umană”.
 - Absence of data is shown as a coverage state, never as absence of a problem.
 - Dates: `zz.ll.aaaa` for readers (DESIGN.md › Dates), ISO only on the wire.
-  *The header shows ISO — D-3.*
 - Numbers: `ro-RO` grouping (`toLocaleString("ro")`).
 - Assisted or AI text is labelled unreviewed until a human accepts it (UX-6, UX-7).
 
@@ -106,6 +105,7 @@ Exactly one of: **Date reale** (Live data) · **Date demonstrative** (Demo data)
 | Engine never hangs; retry and cancel | `tests/browser/static.spec.js` › "engine timeout, progress and cancel" |
 | Labels, 24 px targets, check-first layout | `tests/browser/static.spec.js` › "form labels, target size and check-first layout" |
 | Dataset date and stale warning | `tests/browser/static.spec.js` › "dataset date and stale warning", `tests/test_dossier_ui.py` |
+| Footer links source code and contact | `tests/browser/static.spec.js` › "footer links source code and contact" |
 | English chrome syncs `lang` | `tests/browser/static.spec.js` › "english chrome toggle syncs html lang" |
 | Phone and desktop baseline | `tests/browser/baseline.spec.js` |
 
@@ -121,10 +121,8 @@ and 390 px were not taken in this pass. Items in files other sessions were editi
 - **D-1** No family bar back to the hub; the hub says "Legislation Linter", the H1
   „Ce spune legea despre proiectul tău”, the docs "Legislativ" and the repo
   `legislation-linter`. Needs a naming decision and the hub URL.
-- **D-2** The footer links only the privacy page; add method (README / docs), source code
-  and contact (GitHub issues).
-- **D-3** The header dataset date is ISO („date la zi pe 2026-09-08”), against DESIGN.md
-  › Dates; show `zz.ll.aaaa`.
+- ~~**D-2** The footer links only the privacy page.~~ Fixed by LL-UXG-2.
+- ~~**D-3** The header dataset date is ISO.~~ Fixed by LL-UXG-2.
 - **D-4** No status badge from §7; the fixtures demo is not marked as demo data.
 - **D-5** Mobile tab list (live review): eight tabs plus „Mai multe” at 390 px; check with
   a screenshot and make it one scrollable row with a visible scroll cue if it wraps.

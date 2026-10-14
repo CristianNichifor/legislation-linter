@@ -227,6 +227,20 @@ screens are implemented.
   acts present but no candidate problem gives `data-coverage-state="none"` with the act count.
 
 Test: `tests/browser/matrix.spec.js` (static suite). Phone row density (D-7) stays open.
+### LL-DS-2 Verifică: staged progress and a timeout that keeps the text — done
+
+- Given a running check, then `#lint-out` holds an `aria-live="polite"` section with a
+  `role="progressbar"` (0–3) and an ordered list of three named steps — Pornesc motorul,
+  Verific textul, Caut actele atinse — the current one marked, a cancel button and the sentence
+  „Dacă durează peste 20 s, oprim singuri și îți spunem ce s-a întâmplat.”
+- Given the engine has answered, when the check itself takes over 20 s, then the result area says
+  „Verificarea a durat peste 20 s și a fost oprită. Textul tău e păstrat.” with a retry; a check
+  still waiting on a starting engine keeps LL-ENGINE's message.
+- Given the findings have rendered, then a `role="status"` line „Caut actele atinse…” stays above
+  them until the reach and EU lookups have both answered.
+
+Test: `tests/browser/static.spec.js` › "engine timeout, progress and cancel" (steps, progress bar,
+live region).
 ### LL-DS-4 Dossier finding anatomy — done
 
 - Given a note in a dossier, then it reads, in DOM order: act and locator, the quote as a

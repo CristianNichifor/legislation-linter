@@ -1255,6 +1255,17 @@
     font-family:var(--sans);font-size:.78rem;font-weight:600;letter-spacing:.01em;vertical-align:1px;white-space:nowrap}
   .stat-badge[data-dataset-status="demonstrative"]{color:var(--blocking);border-color:currentColor}
   .lint-progress{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-family:var(--sans);font-size:.85rem;margin:.6rem 0}
+  /* Design screen 02: the check reads as three named steps on a progress bar, not a spinner alone. */
+  .lint-run{font-family:var(--sans);font-size:.85rem;margin:.6rem 0}
+  .lint-run h3{font-size:.95rem;margin:0 0 .4rem}
+  .lint-prog{height:.4rem;border-radius:999px;background:var(--sunk);border:1px solid var(--rule-soft);overflow:hidden;margin:.3rem 0 .5rem}
+  .lint-prog span{display:block;height:100%;background:var(--accent);transition:width .3s}
+  .lint-steps{margin:0 0 .5rem;padding-left:1.3rem}
+  .lint-steps li{margin:.15rem 0;color:var(--ink-mute)}
+  .lint-steps li.now{color:var(--ink);font-weight:600}
+  .lint-steps li.done{color:var(--ink)}
+  .lint-steps li.done::marker{content:"✓ "}
+  .lint-run .row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
   .spin{display:inline-block;width:.9rem;height:.9rem;border:2px solid var(--rule);
     border-top-color:var(--accent);border-radius:50%;animation:s .7s linear infinite;vertical-align:-1px}
   @keyframes s{to{transform:rotate(360deg)}}
@@ -3038,17 +3049,31 @@ function renderOpinie(r){
   return h;
 }
 
-// Staged progress and a way out: the first check may wait for the in-browser engine to start.
+// Staged progress and a way out (design screen 02, LL-ENGINE): three named steps on a progress
+// bar in a live region, and a cancel button. Step 1 waits for the in-browser engine, step 2 is the
+// check itself, step 3 the reach and EU lookups that follow the result.
+const LINT_STEPS=["Pornesc motorul","Verific textul","Caut actele atinse"];
+const LINT_TIMEOUT_MS=20000;
 function lintProgress(cancel){
-  const box=document.createElement("div");box.className="lint-progress";box.setAttribute("role","status");
-  const stage=()=>window.legislativEngine&&window.legislativEngine.state==="starting"
-    ?"Pornesc motorul de verificare în browser…":"Verific textul…";
-  box.innerHTML=`<span class="spin"></span> <span data-lint-stage>${stage()}</span> `
-    +`<button type="button" class="ghost mini" data-lint-cancel>Anulează</button>`;
-  const update=()=>{const node=box.querySelector("[data-lint-stage]");if(node)node.textContent=stage();};
+  const box=document.createElement("section");box.className="lint-run";box.setAttribute("aria-live","polite");
+  let step=0;
+  const engineStarting=()=>window.legislativEngine&&window.legislativEngine.state==="starting";
+  const render=()=>{
+    const now=step===0&&!engineStarting()?1:step;
+    box.innerHTML=`<h3 data-lint-stage>${esc(LINT_STEPS[Math.min(now,2)])}…</h3>`
+      +`<div class="lint-prog" role="progressbar" aria-valuemin="0" aria-valuemax="3" aria-valuenow="${now}" aria-label="Progres verificare"><span style="width:${Math.round(now/3*100)}%"></span></div>`
+      +`<ol class="lint-steps">${LINT_STEPS.map((t,i)=>`<li class="${i<now?'done':i===now?'now':''}">${esc(t)}</li>`).join("")}</ol>`
+      +`<div class="row"><span class="spin"></span><button type="button" class="ghost mini" data-lint-cancel>Anulează</button>`
+      +`<span class="hint">Dacă durează peste ${LINT_TIMEOUT_MS/1000} s, oprim singuri și îți spunem ce s-a întâmplat.</span></div>`;
+    box.querySelector("[data-lint-cancel]").onclick=cancel;
+  };
+  const update=()=>render();
   window.addEventListener("legislativ-engine",update);
-  box.querySelector("[data-lint-cancel]").onclick=cancel;
-  return {box,done:()=>window.removeEventListener("legislativ-engine",update)};
+  render();
+  return {box,advance:n=>{step=n;render();},done:()=>window.removeEventListener("legislativ-engine",update)};
+}
+function lintTimedOutState(){
+  return lintRetryState(`Verificarea a durat peste ${LINT_TIMEOUT_MS/1000} s și a fost oprită. Textul tău e păstrat.`);
 }
 function lintRetryState(message){
   const box=document.createElement("div");
@@ -3067,18 +3092,34 @@ $("#go").onclick = async ()=>{
   $("#go").disabled=true; $("#go").innerHTML=`<span class="spin"></span> se verifică…`;
   $("#lint-out").replaceChildren(progress.box);
   const t0=performance.now();
+  let timedOut=false, watchdog=null;
+  // Once the engine answers, the check itself gets LINT_TIMEOUT_MS; a check that waits on a
+  // starting engine keeps the engine's own timeout and message (ENGINE_FAILED).
+  const timeoutPromise=new Promise((_,reject)=>{
+    const arm=()=>{ if(watchdog) return; watchdog=setTimeout(()=>{timedOut=true;reject(new Error("timed out"));},LINT_TIMEOUT_MS); };
+    if(!(window.legislativEngine&&window.legislativEngine.state==="starting")) arm();
+    else window.addEventListener("legislativ-engine",e=>{ if(e.detail?.state==="ready") arm(); },{once:true});
+  });
   try{
     const opt={method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({draft})};
-    const result = await Promise.race([fetch("/api/lint",opt).then(apiJson),cancelPromise]);
+    const result = await Promise.race([fetch("/api/lint",opt).then(apiJson),cancelPromise,timeoutPromise]);
+    progress.advance(2);
     renderLint(result);
-    // impact (reach) loads on its own, so a slow corpus count never delays the lint results
-    fetch("/api/impact",opt).then(ri=>ri.ok?ri.json():null).then(im=>{
-      const html=im?renderImpact(im):""; if(html) insertLintSection("sec-impact", html);
-    }).catch(()=>{});
-    // EU retrieval is also separate: it is useful context, but not part of the blocking lint gate.
-    fetch("/api/ue",opt).then(ri=>ri.ok?ri.json():null).then(ue=>{
-      const html=ue?renderUEInline(ue):""; if(html) insertLintSection("sec-drept-ue", html);
-    }).catch(()=>{});
+    // Step 3 in the result area: reach and EU context load on their own, so a slow corpus count
+    // never delays the findings; the line goes away when both have answered.
+    const reach=document.createElement("p"); reach.className="hint"; reach.setAttribute("role","status"); reach.dataset.lintReach="";
+    reach.innerHTML=`<span class="spin"></span> ${esc(LINT_STEPS[2])}…`;
+    $("#lint-out").prepend(reach);
+    const settle=[
+      fetch("/api/impact",opt).then(ri=>ri.ok?ri.json():null).then(im=>{
+        const html=im?renderImpact(im):""; if(html) insertLintSection("sec-impact", html);
+      }).catch(()=>{}),
+      // EU retrieval is also separate: it is useful context, but not part of the blocking lint gate.
+      fetch("/api/ue",opt).then(ri=>ri.ok?ri.json():null).then(ue=>{
+        const html=ue?renderUEInline(ue):""; if(html) insertLintSection("sec-drept-ue", html);
+      }).catch(()=>{}),
+    ];
+    Promise.all(settle).then(()=>reach.remove());
     const ms=performance.now()-t0;
     const s=document.createElement("p"); s.className="hint"; s.style.margin=".4rem 0 0";
     s.textContent="verificat în "+(ms<1000?Math.round(ms)+" ms":(ms/1000).toFixed(1)+" s");
@@ -3086,10 +3127,11 @@ $("#go").onclick = async ()=>{
   }catch(e){
     const message=String(e&&e.message||e);
     if(cancelled) $("#lint-out").replaceChildren(lintRetryState("Verificare anulată. Textul a rămas în editor."));
+    else if(timedOut) $("#lint-out").replaceChildren(lintTimedOutState());
     else if(engineFailed(message)) $("#lint-out").replaceChildren(lintRetryState(ENGINE_FAILED+" ("+message+")"));
     else $("#lint-out").innerHTML = empty("Eroare: "+esc(message));
   }
-  finally{ progress.done(); $("#go").disabled=false; $("#go").textContent="Verifică"; }
+  finally{ if(watchdog) clearTimeout(watchdog); progress.done(); $("#go").disabled=false; $("#go").textContent="Verifică"; }
 };
 
 // ---- draft assistant: structured act picker (tip/număr/an) → citation + corpus lookup ----

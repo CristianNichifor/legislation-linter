@@ -11,9 +11,21 @@ const CORS = {
   'access-control-allow-methods': 'POST, OPTIONS',
 };
 
-async function openDossierWithEvidence(page) {
-  await page.goto('/#dosare');
+// Settings live on another pane, and leaving the dossier pane re-renders the note form (WebKit
+// does it late enough to race a click), so the provider is configured before the dossier exists.
+async function setOnlineProvider(page, { key = KEY, seconds = 5 } = {}) {
+  await page.goto('/#consolidat');
   await expect(page.locator('#stat')).toContainText('4 acte');
+  await page.locator('#ai-mode').selectOption('online');
+  await page.locator('#ai-provider').selectOption('openai');
+  await expect(page.locator('#ai-key')).toBeVisible();
+  await page.locator('#ai-key').fill(key);
+  await page.locator('#ai-timeout').fill(String(seconds));
+  await expect(page.locator('#ai-contract')).toContainText(key ? 'cheie în sesiune' : 'cheie lipsă');
+}
+
+async function openDossierWithEvidence(page) {
+  await page.evaluate(() => { location.hash = 'dosare'; });
   await expect(page.locator('#dossier-library')).toHaveAttribute('open', '');
   const create = page.locator('#dossier-create');
   // The "Dosar nou" section may already be open when no dossier exists; opening is idempotent.
@@ -41,16 +53,6 @@ async function preparePrompt(panel) {
   await expect(card).toContainText('lege-98-2016 / art. 1');
   await expect(card).toContainText('Aprobare externă: obligatorie');
   await expect(panel.locator('[data-ai-send-note]')).toBeEnabled();
-}
-
-async function setOnlineProvider(page, { key = KEY, seconds = 5 } = {}) {
-  await page.evaluate(() => { location.hash = 'consolidat'; });
-  await page.locator('#ai-mode').selectOption('online');
-  await page.locator('#ai-provider').selectOption('openai');
-  await expect(page.locator('#ai-key')).toBeVisible();
-  await page.locator('#ai-key').fill(key);
-  await page.locator('#ai-timeout').fill(String(seconds));
-  await expect(page.locator('#ai-contract')).toContainText(key ? 'cheie în sesiune' : 'cheie lipsă');
 }
 
 function mockProvider(page, handler) {
@@ -82,9 +84,8 @@ test('byok draft from evidence: consent, provider call, audit and citations', as
     body: JSON.stringify({ choices: [{ message: { content:
       'Conform [1], legea reglementează realizarea achizițiilor publice. Termenul rămâne de verificat în textul sursă [1].' } }] }),
   }));
-  const { panel } = await openDossierWithEvidence(page);
   await setOnlineProvider(page);
-  await page.evaluate(() => { location.hash = 'dosare'; });
+  const { panel } = await openDossierWithEvidence(page);
   await preparePrompt(panel);
   // Declining the consent sends nothing.
   await run(panel, page, { accept: false });
@@ -120,6 +121,7 @@ test('byok failure states: missing key, rejected key, quota and timeout create n
     if (mode === 'quota') return route.fulfill({ status: 429, headers: { ...CORS, 'content-type': 'application/json' }, body: JSON.stringify({ error: { message: 'Rate limit reached' } }) });
     return new Promise(() => {}); // timeout: the provider never answers
   });
+  await setOnlineProvider(page, { key: '' });
   const { panel } = await openDossierWithEvidence(page);
   const guardrail = panel.locator('[data-ai-guardrail-summary]');
   const status = panel.locator('[data-ai-draft-status]');
@@ -133,8 +135,6 @@ test('byok failure states: missing key, rejected key, quota and timeout create n
     await expect(panel.locator('[data-ai-insert-note]')).toBeDisabled();
   };
   // No key in the session: the app refuses before any request leaves the browser.
-  await setOnlineProvider(page, { key: '' });
-  await page.evaluate(() => { location.hash = 'dosare'; });
   await preparePrompt(panel);
   const unexpected = [];
   const noConsent = dialog => { unexpected.push(dialog.message()); return dialog.dismiss(); };
@@ -145,9 +145,9 @@ test('byok failure states: missing key, rejected key, quota and timeout create n
   expect(unexpected).toEqual([]);
   page.off('dialog', noConsent);
   expect(calls).toEqual([]);
-  // The provider rejects the key.
-  await setOnlineProvider(page);
-  await page.evaluate(() => { location.hash = 'dosare'; });
+  // The provider rejects the key. The settings field keeps the key in sessionStorage only; it is
+  // set there directly so the filled note is not re-rendered by a trip to the settings pane.
+  await page.evaluate(key => sessionStorage.setItem('ai_key_openai', key), KEY);
   await run(panel, page);
   await expectFailure('cheie invalidă');
   expect(calls).toHaveLength(1);

@@ -190,6 +190,7 @@ const INTERNAL_TERMS = [
   /\bpack\b/i, /AI\/BYOK\/MCP/, /\bgap\b/i, /Reîncarcă/,
   /law-matrix/, /\b[a-z]+_[a-z_]+\b/, /\bdraft\b/i,
   /\bCauta\b/, /\bFara\b/, /\bversiune noua\b/,
+  /\bcockpit/i, /\bdrilldown/i, /\blifecycle/i, /metadata-first/i,
 ];
 
 test('primary copy uses no internal terms', async ({ page }) => {
@@ -338,6 +339,52 @@ test('dataset date and stale warning', async ({ page }) => {
   await expect(stat).toContainText('date la zi pe 05.09.2026');
   await expect(page.locator('#stat [data-dataset-stale]')).toBeVisible();
   await expect(page.locator('#stat [data-dataset-stale]')).toContainText('peste 30 de zile');
+});
+
+// The Dossiers and Sources views open further panels of the same pane; their first screen is
+// primary copy too.
+test('dossiers and sources views use no internal terms', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('[data-law-matrix-workspace-v1]')).toBeVisible();
+  for (const tab of ['#tab-dosare', '#tab-surse']) {
+    await page.locator(tab).click();
+    await expect(page.locator(tab)).toHaveAttribute('aria-selected', 'true');
+    const text = await page.locator('body').innerText();
+    expect(INTERNAL_TERMS.filter(term => term.test(text)).map(String), tab).toEqual([]);
+  }
+});
+
+// In English, everything outside the Romanian-marked data regions is English: visible text,
+// aria-label and title. Romanian is recognised by its diacritics and common short words.
+test('english mode leaves no romanian chrome', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('limba', 'en'));
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('[data-law-matrix-workspace-v1]')).toBeVisible();
+  const leftovers = await page.evaluate(() => {
+    const romanian = /[ăâîșțĂÂÎȘȚ]|\b(și|sau|niciun|dosar|fără|pentru|sus)\b/i;
+    const found = [];
+    for (const node of document.body.querySelectorAll('*')) {
+      if (node.closest('[lang="ro"],script,style')) continue;
+      for (const attribute of ['aria-label', 'title']) {
+        const value = node.getAttribute(attribute);
+        if (value && romanian.test(value)) found.push(`${node.id || node.tagName} @${attribute}: ${value}`);
+      }
+      if (node.offsetParent === null && node !== document.body) continue;
+      for (const child of node.childNodes) {
+        if (child.nodeType === Node.TEXT_NODE && romanian.test(child.textContent)) {
+          found.push(`${node.id || node.tagName}: ${child.textContent.trim()}`);
+        }
+      }
+    }
+    return found;
+  });
+  expect(leftovers).toEqual([]);
+  await expect(page.locator('#main-flow-context')).toContainText('no dossier selected');
+  await expect(page.locator('#totop')).toHaveAttribute('aria-label', 'Back to top');
+  await page.locator('#lang-toggle').click();
+  await expect(page.locator('#main-flow-context')).toContainText('niciun dosar ales');
+  await expect(page.locator('#totop')).toHaveAttribute('aria-label', 'Înapoi sus');
 });
 
 test('english chrome toggle syncs html lang', async ({ page }) => {

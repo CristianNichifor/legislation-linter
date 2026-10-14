@@ -135,6 +135,21 @@ Test: `tests/browser/static.spec.js` › "english chrome toggle syncs html lang"
 at the end of the navigation and names the other language in that language. The main region and
 the data panels keep `lang="ro"`. English strings are marked *needs human review*.
 
+### LL-EN English leftovers and internal terms — done
+
+- Given English mode, then no text, `aria-label` or `title` outside the `lang="ro"` regions is
+  Romanian: the flow summary, the connections panel, its toggle, the back-to-top button and the
+  language toggle's title switch with the language. The local-data panel and the workflow
+  status messages are marked `lang="ro"`, like the other data panels.
+- Given the Dossiers and Sources views, then their first screen uses none of the internal
+  terms: "Workbench surse", "Gate produs", "tracker" and "cockpit" give way to plain Romanian
+  ("Starea surselor", "Verificare de completitudine", "urmărire", "fișa proiectului"), and
+  "Reîncarcă" gives way to "Reîmprospătează".
+- The denylist also covers `cockpit`, `drilldown`, `lifecycle` and `metadata-first`.
+
+Test: `tests/browser/static.spec.js` › "english mode leaves no romanian chrome" and "dossiers
+and sources views use no internal terms"; `tests/test_app_completeness.py`. The English strings
+and the new Romanian labels need human review.
 ## Theme E: UX guidelines
 
 ### LL-UXG UX guidelines with a conformance checklist — done

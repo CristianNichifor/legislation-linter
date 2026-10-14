@@ -1496,6 +1496,7 @@ def _pagina(
     )
     shutil.copy2(ROOT / "app" / "browser-workspace.js", WEB / "browser-workspace.js")
     shutil.copy2(ROOT / "app" / "browser-generation.js", WEB / "browser-generation.js")
+    shutil.copy2(ROOT / "app" / "confidentialitate.html", WEB / "confidentialitate.html")
     # Local update controls own their unsupported-endpoint state in the shared page.
     updates = ROOT / "app" / "dataset-updates.js"
     if updates.is_file():

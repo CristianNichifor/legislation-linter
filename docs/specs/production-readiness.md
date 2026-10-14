@@ -212,3 +212,16 @@ Test: `tests/test_design_screens.py` (to add with the implementation): every fil
 README exists, has no `ş`/`ţ`, no `<script>` and no `http` request in `src=`/`href` of
 stylesheets or scripts. Acceptance criteria 1–7 in the README become browser tests when the
 screens are implemented.
+
+### LL-DS-3 Matrix filter rail, table and coverage states — done
+
+- Given the matrix pane, then `#matrix-filters` holds the five filters as
+  `select[name="domeniu"|"familie"|"ciclu"|"tip"|"calitate"]` (domain, source family, lifecycle,
+  issue type, source quality) and a „Șterge filtrele” button that resets them all.
+- Given rows, then they render as a `<table>` with seven column headers and a caption; the first
+  cell is a button with `aria-expanded` that opens the row's detail (the row itself stays a row).
+- Given a filter with no acts in the corpus, then the empty state carries
+  `data-coverage-state="missing"`, names the domain and says it is not an absence of problems;
+  acts present but no candidate problem gives `data-coverage-state="none"` with the act count.
+
+Test: `tests/browser/matrix.spec.js` (static suite). Phone row density (D-7) stays open.

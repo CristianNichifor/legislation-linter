@@ -127,7 +127,7 @@ and 390 px were not taken in this pass. Items in files other sessions were editi
 - **D-5** Mobile tab list (live review): eight tabs plus „Mai multe” at 390 px; check with
   a screenshot and make it one scrollable row with a visible scroll cue if it wraps.
 - **D-6** No forced-colours or reduced-motion test.
-- **D-7** Matrix workspace polish (UX-5): filters by domain, source family, lifecycle,
-  quality and issue type; row density on a phone.
+- **D-7** Matrix workspace polish (UX-5): row density on a phone. *The filter rail, the table
+  and the two empty states landed (LL-DS-3).*
 - **D-8** Deeper panels (cockpit, tracker review, rule drafts) still show machine terms
   (LL-5 note).

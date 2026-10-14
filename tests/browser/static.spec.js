@@ -110,3 +110,24 @@ test('cold offline context cannot load an uncached static shell', async ({ page,
   await expect(page.goto('/')).rejects.toThrow();
   expect(await context.serviceWorkers()).toEqual([]);
 });
+
+const CANONICAL = 'https://projects.cristian-nichifor.com/legislation-linter/';
+
+test('metadata, canonical and skip link', async ({ page, browserName }) => {
+  await page.goto('/');
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /.{40,}/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', CANONICAL);
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', CANONICAL);
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'website');
+  for (const property of ['og:title', 'og:description']) {
+    await expect(page.locator(`meta[property="${property}"]`)).toHaveAttribute('content', /\S/);
+  }
+  await expect(page.locator('#main')).toHaveCount(1);
+  // WebKit only moves Tab focus to links when the platform setting allows it.
+  await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
+  const skip = page.locator('a.skip-link[href="#main"]');
+  await expect(skip).toBeFocused();
+  await expect(skip).toBeVisible();
+  await skip.press('Enter');
+  await expect(page.locator('#main')).toBeFocused();
+});

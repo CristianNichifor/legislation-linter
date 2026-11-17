@@ -235,9 +235,17 @@
   border-color: var(--good);
 }
 @media (max-width: 700px) {
+  /* Type takes its own line; the two year selects share the next one instead of stacking three
+     44px controls before the first result. */
   .civic-legislativ .cauta-filtre {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .civic-legislativ .cauta-filtre > :not(.f-an) {
+    grid-column: 1 / -1;
+  }
+  .civic-legislativ .cauta-filtre select {
+    width: 100%;
   }
   .civic-legislativ .civic-workspace-nav,
   .civic-legislativ .civic-workspace-status,

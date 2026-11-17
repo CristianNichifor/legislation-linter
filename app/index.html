@@ -591,6 +591,13 @@
     .matrix-head,.matrix-row{grid-template-columns:minmax(0,1fr) 3.6rem 4.2rem 3.6rem;padding:.4rem .5rem;gap:.35rem}
     .matrix-head>:nth-child(n+5),.matrix-row>:nth-child(n+5){display:none}
     .matrix-row{font-size:.76rem}
+    /* The 12rem width above keeps the selects from each claiming a line on a wide screen. On a
+       phone it did the opposite: ten half-width selects, one per line, under a full-width search
+       box. Two equal columns halve the scroll before the first row of the matrix. */
+    .matrix-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+    .matrix-tools input{grid-column:1/-1}
+    .matrix-tools select{width:100%;padding-inline:.7rem 2rem;background-position:right .7rem center}
+    .matrix-tools button{min-height:2.5rem}
   }
   .matrix-detail{margin-top:.7rem}
   .matrix-ex{font-size:.78rem;margin:.25rem 0;padding-left:.55rem;border-left:2px solid var(--rule);
